@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 38 30% 99%;
+    --foreground: 24 56% 15%;
+    --border: 70 8% 90%;
+    --primary: 25 75% 29%;
+    --primary-foreground: 38 45% 98%;
+    --secondary: 184 33% 11%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 70 8% 94%;
+    --muted-foreground: 70 8% 45%;
+    --accent: 25 58% 66%;
+    --accent-foreground: 24 56% 15%;
+    --input: 70 8% 88%;
+    --ring: 25 75% 29%;
+    --app-font-sans: 'Manrope', sans-serif;
+    --app-font-serif: 'Cormorant Garamond', serif;
+    --radius: 0.5rem;
+  }
+  
+  body {
+    @apply bg-background text-foreground font-sans antialiased selection:bg-primary selection:text-white overflow-x-hidden;
+  }
+}
+
+@layer utilities {
+  .glass-premium {
+    @apply bg-white/70 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.05)];
+  }
+  
+  .glass-dark {
+    @apply bg-black/60 backdrop-blur-xl border border-white/5 shadow-2xl;
+  }
+
+  .text-portrait {
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+  }
+
+  .noise-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* CSS-only noise pattern for better performance and no 404s */
+    background-image: 
+      linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+    background-size: 3px 3px;
+    opacity: 0.1;
+    pointer-events: none;
+    z-index: 9999;
+    mix-blend-mode: overlay;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* Lenis Smooth Scroll Base CSS */
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
