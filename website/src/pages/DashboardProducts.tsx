@@ -278,7 +278,6 @@ export default function DashboardProducts() {
                     <Label htmlFor="imageUrl" className="text-[10px] font-black tracking-[0.2em] uppercase text-primary/80">Primary Artifact Portrait</Label>
                     <div className="flex flex-col md:flex-row gap-6 items-start">
                       <div className="flex-1 w-full space-y-4">
-                        <Input id="imageUrl" placeholder="https://... or upload artifact below" className="bg-white border border-primary/10 hover:border-primary/20 rounded-2xl py-6 px-5 text-sm tracking-wide focus:border-primary/30 focus:ring-1 focus:ring-primary/10 transition-all shadow-sm outline-none placeholder:text-muted-foreground/35" value={form.imageUrl} onChange={(e) => setForm({ ...form, imageUrl: e.target.value })} data-testid="input-image-url" />
                         <div className="relative">
                           <input
                             type="file"
