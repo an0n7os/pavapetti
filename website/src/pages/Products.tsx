@@ -190,7 +190,7 @@ export default function Products() {
             >
               All Archive
             </button>
-            {(categories ?? []).map((cat: any) => (
+            {(Array.isArray(categories) ? categories : []).map((cat: any) => (
               <button
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.name)}
@@ -245,7 +245,7 @@ export default function Products() {
               </div>
             ))}
           </div>
-        ) : (products ?? []).length === 0 ? (
+        ) : (Array.isArray(products) ? products : []).length === 0 ? (
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -275,7 +275,7 @@ export default function Products() {
             }}
             className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-16"
           >
-            {(products ?? []).map((product: any, i: number) => (
+            {(Array.isArray(products) ? products : []).map((product: any, i: number) => (
               <ProductCard key={product.id} product={product} index={i} />
             ))}
           </motion.div>

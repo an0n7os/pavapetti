@@ -358,14 +358,14 @@ export default function Home() {
               <div key={i} className="aspect-[3/4] bg-muted animate-pulse rounded-[2rem]" />
             ))}
           </div>
-        ) : (featured ?? []).length === 0 ? (
+        ) : (Array.isArray(featured) ? featured : []).length === 0 ? (
           <div className="text-center py-20 bg-secondary/30 rounded-[3rem] border border-dashed border-primary/10">
             <p className="font-serif text-2xl text-muted-foreground mb-2 italic">Awaiting Curation</p>
             <p className="text-xs uppercase tracking-widest opacity-40">Artifacts are being selected for the gallery</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-8">
-            {(featured ?? []).map((product: any, i: number) => (
+            {(Array.isArray(featured) ? featured : []).map((product: any, i: number) => (
               <ProductCard key={product.id} product={product} index={i} />
             ))}
           </div>
@@ -379,7 +379,7 @@ export default function Home() {
         </div>
         {catLoading ? <div className="grid grid-cols-2 md:grid-cols-4 gap-8">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="aspect-[3/4] bg-muted animate-pulse" />)}</div> : (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-10">
-            {(categories ?? []).slice(0, 4).map((cat: any, i: number) => {
+            {(Array.isArray(categories) ? categories : []).slice(0, 4).map((cat: any, i: number) => {
               const ROMAN_NUMERALS = ["I", "II", "III", "IV"];
               return (
                 <motion.div 
