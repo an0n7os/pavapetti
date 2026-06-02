@@ -322,10 +322,282 @@ async function parseSuccessBody(
   }
 }
 
+// --- Local Static Mock Database Fallback (for static deploys like Netlify) ---
+const FALLBACK_CATEGORIES = [
+  { id: 1, name: "Pooja Category", description: "Sacred ritual oils, dhoop, and temple essentials", imageUrl: "/hero-brass.png", productCount: 12 },
+  { id: 2, name: "Chains and Bracelets", description: "Sacred Karungali and Rudraksha silver-capped jewelry", imageUrl: "/karungali_mala.png", productCount: 15 },
+  { id: 3, name: "Elephant Heritage", description: "Majestic Netipattams and wall-hanging elephant heads", imageUrl: "/elephant_head.png", productCount: 8 },
+  { id: 4, name: "Heritage Textiles", description: "Premium Kasavu Mundu and traditional Kerala attire", imageUrl: "/hero-textile.png", productCount: 10 },
+  { id: 5, name: "Miniatures & Mini Chenda", description: "Handcrafted miniature musical instruments and icons", imageUrl: "/hero-dance.png", productCount: 20 },
+  { id: 6, name: "Fragrances & Organic Soap", description: "Temple-inspired scents and handmade organic soaps", imageUrl: "/kalabham_perfume.png", productCount: 8 },
+];
+
+const FALLBACK_PRODUCTS = [
+  {
+    id: 1,
+    name: "Pure Pooja Oil (700ml)",
+    description: "Premium blend pooja oil for daily temple rituals and lamp lighting. Smoke-free and long-lasting.",
+    price: 250,
+    mrp: 300,
+    imageUrl: "/pooja_oil.png",
+    categoryId: 1,
+    categoryName: "Pooja Category",
+    stock: 50,
+    material: "Natural Oils",
+    size: "700ml",
+    featured: true,
+    isVisible: true,
+    isNewArrival: false
+  },
+  {
+    id: 2,
+    name: "Nithya Agnihotra Dhoop",
+    description: "Traditional dhoop for daily pooja. 18 pieces per box. Purifies the atmosphere with a divine fragrance.",
+    price: 250,
+    mrp: 300,
+    imageUrl: "/dhoop.png",
+    categoryId: 1,
+    categoryName: "Pooja Category",
+    stock: 100,
+    material: "Herbal Extract",
+    size: "18 pcs",
+    featured: false,
+    isVisible: true,
+    isNewArrival: true
+  },
+  {
+    id: 3,
+    name: "Karungali Pure Silver Mala (8mm)",
+    description: "Original Karungali (Ebony wood) beads capped with 925 pure silver. A sacred shield for protection and clarity.",
+    price: 9000,
+    mrp: 9500,
+    imageUrl: "/karungali_mala.png",
+    categoryId: 2,
+    categoryName: "Chains and Bracelets",
+    stock: 5,
+    material: "Ebony Wood & 925 Silver",
+    size: "30 inch",
+    featured: true,
+    isVisible: true,
+    isNewArrival: true
+  },
+  {
+    id: 4,
+    name: "Rudraksha Pure Silver Bracelet",
+    description: "Authentic Rudraksha beads with pure silver casing. Designed for spiritual balance and modern elegance.",
+    price: 4500,
+    mrp: 5000,
+    imageUrl: "/rudraksha_bracelet.png",
+    categoryId: 2,
+    categoryName: "Chains and Bracelets",
+    stock: 15,
+    material: "Rudraksha & 925 Silver",
+    size: "Standard",
+    featured: true,
+    isVisible: true,
+    isNewArrival: false
+  },
+  {
+    id: 5,
+    name: "Ramachandran Wall Hanging Elephant Head",
+    description: "Stunning 30-inch wall-hanging elephant head inspired by the legendary 'Thechikkottukavu Ramachandran'. Hand-painted with authentic textures.",
+    price: 10000,
+    mrp: 11000,
+    imageUrl: "/elephant_head.png",
+    categoryId: 3,
+    categoryName: "Elephant Heritage",
+    stock: 3,
+    material: "High-density Fiber",
+    size: "30 inch",
+    featured: true,
+    isVisible: true,
+    isNewArrival: true
+  },
+  {
+    id: 6,
+    name: "Golden Netipattam (Small)",
+    description: "Traditional elephant caparison for home decor. Handcrafted with shimmering gold-finish details and colorful tassels.",
+    price: 1600,
+    mrp: 2500,
+    imageUrl: "/netipattam.png",
+    categoryId: 3,
+    categoryName: "Elephant Heritage",
+    stock: 20,
+    material: "Gold-finish Copper & Fabric",
+    size: "14x10 inch",
+    featured: false,
+    isVisible: true,
+    isNewArrival: false
+  },
+  {
+    id: 7,
+    name: "Premium Blue Border Mundu",
+    description: "Traditional Kerala Mundu with a sophisticated deep blue border. Woven from ultra-soft fine cotton for maximum comfort.",
+    price: 550,
+    mrp: 600,
+    imageUrl: "/hero-textile.png",
+    categoryId: 4,
+    categoryName: "Heritage Textiles",
+    stock: 40,
+    material: "Fine Cotton",
+    size: "4 meters",
+    featured: true,
+    isVisible: true,
+    isNewArrival: true
+  },
+  {
+    id: 8,
+    name: "Black Theyyam Printed Mundu",
+    description: "A bold statement piece featuring traditional Theyyam motifs. Perfect for cultural events and heritage gatherings.",
+    price: 600,
+    mrp: 700,
+    imageUrl: "/theyyam_mundu.png",
+    categoryId: 4,
+    categoryName: "Heritage Textiles",
+    stock: 25,
+    material: "Hand-printed Cotton",
+    size: "4 meters",
+    featured: false,
+    isVisible: true,
+    isNewArrival: false
+  },
+  {
+    id: 9,
+    name: "Miniature Chenda (Traditional Drum)",
+    description: "Perfectly detailed miniature of Kerala's iconic 'Chenda'. Hand-carved wood with authentic skin tensioning.",
+    price: 650,
+    mrp: 750,
+    imageUrl: "/chenda.png",
+    categoryId: 5,
+    categoryName: "Miniatures & Mini Chenda",
+    stock: 30,
+    material: "Wood & Leather",
+    size: "3 inch",
+    featured: true,
+    isVisible: true,
+    isNewArrival: true
+  },
+  {
+    id: 10,
+    name: "Kathakali Face Stand (Small)",
+    description: "Miniature hand-painted Kathakali face on a wooden stand. A classic Kerala souvenir for your bookshelf.",
+    price: 850,
+    mrp: 1000,
+    imageUrl: "/hero-dance.png",
+    categoryId: 5,
+    categoryName: "Miniatures & Mini Chenda",
+    stock: 50,
+    material: "Painted Wood",
+    size: "12 inch",
+    featured: true,
+    isVisible: true,
+    isNewArrival: false
+  },
+  {
+    id: 11,
+    name: "Divine Kalabham Perfume (50ml)",
+    description: "A signature temple fragrance capturing the essence of sandalwood and divine rituals. Long-lasting and pure.",
+    price: 1350,
+    mrp: 1500,
+    imageUrl: "/kalabham_perfume.png",
+    categoryId: 6,
+    categoryName: "Fragrances & Organic Soap",
+    stock: 12,
+    material: "Essential Oils",
+    size: "50ml",
+    featured: true,
+    isVisible: true,
+    isNewArrival: true
+  },
+  {
+    id: 12,
+    name: "Charcoal Organic Handmade Soap",
+    description: "Detoxifying handmade soap with activated charcoal and traditional oils. Chemical-free and skin-friendly.",
+    price: 200,
+    mrp: 250,
+    imageUrl: "/charcoal_soap.png",
+    categoryId: 6,
+    categoryName: "Fragrances & Organic Soap",
+    stock: 40,
+    material: "Activated Charcoal & Coconut Oil",
+    size: "100g",
+    featured: false,
+    isVisible: true,
+    isNewArrival: false
+  },
+  {
+    id: 13,
+    name: "Aranmula Kannadi Hand-Held",
+    description: "Authentic metal mirror from Aranmula. A sacred object for prosperity and beauty. Hand-held model with traditional patterns.",
+    price: 4500,
+    mrp: 5500,
+    imageUrl: "/aranmula_kannadi.png",
+    categoryId: 3,
+    categoryName: "Elephant Heritage",
+    stock: 5,
+    material: "Aranmula Metal Alloy",
+    size: "5 inch",
+    featured: true,
+    isVisible: true,
+    isNewArrival: true
+  }
+];
+
 export async function customFetch<T = unknown>(
   input: RequestInfo | URL,
   options: CustomFetchOptions = {},
 ): Promise<T> {
+  const urlStr = resolveUrl(input);
+  const isFallbackNeeded = !_baseUrl || _baseUrl === "" || window.location.hostname.includes("netlify.app");
+
+  // Intercept relative API routes in production to serve local mock arrays
+  if (isFallbackNeeded && urlStr.startsWith("/api")) {
+    const cleanUrl = urlStr.split("?")[0];
+    
+    // 1. Categories List
+    if (cleanUrl === "/api/categories") {
+      return FALLBACK_CATEGORIES as unknown as T;
+    }
+    
+    // 2. Products List
+    if (cleanUrl === "/api/products") {
+      const params = new URLSearchParams(urlStr.split("?")[1] || "");
+      const cat = params.get("category");
+      const search = params.get("search");
+      const featured = params.get("featured") === "true";
+      
+      let filtered = [...FALLBACK_PRODUCTS];
+      if (cat) filtered = filtered.filter(p => p.categoryName === cat);
+      if (search) filtered = filtered.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
+      if (featured) filtered = filtered.filter(p => p.featured);
+      
+      return filtered as unknown as T;
+    }
+    
+    // 3. Product Details
+    if (cleanUrl.match(/^\/api\/products\/\d+$/)) {
+      const id = parseInt(cleanUrl.split("/").pop() || "0", 10);
+      const p = FALLBACK_PRODUCTS.find(prod => prod.id === id);
+      if (p) return p as unknown as T;
+    }
+    
+    // 4. Featured Hero Products
+    if (cleanUrl === "/api/dashboard/featured") {
+      return FALLBACK_PRODUCTS.filter(p => p.featured) as unknown as T;
+    }
+    
+    // 5. Dashboard Statistics
+    if (cleanUrl === "/api/dashboard/stats") {
+      return {
+        totalProducts: FALLBACK_PRODUCTS.length,
+        totalCategories: FALLBACK_CATEGORIES.length,
+        featuredProducts: FALLBACK_PRODUCTS.filter(p => p.featured).length,
+        lowStockProducts: FALLBACK_PRODUCTS.filter(p => p.stock < 5).length,
+        recentProducts: FALLBACK_PRODUCTS.slice(-5).reverse()
+      } as unknown as T;
+    }
+  }
+
   input = applyBaseUrl(input);
   const { responseType = "auto", headers: headersInit, ...init } = options;
 
