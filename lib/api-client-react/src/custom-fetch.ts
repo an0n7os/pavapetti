@@ -323,7 +323,7 @@ async function parseSuccessBody(
 }
 
 // --- Local Static Mock Database Fallback (for static deploys like Netlify) ---
-const FALLBACK_CATEGORIES = [
+let FALLBACK_CATEGORIES = [
   { id: 1, name: "Pooja Category", description: "Sacred ritual oils, dhoop, and temple essentials", imageUrl: "/hero-brass.png", productCount: 12 },
   { id: 2, name: "Chains and Bracelets", description: "Sacred Karungali and Rudraksha silver-capped jewelry", imageUrl: "/karungali_mala.png", productCount: 15 },
   { id: 3, name: "Elephant Heritage", description: "Majestic Netipattams and wall-hanging elephant heads", imageUrl: "/elephant_head.png", productCount: 8 },
@@ -332,7 +332,7 @@ const FALLBACK_CATEGORIES = [
   { id: 6, name: "Fragrances & Organic Soap", description: "Temple-inspired scents and handmade organic soaps", imageUrl: "/kalabham_perfume.png", productCount: 8 },
 ];
 
-const FALLBACK_PRODUCTS = [
+let FALLBACK_PRODUCTS = [
   {
     id: 1,
     name: "Pure Pooja Oil (700ml)",
@@ -550,51 +550,449 @@ export async function customFetch<T = unknown>(
   const urlStr = resolveUrl(input);
   const isFallbackNeeded = !_baseUrl || _baseUrl === "" || window.location.hostname.includes("netlify.app");
 
-  // Intercept relative API routes in production to serve local mock arrays
+  // Read client-side Supabase credentials from Vite environment
+  const supabaseUrl = (typeof import.meta !== "undefined" && import.meta.env?.VITE_SUPABASE_URL) || "";
+  const supabaseKey = (typeof import.meta !== "undefined" && import.meta.env?.VITE_SUPABASE_ANON_KEY) || "";
+  
+  const getSupabaseHeaders = () => ({
+    "apikey": supabaseKey,
+    "Authorization": `Bearer ${supabaseKey}`,
+    "Content-Type": "application/json",
+    "Prefer": "return=representation"
+  });
+
+  // Intercept relative API routes in production to serve local mock arrays or direct Supabase REST
   if (isFallbackNeeded && urlStr.startsWith("/api")) {
     const cleanUrl = urlStr.split("?")[0];
+    const { method = "GET", body: requestBody } = options;
     
-    // 1. Categories List
+    // 1. DELETE Product
+    if (method === "DELETE" && cleanUrl.match(/^\/api\/products\/\d+$/)) {
+      const id = parseInt(cleanUrl.split("/").pop() || "0", 10);
+      
+      if (supabaseUrl && supabaseKey) {
+        try {
+          // Get category ID first to decrement count later
+          const getRes = await fetch(`${supabaseUrl}/rest/v1/products?id=eq.${id}&select=category_id`, {
+            headers: getSupabaseHeaders(),
+            method: "GET"
+          });
+          const getProducts = await getRes.json();
+          const catId = getProducts[0]?.category_id;
+
+          // Perform DELETE
+          const delRes = await fetch(`${supabaseUrl}/rest/v1/products?id=eq.${id}`, {
+            headers: getSupabaseHeaders(),
+            method: "DELETE"
+          });
+          if (!delRes.ok) {
+            throw new Error(`Failed to delete product from Supabase: ${delRes.statusText}`);
+          }
+
+          // Decrement category count if there's a category
+          if (catId) {
+            await fetch(`${supabaseUrl}/rest/v1/rpc/decrement_category_count`, {
+              headers: getSupabaseHeaders(),
+              method: "POST",
+              body: JSON.stringify({ row_id: catId })
+            });
+          }
+
+          return {} as unknown as T;
+        } catch (err) {
+          console.error("Direct Supabase DELETE error:", err);
+          throw err;
+        }
+      } else {
+        const exists = FALLBACK_PRODUCTS.some(prod => prod.id === id);
+        if (exists) {
+          FALLBACK_PRODUCTS = FALLBACK_PRODUCTS.filter(prod => prod.id !== id);
+          return {} as unknown as T;
+        }
+      }
+    }
+
+    // 2. POST Product (Create)
+    if (method === "POST" && cleanUrl === "/api/products") {
+      try {
+        const bodyData = typeof requestBody === "string" ? JSON.parse(requestBody) : requestBody;
+        
+        if (supabaseUrl && supabaseKey) {
+          // Get category name
+          let catName = "Uncategorized";
+          if (bodyData.categoryId) {
+            const catRes = await fetch(`${supabaseUrl}/rest/v1/categories?id=eq.${bodyData.categoryId}&select=name`, {
+              headers: getSupabaseHeaders(),
+              method: "GET"
+            });
+            const cats = await catRes.json();
+            catName = cats[0]?.name || "Uncategorized";
+          }
+
+          const dbProduct = {
+            name: bodyData.name,
+            description: bodyData.description,
+            price: bodyData.price,
+            mrp: bodyData.mrp,
+            image_url: bodyData.imageUrl,
+            category_id: bodyData.categoryId,
+            category_name: catName,
+            stock: bodyData.stock,
+            material: bodyData.material,
+            size: bodyData.size,
+            featured: bodyData.featured,
+            is_visible: bodyData.isVisible !== undefined ? bodyData.isVisible : true,
+            is_new_arrival: bodyData.isNewArrival || false
+          };
+
+          const postRes = await fetch(`${supabaseUrl}/rest/v1/products`, {
+            headers: getSupabaseHeaders(),
+            method: "POST",
+            body: JSON.stringify(dbProduct)
+          });
+          if (!postRes.ok) {
+            throw new Error(`Failed to create product in Supabase: ${postRes.statusText}`);
+          }
+          const createdList = await postRes.json();
+          const created = createdList[0];
+
+          // Increment category count
+          if (bodyData.categoryId) {
+            await fetch(`${supabaseUrl}/rest/v1/rpc/increment_category_count`, {
+              headers: getSupabaseHeaders(),
+              method: "POST",
+              body: JSON.stringify({ row_id: bodyData.categoryId })
+            });
+          }
+
+          return {
+            id: Number(created.id),
+            name: created.name,
+            description: created.description,
+            price: Number(created.price),
+            mrp: created.mrp ? Number(created.mrp) : undefined,
+            imageUrl: created.image_url,
+            categoryId: Number(created.category_id),
+            categoryName: created.category_name,
+            stock: Number(created.stock),
+            material: created.material,
+            size: created.size,
+            featured: Boolean(created.featured),
+            isVisible: Boolean(created.is_visible),
+            isNewArrival: Boolean(created.is_new_arrival),
+            createdAt: created.created_at
+          } as unknown as T;
+        } else {
+          const catName = FALLBACK_CATEGORIES.find(c => c.id === bodyData.categoryId)?.name || "Uncategorized";
+          const newProduct = {
+            ...bodyData,
+            id: FALLBACK_PRODUCTS.reduce((max, p) => Math.max(max, p.id), 0) + 1,
+            categoryName: catName,
+            createdAt: new Date().toISOString()
+          };
+          FALLBACK_PRODUCTS.push(newProduct);
+          return newProduct as unknown as T;
+        }
+      } catch (e) {
+        console.error("Failed to parse POST body", e);
+        throw e;
+      }
+    }
+
+    // 3. PUT Product (Update)
+    if (method === "PUT" && cleanUrl.match(/^\/api\/products\/\d+$/)) {
+      try {
+        const id = parseInt(cleanUrl.split("/").pop() || "0", 10);
+        const bodyData = typeof requestBody === "string" ? JSON.parse(requestBody) : requestBody;
+        
+        if (supabaseUrl && supabaseKey) {
+          // Get category name
+          let catName = "Uncategorized";
+          if (bodyData.categoryId) {
+            const catRes = await fetch(`${supabaseUrl}/rest/v1/categories?id=eq.${bodyData.categoryId}&select=name`, {
+              headers: getSupabaseHeaders(),
+              method: "GET"
+            });
+            const cats = await catRes.json();
+            catName = cats[0]?.name || "Uncategorized";
+          }
+
+          const dbProduct = {
+            name: bodyData.name,
+            description: bodyData.description,
+            price: bodyData.price,
+            mrp: bodyData.mrp,
+            image_url: bodyData.imageUrl,
+            category_id: bodyData.categoryId,
+            category_name: catName,
+            stock: bodyData.stock,
+            material: bodyData.material,
+            size: bodyData.size,
+            featured: bodyData.featured,
+            is_visible: bodyData.isVisible !== undefined ? bodyData.isVisible : true,
+            is_new_arrival: bodyData.isNewArrival || false
+          };
+
+          const putRes = await fetch(`${supabaseUrl}/rest/v1/products?id=eq.${id}`, {
+            headers: getSupabaseHeaders(),
+            method: "PATCH",
+            body: JSON.stringify(dbProduct)
+          });
+          if (!putRes.ok) {
+            throw new Error(`Failed to update product in Supabase: ${putRes.statusText}`);
+          }
+          const updatedList = await putRes.json();
+          const updated = updatedList[0];
+
+          return {
+            id: Number(updated.id),
+            name: updated.name,
+            description: updated.description,
+            price: Number(updated.price),
+            mrp: updated.mrp ? Number(updated.mrp) : undefined,
+            imageUrl: updated.image_url,
+            categoryId: Number(updated.category_id),
+            categoryName: updated.category_name,
+            stock: Number(updated.stock),
+            material: updated.material,
+            size: updated.size,
+            featured: Boolean(updated.featured),
+            isVisible: Boolean(updated.is_visible),
+            isNewArrival: Boolean(updated.is_new_arrival),
+            createdAt: updated.created_at
+          } as unknown as T;
+        } else {
+          const idx = FALLBACK_PRODUCTS.findIndex(prod => prod.id === id);
+          if (idx !== -1) {
+            const catName = FALLBACK_CATEGORIES.find(c => c.id === bodyData.categoryId)?.name || FALLBACK_PRODUCTS[idx].categoryName;
+            FALLBACK_PRODUCTS[idx] = {
+              ...FALLBACK_PRODUCTS[idx],
+              ...bodyData,
+              categoryName: catName
+            };
+            return FALLBACK_PRODUCTS[idx] as unknown as T;
+          }
+        }
+      } catch (e) {
+        console.error("Failed to parse PUT body", e);
+        throw e;
+      }
+    }
+
+    // 4. Categories List
     if (cleanUrl === "/api/categories") {
-      return FALLBACK_CATEGORIES as unknown as T;
+      if (supabaseUrl && supabaseKey) {
+        try {
+          const catRes = await fetch(`${supabaseUrl}/rest/v1/categories?order=id.asc`, {
+            headers: getSupabaseHeaders(),
+            method: "GET"
+          });
+          const cats = await catRes.json();
+          return cats.map((c: any) => ({
+            id: Number(c.id),
+            name: c.name,
+            description: c.description,
+            imageUrl: c.image_url,
+            productCount: Number(c.product_count),
+            createdAt: c.created_at
+          })) as unknown as T;
+        } catch (err) {
+          console.error("Direct Supabase load categories error:", err);
+          return FALLBACK_CATEGORIES as unknown as T;
+        }
+      } else {
+        return FALLBACK_CATEGORIES as unknown as T;
+      }
     }
     
-    // 2. Products List
+    // 5. Products List
     if (cleanUrl === "/api/products") {
       const params = new URLSearchParams(urlStr.split("?")[1] || "");
       const cat = params.get("category");
       const search = params.get("search");
       const featured = params.get("featured") === "true";
       
-      let filtered = [...FALLBACK_PRODUCTS];
-      if (cat) filtered = filtered.filter(p => p.categoryName === cat);
-      if (search) filtered = filtered.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
-      if (featured) filtered = filtered.filter(p => p.featured);
-      
-      return filtered as unknown as T;
+      if (supabaseUrl && supabaseKey) {
+        try {
+          let queryParams = new URLSearchParams();
+          queryParams.append("select", "*");
+          queryParams.append("order", "id.desc");
+          if (cat) queryParams.append("category_name", `eq.${cat}`);
+          if (search) queryParams.append("name", `ilike.*${search}*`);
+          if (featured) queryParams.append("featured", "eq.true");
+
+          const prodRes = await fetch(`${supabaseUrl}/rest/v1/products?${queryParams.toString()}`, {
+            headers: getSupabaseHeaders(),
+            method: "GET"
+          });
+          const prods = await prodRes.json();
+          return prods.map((p: any) => ({
+            id: Number(p.id),
+            name: p.name,
+            description: p.description,
+            price: Number(p.price),
+            mrp: p.mrp ? Number(p.mrp) : undefined,
+            imageUrl: p.image_url,
+            categoryId: Number(p.category_id),
+            categoryName: p.category_name,
+            stock: Number(p.stock),
+            material: p.material,
+            size: p.size,
+            featured: Boolean(p.featured),
+            isVisible: Boolean(p.is_visible),
+            isNewArrival: Boolean(p.is_new_arrival),
+            createdAt: p.created_at
+          })) as unknown as T;
+        } catch (err) {
+          console.error("Direct Supabase load products error:", err);
+          let filtered = [...FALLBACK_PRODUCTS];
+          if (cat) filtered = filtered.filter(p => p.categoryName === cat);
+          if (search) filtered = filtered.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
+          if (featured) filtered = filtered.filter(p => p.featured);
+          return filtered as unknown as T;
+        }
+      } else {
+        let filtered = [...FALLBACK_PRODUCTS];
+        if (cat) filtered = filtered.filter(p => p.categoryName === cat);
+        if (search) filtered = filtered.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
+        if (featured) filtered = filtered.filter(p => p.featured);
+        
+        return filtered as unknown as T;
+      }
     }
     
-    // 3. Product Details
+    // 6. Product Details
     if (cleanUrl.match(/^\/api\/products\/\d+$/)) {
       const id = parseInt(cleanUrl.split("/").pop() || "0", 10);
-      const p = FALLBACK_PRODUCTS.find(prod => prod.id === id);
-      if (p) return p as unknown as T;
+      if (supabaseUrl && supabaseKey) {
+        try {
+          const prodRes = await fetch(`${supabaseUrl}/rest/v1/products?id=eq.${id}`, {
+            headers: getSupabaseHeaders(),
+            method: "GET"
+          });
+          const prods = await prodRes.json();
+          const p = prods[0];
+          if (p) {
+            return {
+              id: Number(p.id),
+              name: p.name,
+              description: p.description,
+              price: Number(p.price),
+              mrp: p.mrp ? Number(p.mrp) : undefined,
+              imageUrl: p.image_url,
+              categoryId: Number(p.category_id),
+              categoryName: p.category_name,
+              stock: Number(p.stock),
+              material: p.material,
+              size: p.size,
+              featured: Boolean(p.featured),
+              isVisible: Boolean(p.is_visible),
+              isNewArrival: Boolean(p.is_new_arrival),
+              createdAt: p.created_at
+            } as unknown as T;
+          }
+          throw new Error("Product not found");
+        } catch (err) {
+          console.error("Direct Supabase load product details error:", err);
+          const p = FALLBACK_PRODUCTS.find(prod => prod.id === id);
+          if (p) return p as unknown as T;
+        }
+      } else {
+        const p = FALLBACK_PRODUCTS.find(prod => prod.id === id);
+        if (p) return p as unknown as T;
+      }
     }
     
-    // 4. Featured Hero Products
+    // 7. Featured Hero Products
     if (cleanUrl === "/api/dashboard/featured") {
-      return FALLBACK_PRODUCTS.filter(p => p.featured) as unknown as T;
+      if (supabaseUrl && supabaseKey) {
+        try {
+          const prodRes = await fetch(`${supabaseUrl}/rest/v1/products?featured=eq.true&order=id.desc`, {
+            headers: getSupabaseHeaders(),
+            method: "GET"
+          });
+          const prods = await prodRes.json();
+          return prods.map((p: any) => ({
+            id: Number(p.id),
+            name: p.name,
+            description: p.description,
+            price: Number(p.price),
+            mrp: p.mrp ? Number(p.mrp) : undefined,
+            imageUrl: p.image_url,
+            categoryId: Number(p.category_id),
+            categoryName: p.category_name,
+            stock: Number(p.stock),
+            material: p.material,
+            size: p.size,
+            featured: Boolean(p.featured),
+            isVisible: Boolean(p.is_visible),
+            isNewArrival: Boolean(p.is_new_arrival),
+            createdAt: p.created_at
+          })) as unknown as T;
+        } catch (err) {
+          console.error("Direct Supabase load featured error:", err);
+          return FALLBACK_PRODUCTS.filter(p => p.featured) as unknown as T;
+        }
+      } else {
+        return FALLBACK_PRODUCTS.filter(p => p.featured) as unknown as T;
+      }
     }
     
-    // 5. Dashboard Statistics
+    // 8. Dashboard Statistics
     if (cleanUrl === "/api/dashboard/stats") {
-      return {
-        totalProducts: FALLBACK_PRODUCTS.length,
-        totalCategories: FALLBACK_CATEGORIES.length,
-        featuredProducts: FALLBACK_PRODUCTS.filter(p => p.featured).length,
-        lowStockProducts: FALLBACK_PRODUCTS.filter(p => p.stock < 5).length,
-        recentProducts: FALLBACK_PRODUCTS.slice(-5).reverse()
-      } as unknown as T;
+      if (supabaseUrl && supabaseKey) {
+        try {
+          const [prodRes, catRes] = await Promise.all([
+            fetch(`${supabaseUrl}/rest/v1/products`, { headers: getSupabaseHeaders(), method: "GET" }),
+            fetch(`${supabaseUrl}/rest/v1/categories`, { headers: getSupabaseHeaders(), method: "GET" })
+          ]);
+          const prods = await prodRes.json();
+          const cats = await catRes.json();
+
+          const mappedProds = prods.map((p: any) => ({
+            id: Number(p.id),
+            name: p.name,
+            description: p.description,
+            price: Number(p.price),
+            mrp: p.mrp ? Number(p.mrp) : undefined,
+            imageUrl: p.image_url,
+            categoryId: Number(p.category_id),
+            categoryName: p.category_name,
+            stock: Number(p.stock),
+            material: p.material,
+            size: p.size,
+            featured: Boolean(p.featured),
+            isVisible: Boolean(p.is_visible),
+            isNewArrival: Boolean(p.is_new_arrival),
+            createdAt: p.created_at
+          }));
+
+          return {
+            totalProducts: mappedProds.length,
+            totalCategories: cats.length,
+            featuredProducts: mappedProds.filter((p: any) => p.featured).length,
+            lowStockProducts: mappedProds.filter((p: any) => p.stock < 5).length,
+            recentProducts: mappedProds.slice(-5).reverse()
+          } as unknown as T;
+        } catch (err) {
+          console.error("Direct Supabase load stats error:", err);
+          return {
+            totalProducts: FALLBACK_PRODUCTS.length,
+            totalCategories: FALLBACK_CATEGORIES.length,
+            featuredProducts: FALLBACK_PRODUCTS.filter(p => p.featured).length,
+            lowStockProducts: FALLBACK_PRODUCTS.filter(p => p.stock < 5).length,
+            recentProducts: FALLBACK_PRODUCTS.slice(-5).reverse()
+          } as unknown as T;
+        }
+      } else {
+        return {
+          totalProducts: FALLBACK_PRODUCTS.length,
+          totalCategories: FALLBACK_CATEGORIES.length,
+          featuredProducts: FALLBACK_PRODUCTS.filter(p => p.featured).length,
+          lowStockProducts: FALLBACK_PRODUCTS.filter(p => p.stock < 5).length,
+          recentProducts: FALLBACK_PRODUCTS.slice(-5).reverse()
+        } as unknown as T;
+      }
     }
   }
 
