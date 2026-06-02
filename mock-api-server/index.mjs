@@ -416,17 +416,21 @@ app.get('/api/products/:id', async (req, res) => {
 app.post('/api/products', async (req, res) => {
   if (isSupabaseConfigured) {
     try {
-      // Find category name
-      const { data: catData, error: catError } = await supabase
-        .from('categories')
-        .select('name')
-        .eq('id', req.body.categoryId)
-        .single();
-
-      const catName = catData?.name || "Uncategorized";
+      let catName = "Uncategorized";
+      const hasCategory = req.body.categoryId !== undefined && req.body.categoryId !== null && req.body.categoryId !== 0;
+      
+      if (hasCategory) {
+        const { data: catData } = await supabase
+          .from('categories')
+          .select('name')
+          .eq('id', req.body.categoryId)
+          .single();
+        catName = catData?.name || "Uncategorized";
+      }
 
       const dbProduct = mapProductToDb({
         ...req.body,
+        categoryId: hasCategory ? req.body.categoryId : null,
         categoryName: catName
       });
 
@@ -439,7 +443,9 @@ app.post('/api/products', async (req, res) => {
       if (error) throw error;
 
       // Increment category count
-      await supabase.rpc('increment_category_count', { row_id: req.body.categoryId });
+      if (hasCategory) {
+        await supabase.rpc('increment_category_count', { row_id: req.body.categoryId });
+      }
 
       return res.status(201).json(mapProductFromDb(data));
     } catch (err) {
@@ -464,17 +470,22 @@ app.put('/api/products/:id', async (req, res) => {
   if (isSupabaseConfigured) {
     try {
       let catName = undefined;
-      if (req.body.categoryId !== undefined) {
+      const hasCategory = req.body.categoryId !== undefined && req.body.categoryId !== null && req.body.categoryId !== 0;
+      
+      if (hasCategory) {
         const { data: catData } = await supabase
           .from('categories')
           .select('name')
           .eq('id', req.body.categoryId)
           .single();
         catName = catData?.name || "Uncategorized";
+      } else if (req.body.categoryId === 0 || req.body.categoryId === null) {
+        catName = "Uncategorized";
       }
 
       const dbProduct = mapProductToDb({
         ...req.body,
+        categoryId: hasCategory ? req.body.categoryId : (req.body.categoryId === 0 || req.body.categoryId === null ? null : undefined),
         ...(catName !== undefined ? { categoryName: catName } : {})
       });
 

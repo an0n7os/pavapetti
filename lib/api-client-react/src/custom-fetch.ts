@@ -543,6 +543,15 @@ let FALLBACK_PRODUCTS = [
   }
 ];
 
+async function handleFetchError(res: Response, prefix: string): Promise<never> {
+  let errMsg = res.statusText;
+  try {
+    const errJson = await res.json();
+    errMsg = errJson.message || errJson.error || JSON.stringify(errJson);
+  } catch (_) {}
+  throw new Error(`${prefix}: ${errMsg}`);
+}
+
 export async function customFetch<T = unknown>(
   input: RequestInfo | URL,
   options: CustomFetchOptions = {},
@@ -586,7 +595,7 @@ export async function customFetch<T = unknown>(
             method: "DELETE"
           });
           if (!delRes.ok) {
-            throw new Error(`Failed to delete product from Supabase: ${delRes.statusText}`);
+            await handleFetchError(delRes, "Failed to delete product from Supabase");
           }
 
           // Decrement category count if there's a category
@@ -620,7 +629,7 @@ export async function customFetch<T = unknown>(
         if (supabaseUrl && supabaseKey) {
           // Get category name
           let catName = "Uncategorized";
-          if (bodyData.categoryId) {
+          if (bodyData.categoryId && bodyData.categoryId !== 0) {
             const catRes = await fetch(`${supabaseUrl}/rest/v1/categories?id=eq.${bodyData.categoryId}&select=name`, {
               headers: getSupabaseHeaders(),
               method: "GET"
@@ -635,7 +644,7 @@ export async function customFetch<T = unknown>(
             price: bodyData.price,
             mrp: bodyData.mrp,
             image_url: bodyData.imageUrl,
-            category_id: bodyData.categoryId,
+            category_id: bodyData.categoryId && bodyData.categoryId !== 0 ? bodyData.categoryId : null,
             category_name: catName,
             stock: bodyData.stock,
             material: bodyData.material,
@@ -651,13 +660,13 @@ export async function customFetch<T = unknown>(
             body: JSON.stringify(dbProduct)
           });
           if (!postRes.ok) {
-            throw new Error(`Failed to create product in Supabase: ${postRes.statusText}`);
+            await handleFetchError(postRes, "Failed to create product in Supabase");
           }
           const createdList = await postRes.json();
           const created = createdList[0];
 
           // Increment category count
-          if (bodyData.categoryId) {
+          if (bodyData.categoryId && bodyData.categoryId !== 0) {
             await fetch(`${supabaseUrl}/rest/v1/rpc/increment_category_count`, {
               headers: getSupabaseHeaders(),
               method: "POST",
@@ -708,7 +717,7 @@ export async function customFetch<T = unknown>(
         if (supabaseUrl && supabaseKey) {
           // Get category name
           let catName = "Uncategorized";
-          if (bodyData.categoryId) {
+          if (bodyData.categoryId && bodyData.categoryId !== 0) {
             const catRes = await fetch(`${supabaseUrl}/rest/v1/categories?id=eq.${bodyData.categoryId}&select=name`, {
               headers: getSupabaseHeaders(),
               method: "GET"
@@ -723,7 +732,7 @@ export async function customFetch<T = unknown>(
             price: bodyData.price,
             mrp: bodyData.mrp,
             image_url: bodyData.imageUrl,
-            category_id: bodyData.categoryId,
+            category_id: bodyData.categoryId && bodyData.categoryId !== 0 ? bodyData.categoryId : null,
             category_name: catName,
             stock: bodyData.stock,
             material: bodyData.material,
@@ -739,7 +748,7 @@ export async function customFetch<T = unknown>(
             body: JSON.stringify(dbProduct)
           });
           if (!putRes.ok) {
-            throw new Error(`Failed to update product in Supabase: ${putRes.statusText}`);
+            await handleFetchError(putRes, "Failed to update product in Supabase");
           }
           const updatedList = await putRes.json();
           const updated = updatedList[0];

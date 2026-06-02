@@ -127,7 +127,15 @@ export default function DashboardProducts() {
             setShowForm(false);
             invalidate();
           },
-          onError: () => toast({ title: "Failed to update product", variant: "destructive" }),
+          onError: (error: any) => {
+            console.error("Update product error details:", error);
+            const errMsg = error.message || (error.data && typeof error.data === 'object' ? JSON.stringify(error.data) : String(error));
+            toast({
+              title: "Failed to update product",
+              description: errMsg,
+              variant: "destructive"
+            });
+          },
         }
       );
     } else {
@@ -139,7 +147,15 @@ export default function DashboardProducts() {
             setShowForm(false);
             invalidate();
           },
-          onError: () => toast({ title: "Failed to create product", variant: "destructive" }),
+          onError: (error: any) => {
+            console.error("Create product error details:", error);
+            const errMsg = error.message || (error.data && typeof error.data === 'object' ? JSON.stringify(error.data) : String(error));
+            toast({
+              title: "Failed to create product",
+              description: errMsg,
+              variant: "destructive"
+            });
+          },
         }
       );
     }
@@ -197,23 +213,28 @@ export default function DashboardProducts() {
             transition={{ duration: 0.25 }}
             className="mb-6"
           >
-            <Card className="border-primary/30">
-              <CardHeader className="pb-3 flex-row items-center justify-between">
-                <CardTitle className="font-serif text-lg">{editProduct ? "Edit Product" : "Add New Product"}</CardTitle>
-                <Button size="sm" variant="ghost" onClick={() => setShowForm(false)} data-testid="button-close-form"><X size={16} /></Button>
+            <Card className="border border-primary/10 rounded-[2.5rem] bg-[#fdfbf7] shadow-2xl shadow-primary/5 overflow-hidden">
+              <CardHeader className="pb-5 pt-8 px-8 border-b border-primary/5 flex-row items-center justify-between bg-[#faf7f2]">
+                <div>
+                  <span className="text-[9px] tracking-[0.4em] text-primary/80 uppercase font-black block mb-1">Boutique Archival Vault</span>
+                  <CardTitle className="font-serif text-2xl font-light text-foreground">{editProduct ? "Modify Masterpiece Details" : "Archive New Heritage Piece"}</CardTitle>
+                </div>
+                <Button size="sm" variant="ghost" className="rounded-full hover:bg-primary/5 text-muted-foreground hover:text-foreground p-2" onClick={() => setShowForm(false)} data-testid="button-close-form">
+                  <X size={18} />
+                </Button>
               </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <CardContent className="p-8">
+                <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="name">Product Name</Label>
-                    <Input id="name" placeholder="e.g. Brass Nilavilakku" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required data-testid="input-product-name" />
+                    <Label htmlFor="name" className="text-[10px] font-black tracking-[0.2em] uppercase text-primary/80">Product Name</Label>
+                    <Input id="name" placeholder="e.g. Pure Sandalwood Urli" className="bg-white border border-primary/10 hover:border-primary/20 rounded-2xl py-6 px-5 text-sm tracking-wide focus:border-primary/30 focus:ring-1 focus:ring-primary/10 transition-all shadow-sm outline-none placeholder:text-muted-foreground/35" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required data-testid="input-product-name" />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="category">Category</Label>
+                    <Label htmlFor="category" className="text-[10px] font-black tracking-[0.2em] uppercase text-primary/80">Collection Category</Label>
                     <Select value={form.categoryId ? String(form.categoryId) : ""} onValueChange={(v) => setForm({ ...form, categoryId: parseInt(v, 10) })}>
-                      <SelectTrigger data-testid="select-category">
-                        <SelectValue placeholder="Select category" />
+                      <SelectTrigger className="bg-white border border-primary/10 hover:border-primary/20 rounded-2xl py-6 px-5 text-sm tracking-wide focus:border-primary/30 focus:ring-1 focus:ring-primary/10 transition-all shadow-sm h-auto outline-none" data-testid="select-category">
+                        <SelectValue placeholder="Select archival wing" />
                       </SelectTrigger>
                       <SelectContent>
                         {(categories ?? []).map((cat: any) => (
@@ -224,40 +245,40 @@ export default function DashboardProducts() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="price">Price (₹)</Label>
-                    <Input id="price" type="number" min="0" step="0.01" placeholder="0.00" value={form.price || ""} onChange={(e) => setForm({ ...form, price: parseFloat(e.target.value) || 0 })} data-testid="input-price" />
+                    <Label htmlFor="price" className="text-[10px] font-black tracking-[0.2em] uppercase text-primary/80">Curated Price (₹)</Label>
+                    <Input id="price" type="number" min="0" step="0.01" placeholder="0.00" className="bg-white border border-primary/10 hover:border-primary/20 rounded-2xl py-6 px-5 text-sm tracking-wide focus:border-primary/30 focus:ring-1 focus:ring-primary/10 transition-all shadow-sm outline-none placeholder:text-muted-foreground/35" value={form.price || ""} onChange={(e) => setForm({ ...form, price: parseFloat(e.target.value) || 0 })} data-testid="input-price" />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="stock">Stock Quantity</Label>
-                    <Input id="stock" type="number" min="0" placeholder="0" value={form.stock || ""} onChange={(e) => setForm({ ...form, stock: parseInt(e.target.value, 10) || 0 })} data-testid="input-stock" />
+                    <Label htmlFor="stock" className="text-[10px] font-black tracking-[0.2em] uppercase text-primary/80">Vault Stock Quantity</Label>
+                    <Input id="stock" type="number" min="0" placeholder="0" className="bg-white border border-primary/10 hover:border-primary/20 rounded-2xl py-6 px-5 text-sm tracking-wide focus:border-primary/30 focus:ring-1 focus:ring-primary/10 transition-all shadow-sm outline-none placeholder:text-muted-foreground/35" value={form.stock || ""} onChange={(e) => setForm({ ...form, stock: parseInt(e.target.value, 10) || 0 })} data-testid="input-stock" />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="mrp">MRP (₹)</Label>
-                    <Input id="mrp" type="number" min="0" step="0.01" placeholder="0.00" value={form.mrp || ""} onChange={(e) => setForm({ ...form, mrp: parseFloat(e.target.value) || 0 })} data-testid="input-mrp" />
+                    <Label htmlFor="mrp" className="text-[10px] font-black tracking-[0.2em] uppercase text-primary/80">Standard MRP (₹)</Label>
+                    <Input id="mrp" type="number" min="0" step="0.01" placeholder="0.00" className="bg-white border border-primary/10 hover:border-primary/20 rounded-2xl py-6 px-5 text-sm tracking-wide focus:border-primary/30 focus:ring-1 focus:ring-primary/10 transition-all shadow-sm outline-none placeholder:text-muted-foreground/35" value={form.mrp || ""} onChange={(e) => setForm({ ...form, mrp: parseFloat(e.target.value) || 0 })} data-testid="input-mrp" />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="material">Material</Label>
-                    <Input id="material" placeholder="e.g. Pure Brass" value={form.material || ""} onChange={(e) => setForm({ ...form, material: e.target.value })} data-testid="input-material" />
+                    <Label htmlFor="material" className="text-[10px] font-black tracking-[0.2em] uppercase text-primary/80">Heritage Material</Label>
+                    <Input id="material" placeholder="e.g. Pure Teak Wood & Brass" className="bg-white border border-primary/10 hover:border-primary/20 rounded-2xl py-6 px-5 text-sm tracking-wide focus:border-primary/30 focus:ring-1 focus:ring-primary/10 transition-all shadow-sm outline-none placeholder:text-muted-foreground/35" value={form.material || ""} onChange={(e) => setForm({ ...form, material: e.target.value })} data-testid="input-material" />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="size">Size / Dimensions</Label>
-                    <Input id="size" placeholder="e.g. 12 inches" value={form.size || ""} onChange={(e) => setForm({ ...form, size: e.target.value })} data-testid="input-size" />
+                    <Label htmlFor="size" className="text-[10px] font-black tracking-[0.2em] uppercase text-primary/80">Archival Dimensions</Label>
+                    <Input id="size" placeholder="e.g. 14 x 10 inches" className="bg-white border border-primary/10 hover:border-primary/20 rounded-2xl py-6 px-5 text-sm tracking-wide focus:border-primary/30 focus:ring-1 focus:ring-primary/10 transition-all shadow-sm outline-none placeholder:text-muted-foreground/35" value={form.size || ""} onChange={(e) => setForm({ ...form, size: e.target.value })} data-testid="input-size" />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="weight">Weight</Label>
-                    <Input id="weight" placeholder="e.g. 1.2 kg" value={form.weight || ""} onChange={(e) => setForm({ ...form, weight: e.target.value })} data-testid="input-weight" />
+                    <Label htmlFor="weight" className="text-[10px] font-black tracking-[0.2em] uppercase text-primary/80">Product Net Weight</Label>
+                    <Input id="weight" placeholder="e.g. 1.2 kg" className="bg-white border border-primary/10 hover:border-primary/20 rounded-2xl py-6 px-5 text-sm tracking-wide focus:border-primary/30 focus:ring-1 focus:ring-primary/10 transition-all shadow-sm outline-none placeholder:text-muted-foreground/35" value={form.weight || ""} onChange={(e) => setForm({ ...form, weight: e.target.value })} data-testid="input-weight" />
                   </div>
 
                   <div className="space-y-2 md:col-span-2">
-                    <Label htmlFor="imageUrl">Main Product Image</Label>
-                    <div className="flex flex-col md:flex-row gap-4 items-start">
-                      <div className="flex-1 w-full space-y-2">
-                        <Input id="imageUrl" placeholder="https://... or upload below" value={form.imageUrl} onChange={(e) => setForm({ ...form, imageUrl: e.target.value })} data-testid="input-image-url" />
+                    <Label htmlFor="imageUrl" className="text-[10px] font-black tracking-[0.2em] uppercase text-primary/80">Primary Artifact Portrait</Label>
+                    <div className="flex flex-col md:flex-row gap-6 items-start">
+                      <div className="flex-1 w-full space-y-4">
+                        <Input id="imageUrl" placeholder="https://... or upload artifact below" className="bg-white border border-primary/10 hover:border-primary/20 rounded-2xl py-6 px-5 text-sm tracking-wide focus:border-primary/30 focus:ring-1 focus:ring-primary/10 transition-all shadow-sm outline-none placeholder:text-muted-foreground/35" value={form.imageUrl} onChange={(e) => setForm({ ...form, imageUrl: e.target.value })} data-testid="input-image-url" />
                         <div className="relative">
                           <input
                             type="file"
@@ -269,22 +290,25 @@ export default function DashboardProducts() {
                           <Button
                             type="button"
                             variant="secondary"
-                            className="w-full gap-2 border-dashed border-2 py-8 hover:border-primary/50"
+                            className="w-full gap-3 border-dashed border-2 border-primary/15 bg-white hover:bg-primary/5 hover:border-primary/35 rounded-2xl py-12 flex flex-col h-auto justify-center transition-all duration-300 group"
                             onClick={() => document.getElementById("image-upload")?.click()}
                           >
-                            <Upload size={16} />
-                            Choose Local Image
+                            <Upload size={20} className="text-primary opacity-60 group-hover:scale-110 transition-transform duration-300" />
+                            <div className="flex flex-col items-center">
+                              <span className="text-[10px] font-black tracking-widest uppercase text-foreground mb-1">Select High-Res Image</span>
+                              <span className="text-[9px] text-muted-foreground/60 tracking-wider">png, jpg, jpeg, webp accepted</span>
+                            </div>
                           </Button>
                         </div>
                       </div>
                       
                       {form.imageUrl && (
-                        <div className="relative group w-32 h-32 rounded-2xl overflow-hidden border border-border shadow-md shrink-0">
-                          <img src={form.imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                        <div className="relative group w-32 h-32 rounded-3xl overflow-hidden border border-primary/10 shadow-lg shadow-primary/5 shrink-0 transition-transform duration-300 hover:scale-[1.02]">
+                          <img src={form.imageUrl} alt="Artifact Portrait" className="w-full h-full object-cover" />
                           <button 
                             type="button"
                             onClick={() => setForm({ ...form, imageUrl: "" })}
-                            className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="absolute top-2 right-2 bg-red-500/90 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
                           >
                             <X size={12} />
                           </button>
@@ -294,66 +318,66 @@ export default function DashboardProducts() {
                   </div>
 
                   <div className="space-y-2 md:col-span-2">
-                    <Label>Gallery Images</Label>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3 mb-3">
+                    <Label className="text-[10px] font-black tracking-[0.2em] uppercase text-primary/80">Archival Curatorial Gallery</Label>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-4 mb-4">
                       {(form.images || []).map((img, idx) => (
-                        <div key={idx} className="relative group aspect-square rounded-xl overflow-hidden border border-border shadow-sm">
-                          <img src={img} alt={`Gallery ${idx}`} className="w-full h-full object-cover" />
+                        <div key={idx} className="relative group aspect-square rounded-2xl overflow-hidden border border-primary/10 shadow-sm transition-transform duration-300 hover:scale-[1.03]">
+                          <img src={img} alt={`Gallery Artifact ${idx}`} className="w-full h-full object-cover" />
                           <button 
                             type="button"
                             onClick={() => setForm({ ...form, images: form.images?.filter((_, i) => i !== idx) })}
-                            className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="absolute top-2 right-2 bg-red-500/90 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
                           >
                             <X size={10} />
                           </button>
                         </div>
                       ))}
-                      <label className="flex flex-col items-center justify-center aspect-square rounded-xl border-2 border-dashed border-border hover:border-primary/50 hover:bg-primary/5 cursor-pointer transition-all">
+                      <label className="flex flex-col items-center justify-center aspect-square rounded-2xl border-2 border-dashed border-primary/15 hover:border-primary/35 bg-white hover:bg-primary/5 cursor-pointer transition-all duration-300 group">
                         <input
                           type="file"
                           className="hidden"
                           accept="image/*"
                           onChange={(e) => handleImageUpload(e, false)}
                         />
-                        <Plus size={20} className="text-muted-foreground" />
-                        <span className="text-[9px] font-bold uppercase mt-1 opacity-60 text-muted-foreground">Add</span>
+                        <Plus size={22} className="text-primary opacity-60 group-hover:scale-110 transition-transform duration-300" />
+                        <span className="text-[9px] font-black tracking-widest uppercase mt-1 text-muted-foreground opacity-65">Add Artifact</span>
                       </label>
                     </div>
                     <Textarea 
                       id="images" 
-                      placeholder="Or paste URLs here (one per line)" 
+                      placeholder="Or paste external gallery image URLs here (one per line)..." 
                       value={form.images?.join("\n")} 
                       onChange={(e) => setForm({ ...form, images: e.target.value.split("\n").filter(l => l.trim() !== "") })} 
                       rows={2} 
-                      className="text-xs"
+                      className="bg-white border border-primary/10 hover:border-primary/20 rounded-2xl py-4 px-5 text-xs tracking-wide focus:border-primary/30 focus:ring-1 focus:ring-primary/10 transition-all shadow-sm outline-none resize-none placeholder:text-muted-foreground/35"
                       data-testid="input-images" 
                     />
                   </div>
 
                   <div className="space-y-2 md:col-span-2">
-                    <Label htmlFor="description">Description</Label>
-                    <Textarea id="description" placeholder="Describe the product..." value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3} data-testid="input-description" />
+                    <Label htmlFor="description" className="text-[10px] font-black tracking-[0.2em] uppercase text-primary/80">Artifact Narrative / Curatorial Note</Label>
+                    <Textarea id="description" placeholder="Write a gorgeous, detailed editorial narrative describing the heritage, history, and craft of this masterpiece..." value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={4} className="bg-white border border-primary/10 hover:border-primary/20 rounded-2xl py-4 px-5 text-sm tracking-wide focus:border-primary/30 focus:ring-1 focus:ring-primary/10 transition-all shadow-sm outline-none resize-none placeholder:text-muted-foreground/35" data-testid="input-description" />
                   </div>
 
-                  <div className="flex flex-wrap gap-8 md:col-span-2 py-4">
-                    <div className="flex items-center gap-3">
+                  <div className="flex flex-wrap gap-8 md:col-span-2 py-5 px-6 bg-[#faf7f2] border border-primary/5 rounded-[2rem] justify-between items-center">
+                    <div className="flex items-center gap-3 hover:opacity-90 transition-opacity">
                       <Switch id="featured" checked={form.featured} onCheckedChange={(v) => setForm({ ...form, featured: v })} data-testid="switch-featured" />
-                      <Label htmlFor="featured" className="cursor-pointer">Featured</Label>
+                      <Label htmlFor="featured" className="cursor-pointer text-[10px] font-black tracking-[0.2em] uppercase text-primary/85 select-none">Curated Feature</Label>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 hover:opacity-90 transition-opacity">
                       <Switch id="isVisible" checked={form.isVisible} onCheckedChange={(v) => setForm({ ...form, isVisible: v })} data-testid="switch-visible" />
-                      <Label htmlFor="isVisible" className="cursor-pointer">Visible in Store</Label>
+                      <Label htmlFor="isVisible" className="cursor-pointer text-[10px] font-black tracking-[0.2em] uppercase text-primary/85 select-none">Visible in Wing</Label>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 hover:opacity-90 transition-opacity">
                       <Switch id="isNewArrival" checked={form.isNewArrival} onCheckedChange={(v) => setForm({ ...form, isNewArrival: v })} data-testid="switch-new-arrival" />
-                      <Label htmlFor="isNewArrival" className="cursor-pointer">New Arrival</Label>
+                      <Label htmlFor="isNewArrival" className="cursor-pointer text-[10px] font-black tracking-[0.2em] uppercase text-primary/85 select-none">New Discovery</Label>
                     </div>
                   </div>
 
-                  <div className="md:col-span-2 flex gap-3 justify-end">
-                    <Button type="button" variant="outline" onClick={() => setShowForm(false)}>Cancel</Button>
-                    <Button type="submit" disabled={isPending} className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90" data-testid="button-submit-product">
-                      {isPending ? "Saving..." : (<><Check size={15} /> {editProduct ? "Update Product" : "Create Product"}</>)}
+                  <div className="md:col-span-2 flex gap-4 justify-end mt-4">
+                    <Button type="button" variant="outline" className="rounded-2xl border border-primary/10 text-[10px] font-black tracking-widest uppercase px-8 py-4 h-auto bg-white hover:bg-[#faf7f2] hover:text-foreground text-muted-foreground transition-all duration-300" onClick={() => setShowForm(false)}>Cancel</Button>
+                    <Button type="submit" disabled={isPending} className="bg-primary text-primary-foreground hover:bg-primary/95 shadow-xl shadow-primary/10 rounded-2xl text-[10px] font-black tracking-widest uppercase px-8 py-4 h-auto transition-all duration-300 transform hover:-translate-y-[1px] active:translate-y-0 disabled:opacity-50" data-testid="button-submit-product">
+                      {isPending ? "Archiving..." : (<><Check size={16} /> {editProduct ? "Update Archival Record" : "Archive Masterpiece"}</>)}
                     </Button>
                   </div>
                 </form>
