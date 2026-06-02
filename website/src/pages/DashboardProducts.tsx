@@ -107,9 +107,20 @@ export default function DashboardProducts() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Sanitize the inputs to default safely if left blank
+    const sanitizedForm = {
+      ...form,
+      price: Number(form.price) || 0,
+      mrp: form.mrp ? Number(form.mrp) : undefined,
+      stock: parseInt(String(form.stock), 10) || 0,
+      imageUrl: form.imageUrl || "",
+      description: form.description || "",
+    };
+
     if (editProduct) {
       updateProduct.mutate(
-        { id: editProduct.id, data: form },
+        { id: editProduct.id, data: sanitizedForm },
         {
           onSuccess: () => {
             toast({ title: "Product updated successfully" });
@@ -121,7 +132,7 @@ export default function DashboardProducts() {
       );
     } else {
       createProduct.mutate(
-        { data: form },
+        { data: sanitizedForm },
         {
           onSuccess: () => {
             toast({ title: "Product created successfully" });
@@ -214,12 +225,12 @@ export default function DashboardProducts() {
 
                   <div className="space-y-2">
                     <Label htmlFor="price">Price (₹)</Label>
-                    <Input id="price" type="number" min="0" step="0.01" placeholder="0.00" value={form.price || ""} onChange={(e) => setForm({ ...form, price: parseFloat(e.target.value) || 0 })} required data-testid="input-price" />
+                    <Input id="price" type="number" min="0" step="0.01" placeholder="0.00" value={form.price || ""} onChange={(e) => setForm({ ...form, price: parseFloat(e.target.value) || 0 })} data-testid="input-price" />
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="stock">Stock Quantity</Label>
-                    <Input id="stock" type="number" min="0" placeholder="0" value={form.stock || ""} onChange={(e) => setForm({ ...form, stock: parseInt(e.target.value, 10) || 0 })} required data-testid="input-stock" />
+                    <Input id="stock" type="number" min="0" placeholder="0" value={form.stock || ""} onChange={(e) => setForm({ ...form, stock: parseInt(e.target.value, 10) || 0 })} data-testid="input-stock" />
                   </div>
 
                   <div className="space-y-2">
@@ -246,7 +257,7 @@ export default function DashboardProducts() {
                     <Label htmlFor="imageUrl">Main Product Image</Label>
                     <div className="flex flex-col md:flex-row gap-4 items-start">
                       <div className="flex-1 w-full space-y-2">
-                        <Input id="imageUrl" placeholder="https://... or upload below" value={form.imageUrl} onChange={(e) => setForm({ ...form, imageUrl: e.target.value })} required data-testid="input-image-url" />
+                        <Input id="imageUrl" placeholder="https://... or upload below" value={form.imageUrl} onChange={(e) => setForm({ ...form, imageUrl: e.target.value })} data-testid="input-image-url" />
                         <div className="relative">
                           <input
                             type="file"
@@ -321,7 +332,7 @@ export default function DashboardProducts() {
 
                   <div className="space-y-2 md:col-span-2">
                     <Label htmlFor="description">Description</Label>
-                    <Textarea id="description" placeholder="Describe the product..." value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} required rows={3} data-testid="input-description" />
+                    <Textarea id="description" placeholder="Describe the product..." value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3} data-testid="input-description" />
                   </div>
 
                   <div className="flex flex-wrap gap-8 md:col-span-2 py-4">
