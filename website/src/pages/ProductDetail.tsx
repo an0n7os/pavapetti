@@ -13,6 +13,43 @@ import { useWishlist } from "@/context/WishlistContext";
 import { useToast } from "@/hooks/use-toast";
 import Magnetic from "@/components/Magnetic";
 
+function AccordionItem({ title, content }: { title: string; content: string }) {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <div className={`border-b border-primary/5 pb-4 transition-all duration-500 pl-0 ${isOpen ? "pl-3 border-l-2 border-primary" : ""}`}>
+      <button 
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex justify-between items-center py-2 text-left hover:text-primary transition-colors group"
+      >
+        <span className={`text-[10px] font-black uppercase tracking-[0.25em] transition-colors ${isOpen ? "text-primary" : "text-foreground group-hover:text-primary"}`}>{title}</span>
+        <motion.span 
+          animate={{ rotate: isOpen ? 90 : 0 }}
+          transition={{ duration: 0.2 }}
+          className={`transition-colors ${isOpen ? "text-primary" : "text-primary/60 group-hover:text-primary"}`}
+        >
+          <ChevronRight size={14} />
+        </motion.span>
+      </button>
+      <AnimatePresence initial={false}>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            className="overflow-hidden"
+          >
+            <p className="text-[11px] sm:text-[12px] text-muted-foreground/80 leading-relaxed font-light pt-2 pb-1 pr-4">
+              {content}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 export default function ProductDetail() {
   const params = useParams<{ id: string }>();
   const id = parseInt(params.id ?? "0", 10);
@@ -179,9 +216,13 @@ export default function ProductDetail() {
                   href={`https://wa.me/${PHONE}?text=${waMsg}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="hidden md:flex items-center gap-2 bg-[#25D366] hover:bg-[#1ebe5c] text-white text-sm font-bold px-6 py-3 rounded-full transition-all hover:scale-105 shadow-lg shadow-green-500/20"
+                  className="hidden md:flex items-center gap-2 bg-gradient-to-r from-secondary to-[#1f2e2e] border border-primary/20 text-white text-[10px] font-black tracking-widest uppercase px-6 py-3.5 rounded-full transition-all hover:scale-105 shadow-lg relative pl-8"
                 >
-                  <MessageCircle size={16} /> Order on WhatsApp
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 flex h-1.5 w-1.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500"></span>
+                  </span>
+                  <MessageCircle size={12} className="text-[#25D366]" /> Curator Chat
                 </a>
               </div>
             </div>
@@ -197,68 +238,57 @@ export default function ProductDetail() {
           <div className="lg:col-span-6">
             <div className="flex flex-col gap-6 w-full max-w-xl mx-auto lg:mx-0">
               
-              {/* Main Image Slider — Horizontal on Mobile */}
+              {/* Main Image Slider — Horizontal on Mobile with Premium Archival Borders */}
               <div className="md:hidden -mx-4">
-                <div className="flex overflow-x-auto scroll-snap-x mandatory scrollbar-hide gap-4 px-4 pb-4">
+                <div className="flex overflow-x-auto scroll-snap-x mandatory scrollbar-hide gap-5 px-6 pb-4">
                   {[product.imageUrl, ...(product.images || [])].filter((img, i, self) => self.indexOf(img) === i).map((img, idx) => (
-                    <div key={idx} className="flex-shrink-0 w-full scroll-snap-align-start aspect-square rounded-[2rem] overflow-hidden bg-[#f9f7f4] shadow-lg border border-border/50">
-                      <img src={img} alt={`${product.name} ${idx}`} className="w-full h-full object-cover" />
+                    <div key={idx} className="flex-shrink-0 w-[82vw] scroll-snap-align-start p-3 rounded-[2.5rem] border border-primary/10 bg-gradient-to-br from-white to-[#fcfaf7] shadow-lg">
+                      <div className="aspect-square rounded-[2rem] overflow-hidden bg-[#f9f7f4] border border-border/50">
+                        <img src={img} alt={`${product.name} ${idx}`} className="w-full h-full object-cover" />
+                      </div>
                     </div>
                   ))}
                 </div>
                 {/* Scroll Indicator */}
-                <div className="flex justify-center gap-1.5 mt-2">
+                <div className="flex justify-center gap-1.5 mt-4">
                   {[product.imageUrl, ...(product.images || [])].filter((img, i, self) => self.indexOf(img) === i).map((_, i) => (
                     <div key={i} className="w-1.5 h-1.5 rounded-full bg-primary/20" />
                   ))}
                 </div>
               </div>
 
-              {/* Desktop Main Image */}
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                className="hidden md:block relative aspect-square rounded-[3rem] overflow-hidden bg-[#f9f7f4] shadow-2xl group cursor-zoom-in"
-              >
-                <AnimatePresence mode="wait">
-                  <motion.img
-                    key={selectedImage || product.imageUrl}
-                    src={selectedImage || product.imageUrl}
-                    alt={product.name}
-                    initial={{ opacity: 0, scale: 1.1 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[2000ms] ease-out"
-                  />
-                </AnimatePresence>
+              {/* Desktop Main Image with Double Archival Frame */}
+              <div className="hidden md:block relative p-4 rounded-[3.5rem] border border-primary/10 bg-gradient-to-br from-white to-[#fcfaf7] shadow-xl">
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                  className="relative aspect-square rounded-[3rem] overflow-hidden bg-[#f9f7f4] shadow-2xl group cursor-zoom-in"
+                >
+                  <AnimatePresence mode="wait">
+                    <motion.img
+                      key={selectedImage || product.imageUrl}
+                      src={selectedImage || product.imageUrl}
+                      alt={product.name}
+                      initial={{ opacity: 0, scale: 1.1 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[2000ms] ease-out"
+                    />
+                  </AnimatePresence>
 
-                {/* Floating Status */}
-                {product.stock <= 5 && product.stock > 0 && (
-                  <div className="absolute top-8 left-8">
-                    <div className="bg-white/90 backdrop-blur-md text-foreground text-[10px] font-bold tracking-[0.3em] uppercase px-5 py-2.5 rounded-full shadow-xl">
-                      Limited Edition
+                  {/* Floating Status */}
+                  {product.stock <= 5 && product.stock > 0 && (
+                    <div className="absolute top-8 left-8">
+                      <div className="bg-white/90 backdrop-blur-md text-foreground text-[10px] font-bold tracking-[0.3em] uppercase px-5 py-2.5 rounded-full shadow-xl">
+                        Limited Edition
+                      </div>
                     </div>
-                  </div>
-                )}
-              </motion.div>
+                  )}
+                </motion.div>
+              </div>
 
-              {/* Heritage Note — New Editorial Component */}
-              <motion.div 
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-                className="p-10 border-l border-primary/20 bg-primary/5 rounded-r-[3rem]"
-              >
-                <div className="flex items-center gap-3 mb-4">
-                  <Star size={14} className="text-primary" />
-                  <span className="text-[10px] font-black tracking-[0.3em] uppercase text-primary">Heritage Legacy</span>
-                </div>
-                <p className="font-serif text-lg italic text-foreground/80 leading-relaxed">
-                  "This piece represents generations of Kerala's artisanal wisdom. Each curve and detail is a testament to the master craftsmen who have preserved these techniques for centuries."
-                </p>
-              </motion.div>
 
               {/* Thumbnails — Desktop Only */}
               {product.images && product.images.length > 1 && (
@@ -278,19 +308,19 @@ export default function ProductDetail() {
               )}
             </div>
 
-            {/* Specifications Section — Premium Grid */}
-            <div className="grid grid-cols-3 gap-6 bg-[#f9f7f4] p-10 rounded-[3rem]">
-              <div>
-                <h4 className="text-[10px] uppercase tracking-[0.3em] font-bold text-primary mb-3">Material</h4>
-                <p className="text-lg font-serif font-light">{product.material || "Traditional Brass"}</p>
+            {/* Specifications Section — Premium Responsive Grid */}
+            <div className="grid grid-cols-3 gap-1 sm:gap-6 bg-[#f9f7f4] p-4 sm:p-6 md:p-10 rounded-[2rem] md:rounded-[3rem] text-center sm:text-left shadow-sm">
+              <div className="flex flex-col justify-center">
+                <h4 className="text-[8px] sm:text-[10px] uppercase tracking-[0.1em] sm:tracking-[0.3em] font-black text-primary mb-2">Material</h4>
+                <p className="text-[11px] xs:text-[12px] sm:text-lg font-serif font-light text-foreground line-clamp-2 leading-tight">{product.material || "Traditional Brass"}</p>
               </div>
-              <div className="border-x border-border/40 px-6">
-                <h4 className="text-[10px] uppercase tracking-[0.3em] font-bold text-primary mb-3">Dimensions</h4>
-                <p className="text-lg font-serif font-light">{product.size || "Standard Size"}</p>
+              <div className="border-x border-border/40 px-1 sm:px-6 flex flex-col justify-center">
+                <h4 className="text-[8px] sm:text-[10px] uppercase tracking-[0.1em] sm:tracking-[0.3em] font-black text-primary mb-2">Dimensions</h4>
+                <p className="text-[11px] xs:text-[12px] sm:text-lg font-serif font-light text-foreground line-clamp-2 leading-tight">{product.size || "Standard"}</p>
               </div>
-              <div className="pl-6">
-                <h4 className="text-[10px] uppercase tracking-[0.3em] font-bold text-primary mb-3">Weight</h4>
-                <p className="text-lg font-serif font-light">{product.weight || "N/A"}</p>
+              <div className="pl-1 sm:pl-6 flex flex-col justify-center">
+                <h4 className="text-[8px] sm:text-[10px] uppercase tracking-[0.1em] sm:tracking-[0.3em] font-black text-primary mb-2">Weight</h4>
+                <p className="text-[11px] xs:text-[12px] sm:text-lg font-serif font-light text-foreground line-clamp-2 leading-tight">{product.weight || "N/A"}</p>
               </div>
             </div>
           </div>
@@ -316,7 +346,7 @@ export default function ProductDetail() {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.2 }}
-                className="font-serif text-5xl md:text-6xl font-light text-foreground mb-6 leading-[1.1]"
+                className="font-serif text-3xl sm:text-5xl md:text-6xl font-light text-foreground mb-6 leading-[1.15]"
               >
                 {product.name}
               </motion.h1>
@@ -381,35 +411,54 @@ export default function ProductDetail() {
 
               <Button
                 size="lg"
-                className="w-full rounded-full py-5 text-sm font-bold gap-3 bg-[#25D366] hover:bg-[#1ebe5c] text-white shadow-xl shadow-green-500/10 hover:scale-[1.02] transition-all"
+                className="w-full rounded-full py-7 text-xs font-black tracking-[0.25em] uppercase gap-3 bg-gradient-to-r from-secondary to-[#1f2e2e] hover:from-[#1f2e2e] hover:to-secondary border-2 border-primary/20 text-white shadow-xl hover:shadow-2xl hover:scale-[1.01] active:scale-100 transition-all duration-300 relative overflow-hidden group"
                 onClick={() => window.open(`https://wa.me/${PHONE}?text=${waMsg}`, "_blank")}
               >
-                <MessageCircle size={20} /> Order via WhatsApp
+                {/* Active curator pulse */}
+                <span className="absolute left-6 top-1/2 -translate-y-1/2 flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                </span>
+                <MessageCircle size={16} className="text-[#25D366] group-hover:scale-110 transition-transform ml-4" />
+                <span>Acquire via Secured Chat</span>
               </Button>
             </div>
 
-            {/* Premium Details Accordion style */}
-            <div className="pt-10 border-t border-border/50 space-y-6">
-              {[
-                { icon: Package, title: "Authentic Packaging", desc: "Each piece comes in a premium gift box with an authenticity card." },
-                { icon: Star, title: "Artisan Quality", desc: "Verified and certified for traditional craftsmanship excellence." },
-              ].map(({ icon: Icon, title, desc }) => (
-                <div key={title} className="flex gap-4">
-                  <div className="w-10 h-10 rounded-full bg-[#f9f7f4] flex items-center justify-center shrink-0">
-                    <Icon size={16} className="text-primary" />
-                  </div>
-                  <div>
-                    <h5 className="text-xs font-bold uppercase tracking-widest mb-1">{title}</h5>
-                    <p className="text-xs text-muted-foreground font-light leading-relaxed">{desc}</p>
-                  </div>
-                </div>
-              ))}
+            {/* Wax Seal Authenticity Stamp */}
+            <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-4 sm:gap-5 p-6 rounded-[2rem] bg-gradient-to-br from-[#faf8f5] to-[#f5f1e9] border border-primary/10 shadow-sm">
+              <div className="relative w-14 h-14 rounded-full border border-primary/20 flex items-center justify-center bg-white shadow-inner shrink-0 select-none">
+                <span className="font-serif italic text-primary text-xl font-bold">P</span>
+                {/* Gold outer rim */}
+                <div className="absolute inset-1 rounded-full border border-dashed border-primary/15 animate-[spin_40s_linear_infinite]" />
+              </div>
+              <div className="space-y-1">
+                <h5 className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.15em] sm:tracking-[0.2em] text-primary mb-1">Archival Authenticity Guarantee</h5>
+                <p className="text-[10px] sm:text-[11px] text-muted-foreground/80 leading-relaxed font-light">
+                  Directly sourced from state-registered master craft clusters. Bearing the official Pavapetti Seal of Preservation & Ethical Sourcing.
+                </p>
+              </div>
+            </div>
+
+            {/* Interactive Premium Details Accordion */}
+            <div className="pt-6 border-t border-border/40 space-y-4">
+              <AccordionItem 
+                title="Historical Heritage & Craft" 
+                content={`Sourced from regional craftsman sanctuaries in Kerala. Hand-molded, detailed, and finished using techniques passed down over seven centuries. Made with ${product.material || "sacred teak, rosewood, or brass"}.`} 
+              />
+              <AccordionItem 
+                title="Logistics & Preserved Packaging" 
+                content="Housed in our bespoke sandalwood-toned archival vault box. Double-cushioned and protected to survive global air transit. Includes a numbered certificate of curation." 
+              />
+              <AccordionItem 
+                title="Curator Acquisition Protocol" 
+                content="Once checkout or chat is initiated, a dedicated curator handles your purchase directly. We accept UPI, NetBanking, and all international major credit cards." 
+              />
             </div>
           </div>
         </div>
 
         {/* ── Reviews & Testimonials — Premium Trust Building ── */}
-        <section className="mt-40 border-t border-border/50 pt-24">
+        <section className="mt-20 md:mt-40 border-t border-border/50 pt-24">
           <div className="flex flex-col items-center text-center mb-16">
             <p className="text-primary text-[10px] tracking-[0.5em] uppercase font-bold mb-4 opacity-60">Testimonials</p>
             <h2 className="font-serif text-5xl font-light text-foreground mb-4">Collector <span className="italic">Experiences</span></h2>
@@ -445,7 +494,7 @@ export default function ProductDetail() {
         </section>
 
         {/* ── The Story of the Craft — New Ultra Premium Section ── */}
-        <section className="mt-40 bg-[#f9f7f4] rounded-[3rem] overflow-hidden">
+        <section className="mt-20 md:mt-40 bg-[#f9f7f4] rounded-[3rem] overflow-hidden">
           <div className="grid lg:grid-cols-2">
             <div className="p-12 lg:p-20 flex flex-col justify-center">
               <span className="text-primary text-[10px] tracking-[0.6em] uppercase font-black mb-6">The Story Behind</span>
@@ -485,7 +534,7 @@ export default function ProductDetail() {
 
         {/* ── Related Products ── */}
         {related.length > 0 && (
-          <section className="mt-40">
+          <section className="mt-20 md:mt-40">
             <div className="flex items-end justify-between mb-16 px-2">
               <div>
                 <p className="text-primary text-[10px] tracking-[0.5em] uppercase font-bold mb-4 opacity-60">The Curation</p>

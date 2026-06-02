@@ -121,7 +121,7 @@ export default function CartDrawer() {
 
             {/* Footer */}
             {items.length > 0 && (
-              <div className="px-8 py-8 bg-[#f9f7f4] border-t border-border/50">
+              <div className="px-8 py-8 bg-gradient-to-b from-[#f9f7f4] to-[#f4f0ea] border-t border-border/50 rounded-t-[2rem]">
 
 
                 <div className="flex justify-between items-end mb-6">
@@ -129,22 +129,22 @@ export default function CartDrawer() {
                   <span className="text-2xl font-serif text-primary">₹{total.toLocaleString("en-IN")}</span>
                 </div>
 
-                <div className="grid gap-3">
+                <div className="grid gap-3.5">
                   <Button
-                    className="w-full py-7 bg-primary text-primary-foreground rounded-none text-[13px] font-bold tracking-[0.25em] uppercase hover:gap-4 transition-all group"
+                    className="w-full py-5 h-auto bg-primary text-primary-foreground rounded-full text-[12px] font-bold tracking-[0.25em] uppercase hover:gap-4 transition-all group shadow-lg shadow-primary/20"
                     onClick={() => {
                       closeCart();
                       setLocation("/checkout");
                     }}
                   >
-                    Proceed to Checkout <ArrowRight size={18} className="ml-2" />
+                    Proceed to Checkout <ArrowRight size={16} className="ml-2" />
                   </Button>
                   <Button
                     variant="outline"
-                    className="w-full py-7 border-border rounded-none text-[11px] font-bold tracking-[0.2em] uppercase hover:bg-white"
+                    className="w-full py-5 h-auto border-primary/10 hover:border-primary/30 rounded-full text-[10px] font-bold tracking-[0.2em] uppercase hover:bg-white transition-all"
                     onClick={handleWhatsApp}
                   >
-                    Order via WhatsApp <MessageCircle size={14} className="ml-2" />
+                    Order via WhatsApp <MessageCircle size={14} className="ml-2 text-green-500" />
                   </Button>
                 </div>
                 <p className="text-[10px] text-center text-muted-foreground mt-4 italic">Worldwide heritage delivery available.</p>

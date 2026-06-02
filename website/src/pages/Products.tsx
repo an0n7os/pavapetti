@@ -66,6 +66,23 @@ export default function Products() {
     setFeaturedOnly(featured);
   }, [currentSearchStr]);
 
+  // Sync state changes back to the browser URL for deep-linking & smooth browser navigation
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (activeCategory) params.set("category", activeCategory);
+    if (search) params.set("search", search);
+    if (featuredOnly) params.set("featured", "true");
+
+    const newSearch = params.toString();
+    const currentSearch = window.location.search.replace(/^\?/, "");
+    if (newSearch !== currentSearch) {
+      const newUrl = window.location.pathname + (newSearch ? `?${newSearch}` : "");
+      window.history.replaceState(null, "", newUrl);
+    }
+  }, [activeCategory, search, featuredOnly]);
+
+
+
   const { data: categories } = useListCategories();
   const params = {
     ...(activeCategory ? { category: activeCategory } : {}),
@@ -129,21 +146,21 @@ export default function Products() {
 
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-16">
         {/* Search + filters — Ultra Premium Layout */}
-        <div className="flex flex-col gap-12 mb-16">
+        <div className="flex flex-col gap-8 md:gap-12 mb-16">
           {/* Main Search Row */}
-          <div className="flex flex-col lg:flex-row items-center gap-6 w-full">
+          <div className="flex flex-col lg:flex-row items-center gap-4 lg:gap-6 w-full">
             <form onSubmit={handleSearch} className="relative flex-1 w-full group">
-              <Search size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-primary opacity-40 group-focus-within:opacity-80 transition-opacity" />
+              <Search size={16} className="absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-primary opacity-40 group-focus-within:opacity-80 transition-opacity" />
               <input
-                placeholder="Search by keyword, material, or origin..."
+                placeholder="Search the archives..."
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                className="w-full bg-[#f9f7f4] border border-primary/5 group-hover:border-primary/10 rounded-2xl py-5 pl-14 pr-32 text-sm tracking-wide focus:border-primary/30 focus:ring-1 focus:ring-primary/10 transition-all outline-none shadow-sm"
+                className="w-full bg-[#f9f7f4] border border-primary/5 group-hover:border-primary/10 rounded-2xl py-4 md:py-5 pl-12 md:pl-14 pr-24 md:pr-32 text-xs md:text-sm tracking-wide focus:border-primary/30 focus:ring-1 focus:ring-primary/10 transition-all outline-none shadow-sm"
                 data-testid="input-search"
               />
-              <div className="absolute right-3 top-1/2 -translate-y-1/2">
+              <div className="absolute right-2 md:right-3 top-1/2 -translate-y-1/2">
                 <Magnetic>
-                  <Button type="submit" className="bg-primary text-primary-foreground text-[10px] font-black tracking-widest uppercase px-6 py-2.5 rounded-xl h-auto hover:bg-primary/90 transition-all">
+                  <Button type="submit" className="bg-primary text-primary-foreground text-[9px] md:text-[10px] font-black tracking-widest uppercase px-4 md:px-6 py-2 md:py-2.5 rounded-xl h-auto hover:bg-primary/90 transition-all">
                     Search
                   </Button>
                 </Magnetic>
@@ -155,10 +172,10 @@ export default function Products() {
                 <Button
                   variant="outline"
                   onClick={() => setFeaturedOnly(featuredOnly ? undefined : true)}
-                  className={`rounded-2xl border-primary/10 hover:border-primary/35 py-5 px-6 text-[10px] font-black tracking-widest uppercase transition-all shadow-sm ${featuredOnly ? "bg-primary text-primary-foreground border-primary" : "bg-white hover:bg-[#f9f7f4]"}`}
+                  className={`rounded-2xl border-primary/10 hover:border-primary/35 py-4 md:py-5 px-5 md:px-6 text-[9px] md:text-[10px] font-black tracking-widest uppercase transition-all shadow-sm h-auto ${featuredOnly ? "bg-primary text-primary-foreground border-primary" : "bg-white hover:bg-[#f9f7f4]"}`}
                   data-testid="button-filter-featured"
                 >
-                  <Star size={13} className={featuredOnly ? "fill-current mr-2" : "mr-2 text-primary"} />
+                  <Star size={12} className={featuredOnly ? "fill-current mr-2" : "mr-2 text-primary"} />
                   {featuredOnly ? "Curated Pieces" : "Featured Only"}
                 </Button>
               </Magnetic>
@@ -168,7 +185,7 @@ export default function Products() {
                   <Button
                     variant="ghost"
                     onClick={clearFilters}
-                    className="text-[10px] font-black tracking-widest uppercase text-muted-foreground hover:text-destructive py-5 px-4"
+                    className="text-[9px] md:text-[10px] font-black tracking-widest uppercase text-muted-foreground hover:text-destructive py-4 md:py-5 px-4 h-auto"
                     data-testid="button-clear-filters"
                   >
                     Reset Archive
@@ -178,31 +195,39 @@ export default function Products() {
             </div>
           </div>
 
-          {/* Category Navigation — Horizontal Luxury Pills */}
-          <div className="flex items-center gap-3 overflow-x-auto pb-4 no-scrollbar border-b border-primary/5 scroll-smooth">
-            <button
-              onClick={() => setActiveCategory("")}
-              className={`text-[10px] font-black tracking-[0.25em] uppercase whitespace-nowrap transition-all px-6 py-3 rounded-full ${
-                activeCategory === "" 
-                  ? "bg-secondary text-secondary-foreground shadow-lg shadow-secondary/15" 
-                  : "bg-[#f9f7f4] text-muted-foreground/60 hover:text-primary border border-primary/5 hover:border-primary/15"
-              }`}
-            >
-              All Archive
-            </button>
-            {(Array.isArray(categories) ? categories : []).map((cat: any) => (
+          {/* Category Navigation — Horizontal Luxury Pills with dissolving edge gradients */}
+          <div className="relative w-full border-b border-primary/5 pb-4">
+            {/* Left Edge Dissolve */}
+            <div className="absolute left-0 top-0 bottom-4 w-12 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none opacity-40 md:opacity-100" />
+            
+            <div className="flex items-center gap-3 overflow-x-auto no-scrollbar scroll-smooth w-full px-6 md:px-0">
               <button
-                key={cat.id}
-                onClick={() => setActiveCategory(cat.name)}
-                className={`text-[10px] font-black tracking-[0.25em] uppercase whitespace-nowrap transition-all px-6 py-3 rounded-full ${
-                  activeCategory === cat.name 
+                onClick={() => setActiveCategory("")}
+                className={`text-[9px] md:text-[10px] font-black tracking-[0.25em] uppercase whitespace-nowrap transition-all px-5 md:px-6 py-2.5 md:py-3 rounded-full ${
+                  activeCategory === "" 
                     ? "bg-secondary text-secondary-foreground shadow-lg shadow-secondary/15" 
                     : "bg-[#f9f7f4] text-muted-foreground/60 hover:text-primary border border-primary/5 hover:border-primary/15"
                 }`}
               >
-                {cat.name}
+                All Archive
               </button>
-            ))}
+              {(Array.isArray(categories) ? categories : []).map((cat: any) => (
+                <button
+                  key={cat.id}
+                  onClick={() => setActiveCategory(cat.name)}
+                  className={`text-[9px] md:text-[10px] font-black tracking-[0.25em] uppercase whitespace-nowrap transition-all px-5 md:px-6 py-2.5 md:py-3 rounded-full ${
+                    activeCategory === cat.name 
+                      ? "bg-secondary text-secondary-foreground shadow-lg shadow-secondary/15" 
+                      : "bg-[#f9f7f4] text-muted-foreground/60 hover:text-primary border border-primary/5 hover:border-primary/15"
+                  }`}
+                >
+                  {cat.name}
+                </button>
+              ))}
+            </div>
+
+            {/* Right Edge Dissolve */}
+            <div className="absolute right-0 top-0 bottom-4 w-16 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
           </div>
         </div>
 

@@ -162,7 +162,7 @@ export default function Home() {
             className="absolute inset-0 z-0"
           >
             {/* Enhanced Side Gradient for text protection */}
-            <div className="absolute inset-0 bg-gradient-to-r from-black via-black/40 to-transparent z-10" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/60 md:bg-gradient-to-r md:from-black md:via-black/50 md:to-transparent z-10" />
             
             <motion.div
               style={{ y: y1 }}
@@ -247,12 +247,6 @@ export default function Home() {
                   </span>
                 </button>
               </Link>
-              
-              <Link href="/products">
-                <button className="px-6 h-14 border border-white/20 text-white font-bold text-[11px] tracking-[0.3em] uppercase hover:bg-white hover:text-black transition-all duration-500">
-                  Virtual Tour
-                </button>
-              </Link>
             </motion.div>
           </div>
 
@@ -283,12 +277,27 @@ export default function Home() {
             </button>
           ))}
         </div>
+
+        {/* Mobile Page Indicator Pill */}
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 md:hidden bg-black/60 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/10 flex items-center gap-2.5">
+          <span className="text-[9px] font-black tracking-widest text-primary">{`0${heroIdx + 1}`}</span>
+          <div className="w-8 h-[1px] bg-white/20 relative overflow-hidden rounded-full">
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: "100%" }}
+              key={heroIdx}
+              transition={{ duration: 6.5, ease: "linear" }}
+              className="absolute inset-y-0 left-0 bg-primary"
+            />
+          </div>
+          <span className="text-[9px] font-black tracking-widest text-white/40">{`0${HERO_SLIDES.length}`}</span>
+        </div>
       </section>
 
       <MarqueeBand />
 
       {/* ── Our Essence — Brand Mission Statement ── */}
-      <section className="py-24 bg-background">
+      <section className="py-16 md:py-24 bg-background">
         <div className="max-w-7xl mx-auto px-6 lg:px-16">
           <div className="grid md:grid-cols-2 gap-16 items-center">
             <motion.div
@@ -320,9 +329,9 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-24 border-y border-border/10">
+      <section className="py-16 md:py-24 border-y border-border/10">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-12">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
             {[
               { icon: <ShieldCheck className="text-primary" size={32} />, title: "Authentic Heritage", desc: "100% Original Kerala Artifacts" },
               { icon: <Sparkles className="text-primary" size={32} />, title: "Handcrafted", desc: "Made by Master Artisans" },
@@ -340,15 +349,15 @@ export default function Home() {
       </section>
 
       {/* ── Featured Collection — Immediate Discovery ── */}
-      <section className="py-24 max-w-7xl mx-auto px-6 lg:px-16">
-        <div className="flex items-end justify-between mb-16">
+      <section className="py-16 md:py-24 max-w-7xl mx-auto px-6 lg:px-16">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-12 md:mb-16">
           <div>
-            <p className="text-primary text-[10px] tracking-[0.5em] uppercase font-black mb-4">Curated for you</p>
-            <h2 className="font-serif text-5xl font-light text-foreground">Featured <span className="italic text-primary">Masterpieces</span></h2>
+            <p className="text-primary text-[10px] tracking-[0.5em] uppercase font-black mb-3">Curated for you</p>
+            <h2 className="font-serif text-4xl md:text-5xl font-light text-foreground">Featured <span className="italic text-primary">Masterpieces</span></h2>
           </div>
-          <Link href="/products?featured=true" className="group flex items-center gap-4 text-[11px] font-black tracking-[0.4em] uppercase text-foreground/40 hover:text-primary transition-all duration-500">
+          <Link href="/products?featured=true" className="group flex items-center gap-3 text-[10px] md:text-[11px] font-black tracking-[0.3em] md:tracking-[0.4em] uppercase text-foreground/40 hover:text-primary transition-all duration-500 self-start sm:self-auto">
             Explore All Artifacts
-            <div className="w-12 h-px bg-foreground/10 group-hover:bg-primary group-hover:w-20 transition-all duration-500" />
+            <div className="w-8 md:w-12 h-px bg-foreground/10 group-hover:bg-primary group-hover:w-20 transition-all duration-500" />
           </Link>
         </div>
 
@@ -372,7 +381,7 @@ export default function Home() {
         )}
       </section>
 
-      <section className="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-16 md:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <p className="text-primary text-[10px] tracking-[0.5em] uppercase font-bold mb-4">Curated Collections</p>
           <h2 className="font-serif text-5xl font-light text-foreground">Curated <span className="italic">Parampara</span></h2>
@@ -430,7 +439,7 @@ export default function Home() {
 
 
       {/* ── Heritage Gallery — Ultra Premium Grid ── */}
-      <section className="py-32 bg-white w-full overflow-hidden">
+      <section className="py-20 md:py-32 bg-white w-full overflow-hidden">
         <div className="max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16 w-full">
           <div className="flex flex-col items-center text-center mb-20">
             <motion.span 
@@ -452,19 +461,19 @@ export default function Home() {
             </motion.h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 w-full">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 w-full">
             {/* Main Featured Piece */}
             <motion.div 
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="lg:col-span-2 lg:row-span-2 relative group overflow-hidden rounded-[2.5rem] shadow-2xl aspect-[4/5] lg:aspect-auto border border-primary/5 hover:border-primary/20 transition-all duration-700"
+              className="col-span-2 lg:col-span-2 lg:row-span-2 relative group overflow-hidden rounded-[2rem] md:rounded-[2.5rem] shadow-2xl aspect-[4/3] md:aspect-[4/5] lg:aspect-auto border border-primary/5 hover:border-primary/20 transition-all duration-700"
             >
               <img src="/netipattam.png" alt="Netipattam" className="w-full h-full object-cover transition-transform duration-[2500ms] ease-out group-hover:scale-105" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent transition-opacity duration-700 group-hover:from-black/75" />
-              <div className="absolute bottom-10 left-10 text-white z-10">
-                <span className="text-[10px] font-black tracking-[0.4em] uppercase text-primary/90 mb-3 block">The Golden Ornament</span>
-                <h4 className="font-serif text-3xl md:text-4xl font-light tracking-tight text-[#FFF8E7]">Netipattam</h4>
+              <div className="absolute bottom-6 left-6 md:bottom-10 md:left-10 text-white z-10">
+                <span className="text-[8px] md:text-[10px] font-black tracking-[0.3em] md:tracking-[0.4em] uppercase text-primary/90 mb-2 block">The Golden Ornament</span>
+                <h4 className="font-serif text-2xl md:text-4xl font-light tracking-tight text-[#FFF8E7]">Netipattam</h4>
               </div>
             </motion.div>
 
@@ -481,13 +490,13 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="relative group overflow-hidden rounded-[2rem] shadow-lg hover:shadow-xl aspect-[4/5] border border-primary/5 hover:border-primary/20 transition-all duration-700 bg-[#f9f7f4]"
+                className="relative group overflow-hidden rounded-[1.5rem] md:rounded-[2rem] shadow-lg hover:shadow-xl aspect-[4/5] border border-primary/5 hover:border-primary/20 transition-all duration-700 bg-[#f9f7f4]"
               >
                 <img src={item.img} alt={item.title} className="w-full h-full object-cover transition-transform duration-[2500ms] ease-out group-hover:scale-105" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent opacity-90 group-hover:opacity-100 transition-opacity duration-700" />
-                <div className="absolute bottom-8 left-8 text-white z-10 translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
-                  <p className="text-[9px] font-black tracking-[0.3em] uppercase text-primary/90 mb-2">{item.tag}</p>
-                  <h4 className="font-serif text-xl font-light tracking-tight text-[#FFF8E7]">{item.title}</h4>
+                <div className="absolute bottom-4 left-4 md:bottom-8 md:left-8 text-white z-10 translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
+                  <p className="text-[8px] md:text-[9px] font-black tracking-[0.2em] md:tracking-[0.3em] uppercase text-primary/90 mb-1 md:mb-2">{item.tag}</p>
+                  <h4 className="font-serif text-sm md:text-xl font-light tracking-tight text-[#FFF8E7] leading-tight">{item.title}</h4>
                 </div>
               </motion.div>
             ))}
@@ -498,19 +507,26 @@ export default function Home() {
       <StorySection />
 
       {/* ── As Seen In — Premium Trust Section ── */}
-      <section className="py-20">
+      <section className="py-14 md:py-20">
         <div className="container mx-auto px-4">
           <p className="text-center text-[10px] tracking-[0.4em] uppercase font-bold opacity-30 mb-10">As Seen In & Recognized By</p>
           <div className="grid grid-cols-2 md:flex flex-wrap justify-center items-center gap-x-12 gap-y-8 lg:gap-24 opacity-40 grayscale contrast-150">
-            {["Architectural Digest", "Vogue Living", "Heritage India", "The Hindu", "Deccan Chronicle"].map((brand) => (
-              <span key={brand} className="font-serif text-lg md:text-xl font-black tracking-tighter whitespace-nowrap text-center">{brand}</span>
+            {["Architectural Digest", "Vogue Living", "Heritage India", "The Hindu", "Deccan Chronicle"].map((brand, idx) => (
+              <span 
+                key={brand} 
+                className={`font-serif text-base md:text-xl font-black tracking-tighter whitespace-nowrap text-center ${
+                  idx === 4 ? "col-span-2 text-center mt-2 md:mt-0 md:col-span-1" : ""
+                }`}
+              >
+                {brand}
+              </span>
             ))}
           </div>
         </div>
       </section>
 
       {/* ═══ Testimonials ═══ */}
-      <section className="py-32 bg-card">
+      <section className="py-20 md:py-32 bg-card">
         <div className="max-w-7xl mx-auto px-6 lg:px-16">
           <div className="text-center mb-20">
             <p className="text-primary text-[10px] tracking-[0.5em] uppercase font-black mb-4">Voices of the Connoisseur</p>
@@ -547,7 +563,7 @@ export default function Home() {
       </section>
 
       {/* ── Curatorial Sanctuary — Private Curator's Advisory ── */}
-      <section className="bg-[#0d0d0d] py-32 px-6 overflow-hidden relative border-t border-white/5">
+      <section className="bg-[#0d0d0d] py-20 md:py-32 px-6 overflow-hidden relative border-t border-white/5">
         {/* Volcanic Gold Glow Backdrops */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(var(--primary-rgb),0.12),transparent_70%)] pointer-events-none" />
         <div className="absolute -top-40 -left-40 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none animate-pulse" />
@@ -565,7 +581,7 @@ export default function Home() {
               className="lg:col-span-5 relative group"
             >
               {/* Double Gold-Line Frame */}
-              <div className="absolute -inset-4 border border-primary/20 pointer-events-none rounded-[3rem] transition-all duration-700 group-hover:scale-[1.02] group-hover:border-primary/45" />
+              <div className="absolute -inset-2 sm:-inset-4 border border-primary/20 pointer-events-none rounded-[2.5rem] sm:rounded-[3rem] transition-all duration-700 group-hover:scale-[1.02] group-hover:border-primary/45" />
               
               <div className="relative aspect-[4/5] rounded-[2.5rem] overflow-hidden bg-black/40 border border-white/10 shadow-2xl">
                 <img 

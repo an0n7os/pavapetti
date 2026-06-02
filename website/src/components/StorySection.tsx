@@ -16,8 +16,8 @@ export default function StorySection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
           
-          {/* Left: Visual Storytelling */}
-          <div className="relative">
+          {/* Left: Visual Storytelling — Responsively Cushioned & Scaled */}
+          <div className="relative pb-12 sm:pb-0">
             <motion.div 
               style={{ y: y1 }}
               className="aspect-[4/5] rounded-[2rem] overflow-hidden shadow-2xl relative z-10"
@@ -32,7 +32,7 @@ export default function StorySection() {
             
             <motion.div 
               style={{ y: y2 }}
-              className="absolute -bottom-16 -right-12 w-2/3 aspect-square rounded-[2rem] overflow-hidden shadow-2xl z-20 border-[12px] border-white"
+              className="absolute -bottom-8 -right-4 sm:-bottom-16 sm:-right-12 w-1/2 sm:w-2/3 aspect-square rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden shadow-2xl z-20 border-[6px] sm:border-[12px] border-white"
             >
               <img 
                 src="/aranmula-mirror.png" 

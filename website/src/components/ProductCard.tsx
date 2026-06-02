@@ -94,8 +94,8 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
               />
             </button>
 
-            {/* Tags */}
-            <div className="absolute top-6 left-6 flex flex-col gap-2">
+            {/* Tags — Responsive (Hidden on mobile for pure clean visual catalog look) */}
+            <div className="hidden md:flex absolute top-6 left-6 flex-col gap-2">
               {product.isNewArrival && (
                 <div className="bg-white/90 backdrop-blur-md px-4 py-1 rounded-full border border-white/40 shadow-sm">
                   <p className="text-[9px] font-black tracking-[0.3em] uppercase text-primary">New Arrival</p>
@@ -108,8 +108,8 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
               )}
             </div>
 
-            {/* Quick Add Overlay — More prominent Add to Cart */}
-            <div className="absolute inset-x-0 bottom-0 p-4 md:p-8 translate-y-0 opacity-100 md:translate-y-6 md:opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-700 ease-[0.16, 1, 0.3, 1]">
+            {/* Quick Add Overlay — More prominent Add to Cart on Desktop */}
+            <div className="hidden md:block absolute inset-x-0 bottom-0 p-8 translate-y-6 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-700 ease-[0.16, 1, 0.3, 1]">
               <Button 
                 onClick={(e) => {
                   e.preventDefault();
@@ -139,39 +139,30 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
             </div>
           </div>
 
-          {/* Info */}
-          <div className="mt-8 px-2">
-            <div className="flex justify-between items-start gap-4">
-              <div className="flex-1 min-h-[4rem]">
-                <p className="text-[10px] font-bold tracking-[0.4em] uppercase text-primary/70 mb-2 group-hover:text-primary transition-colors duration-500">
-                  {product.categoryName || "Pavapetti Heritage"}
-                </p>
-                <h3 className="font-serif text-2xl font-light text-foreground transition-all duration-500 leading-tight">
-                  {product.name}
-                </h3>
-                {/* Heritage Note */}
-                <p className="text-[10px] italic text-muted-foreground/60 mt-2 font-serif">
-                  {product.categoryName === "Pooja Category" ? "Ritual brass hand-cast in the traditions of Mannar" :
-                   product.categoryName === "Elephant Heritage" ? "Sacred ornamentation celebrating the spirit of the Gajam" :
-                   product.categoryName === "Chains and Bracelets" ? "Protective talismans crafted with ancient geometry" :
-                   product.categoryName === "Miniatures & Mini Chenda" ? "Small-scale masterpieces preserving temple rhythms" :
-                   product.categoryName === "Fragrances & Organic Soap" ? "Natural essences derived from the sacred groves" :
-                   "A curated piece of Kerala's living heritage"}
-                </p>
-              </div>
-              <div className="flex flex-col items-end">
+          {/* Info — Premium Responsive Layout */}
+          <div className="mt-4 md:mt-8 px-1 md:px-2">
+            <p className="text-[8px] md:text-[10px] font-bold tracking-[0.2em] md:tracking-[0.4em] uppercase text-primary/70 mb-1 md:mb-2 group-hover:text-primary transition-colors duration-500">
+              {product.categoryName || "Pavapetti Heritage"}
+            </p>
+            
+            <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-1 md:gap-4">
+              <h3 className="font-serif text-base md:text-2xl font-light text-foreground transition-all duration-500 leading-tight flex-1">
+                {product.name}
+              </h3>
+              
+              <div className="flex flex-row md:flex-col items-baseline md:items-end gap-1.5 md:gap-1 mt-1 md:mt-0 shrink-0">
                 {product.mrp && product.mrp > product.price && (
-                  <span className="text-[14px] font-light text-foreground/20 line-through tracking-tighter mb-1">
+                  <span className="text-[11px] md:text-[14px] font-light text-foreground/20 line-through tracking-tighter">
                     ₹{product.mrp.toLocaleString("en-IN")}
                   </span>
                 )}
-                <p className="text-[18px] font-bold text-primary tracking-tight">
+                <p className="text-[14px] md:text-[18px] font-bold text-primary tracking-tight">
                   ₹{product.price.toLocaleString("en-IN")}
                 </p>
               </div>
             </div>
             
-            <div className="h-px w-0 group-hover:w-full bg-primary/10 mt-6 transition-all duration-1000 ease-[0.16, 1, 0.3, 1]" />
+            <div className="h-px w-0 group-hover:w-full bg-primary/10 mt-4 md:mt-6 transition-all duration-1000 ease-[0.16, 1, 0.3, 1]" />
           </div>
         </div>
       </Link>

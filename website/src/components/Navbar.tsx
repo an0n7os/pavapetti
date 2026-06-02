@@ -175,7 +175,7 @@ export default function Navbar() {
             </div>
 
             <div className="flex items-center gap-1 shrink-0">
-              {/* Expandable search */}
+              {/* Expandable search - Desktop only */}
               <div className="hidden md:flex items-center relative mr-2">
                 <motion.div
                   initial={false}
@@ -217,8 +217,18 @@ export default function Navbar() {
                 </Magnetic>
               </div>
 
-              {/* Wishlist - Hidden on mobile because it's in MobileNav */}
-              <div className="hidden md:block">
+              {/* Search Toggle Button - Mobile only */}
+              <div className="md:hidden flex items-center">
+                <button
+                  onClick={() => setSearchOpen(!searchOpen)}
+                  className="p-2.5 hover:text-primary hover:bg-primary/8 rounded-xl transition-all text-muted-foreground"
+                >
+                  {searchOpen ? <X size={18} /> : <Search size={18} />}
+                </button>
+              </div>
+
+              {/* Wishlist - Visible on both desktop & mobile */}
+              <div className="flex items-center">
                 <Magnetic>
                   <Link href="/wishlist">
                     <button className="relative p-2.5 hover:text-primary hover:bg-primary/8 rounded-xl transition-all text-muted-foreground">
@@ -260,72 +270,135 @@ export default function Navbar() {
           </div>
         </div>
       </nav>
+
+      {/* Mobile Search Bar Dropdown Overlay */}
+      <AnimatePresence>
+        {searchOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            className="md:hidden w-full bg-white border-b border-border/40 px-6 py-3 flex items-center gap-3 relative z-40 shadow-sm overflow-hidden"
+          >
+            <div className="relative flex-1">
+              <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground/60" />
+              <input
+                ref={searchRef}
+                type="text"
+                placeholder="Search artifacts..."
+                value={searchVal}
+                onChange={(e) => setSearchVal(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    if (searchVal.trim()) {
+                      setLocation(`/products?search=${encodeURIComponent(searchVal.trim())}`);
+                      setSearchOpen(false);
+                    }
+                  }
+                }}
+                className="w-full bg-[#f9f7f4] border border-border/40 rounded-full py-2 pl-10 pr-4 text-xs text-foreground focus:outline-none placeholder:text-muted-foreground/45"
+              />
+            </div>
+            <button 
+              onClick={() => setSearchOpen(false)}
+              className="text-xs font-bold text-muted-foreground hover:text-primary uppercase tracking-widest pl-1"
+            >
+              Cancel
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
 
-      {/* Immersive Mobile Menu Overlay */}
+      {/* Immersive Mobile Menu Overlay — Cinematic Volcanic Charcoal & Gold */}
       <AnimatePresence>
         {menuOpen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] md:hidden bg-white flex flex-col p-8 sm:p-10"
+            className="fixed inset-0 z-[200] md:hidden bg-[#0d0d0d] flex flex-col p-8 sm:p-10 overflow-hidden"
           >
-            <div className="flex justify-between items-center mb-16">
-              <PavapettiLogo size={32} />
+            {/* Ambient Gold Radial Glow */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_0%_0%,rgba(184,134,11,0.1),transparent_60%)] pointer-events-none" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_100%_100%,rgba(184,134,11,0.05),transparent_50%)] pointer-events-none" />
+
+            <div className="relative z-10 flex justify-between items-center mb-16">
+              <PavapettiLogo size={32} variant="dark" />
               <button 
                 onClick={() => setMenuOpen(false)}
-                className="w-12 h-12 rounded-full border border-border/50 flex items-center justify-center text-foreground"
+                className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center text-white/80 hover:text-white transition-colors bg-white/5 backdrop-blur-md"
               >
                 <X size={20} />
               </button>
             </div>
 
-            <nav className="space-y-10">
-              {NAV_LINKS.map(({ href, label }, i) => (
-                <motion.div
-                  key={href}
-                  initial={{ opacity: 0, x: -30 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.1 }}
-                >
-                  <Link
-                    href={href}
-                    onClick={() => setMenuOpen(false)}
-                    className="group flex items-end gap-4"
+            <nav className="relative z-10 space-y-8">
+              {NAV_LINKS.map(({ href, label }, i) => {
+                const active = href === "/dashboard" ? isDashboard : isActive(href);
+                return (
+                  <motion.div
+                    key={href}
+                    initial={{ opacity: 0, x: -30 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.1 }}
                   >
-                    <span className="text-primary text-[10px] font-black tracking-widest mb-2 opacity-40">0{i + 1}</span>
-                    <span className="text-5xl font-serif font-light text-foreground group-hover:text-primary transition-colors italic">
-                      {label}
-                    </span>
-                  </Link>
-                </motion.div>
-              ))}
+                    <Link
+                      href={href}
+                      onClick={() => setMenuOpen(false)}
+                      className="group flex items-end gap-4"
+                    >
+                      <span className={`text-primary text-[10px] font-black tracking-widest mb-2 transition-all ${active ? "opacity-100" : "opacity-60"}`}>
+                        0{i + 1}
+                      </span>
+                      <span className={`text-5xl font-serif font-light transition-colors italic relative ${
+                        active ? "text-primary" : "text-white/90 group-hover:text-primary"
+                      }`}>
+                        {label}
+                        {active && (
+                          <span className="absolute -right-5 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-primary" />
+                        )}
+                      </span>
+                    </Link>
+                  </motion.div>
+                );
+              })}
               
               <motion.div
                 initial={{ opacity: 0, x: -30 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3 }}
+                transition={{ delay: 0.2 }}
               >
-                <button 
-                  onClick={() => { setMenuOpen(false); setCatOpen(true); }}
+                <Link
+                  href="/wishlist"
+                  onClick={() => setMenuOpen(false)}
                   className="group flex items-end gap-4"
                 >
-                  <span className="text-primary text-[10px] font-black tracking-widest mb-2 opacity-40">03</span>
-                  <span className="text-5xl font-serif font-light text-foreground group-hover:text-primary transition-colors italic">
-                    Collections
+                  <span className={`text-primary text-[10px] font-black tracking-widest mb-2 transition-all ${isActive("/wishlist") ? "opacity-100" : "opacity-60"}`}>
+                    03
                   </span>
-                </button>
+                  <span className={`text-5xl font-serif font-light transition-colors italic relative ${
+                    isActive("/wishlist") ? "text-primary" : "text-white/90 group-hover:text-primary"
+                  }`}>
+                    Favorites
+                    {wishlistCount > 0 && (
+                      <span className="absolute -right-12 top-1/2 -translate-y-1/2 bg-primary text-primary-foreground text-[10px] font-black min-w-[20px] min-h-[20px] rounded-full flex items-center justify-center shadow-lg border border-primary/20">
+                        {wishlistCount}
+                      </span>
+                    )}
+                  </span>
+                </Link>
               </motion.div>
             </nav>
 
-            <div className="mt-auto pt-10 border-t border-border/50 space-y-6">
+            <div className="relative z-10 mt-auto pt-10 border-t border-white/10 space-y-6">
               <div className="flex items-center gap-6">
-                <a href="#" className="text-foreground hover:text-primary transition-colors"><Instagram size={20} /></a>
-                <a href="#" className="text-foreground hover:text-primary transition-colors"><Facebook size={20} /></a>
-                <a href="#" className="text-foreground hover:text-primary transition-colors"><Youtube size={20} /></a>
+                <a href="#" className="text-white/60 hover:text-primary transition-colors"><Instagram size={20} /></a>
+                <a href="#" className="text-white/60 hover:text-primary transition-colors"><Facebook size={20} /></a>
+                <a href="#" className="text-white/60 hover:text-primary transition-colors"><Youtube size={20} /></a>
               </div>
-              <p className="text-[9px] text-muted-foreground uppercase tracking-[0.4em] font-black leading-relaxed">
+              <p className="text-[9px] text-white/40 uppercase tracking-[0.4em] font-black leading-relaxed">
                 Authentic Heritage · Curated for the Connoisseur
               </p>
             </div>

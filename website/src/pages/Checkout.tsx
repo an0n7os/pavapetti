@@ -143,7 +143,7 @@ export default function Checkout() {
 
         <div className="grid lg:grid-cols-12 gap-16">
           {/* Shipping Form */}
-          <div className="lg:col-span-7 space-y-12">
+          <div className="lg:col-span-7 space-y-12 order-2 lg:order-1">
             <section>
               <div className="flex items-center gap-3 mb-8">
                 <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
@@ -242,7 +242,7 @@ export default function Checkout() {
           </div>
 
           {/* Order Summary */}
-          <div className="lg:col-span-5">
+          <div className="lg:col-span-5 order-1 lg:order-2">
             <div className="bg-[#f9f7f4] p-10 rounded-[2.5rem] border border-border/40 sticky top-32">
               <h3 className="font-serif text-2xl mb-8">Summary</h3>
               
