@@ -259,7 +259,7 @@ export default function Home() {
         </div>
 
         {/* Custom Hero Slider Indicators with Golden Timelines */}
-        <div className="absolute right-6 md:right-16 bottom-10 z-30 hidden md:flex items-center gap-8 text-white/50">
+        <div className="absolute right-6 md:right-32 bottom-10 z-30 hidden md:flex items-center gap-8 text-white/50">
           {HERO_SLIDES.map((s, idx) => (
             <button
               key={idx}
