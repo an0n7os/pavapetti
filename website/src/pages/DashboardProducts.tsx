@@ -290,13 +290,15 @@ export default function DashboardProducts() {
                           <Button
                             type="button"
                             variant="secondary"
-                            className="w-full gap-3 border-dashed border-2 border-primary/15 bg-white hover:bg-primary/5 hover:border-primary/35 rounded-2xl py-12 flex flex-col h-auto justify-center transition-all duration-300 group"
+                            className="w-full border-2 border-dashed border-primary/20 bg-gradient-to-br from-white/90 to-[#faf8f5]/90 hover:from-white hover:to-[#faf6ee] hover:border-primary/45 rounded-3xl py-14 flex flex-col h-auto justify-center items-center cursor-pointer transition-all duration-300 shadow-md shadow-primary/5 hover:shadow-lg hover:shadow-primary/5 group"
                             onClick={() => document.getElementById("image-upload")?.click()}
                           >
-                            <Upload size={20} className="text-primary opacity-60 group-hover:scale-110 transition-transform duration-300" />
+                            <div className="w-12 h-12 rounded-full bg-primary/5 group-hover:bg-primary/10 flex items-center justify-center mb-3 transition-colors duration-300">
+                              <Upload size={18} className="text-primary opacity-70 group-hover:scale-110 transition-transform duration-300" />
+                            </div>
                             <div className="flex flex-col items-center">
-                              <span className="text-[10px] font-black tracking-widest uppercase text-foreground mb-1">Select High-Res Image</span>
-                              <span className="text-[9px] text-muted-foreground/60 tracking-wider">png, jpg, jpeg, webp accepted</span>
+                              <span className="text-[10px] font-black tracking-[0.2em] uppercase text-primary/80 group-hover:text-primary transition-colors duration-300">Select Artifact Photo</span>
+                              <span className="text-[9px] font-serif italic text-muted-foreground/60 tracking-wider mt-1">supports high-res png, jpg, webp</span>
                             </div>
                           </Button>
                         </div>
@@ -332,15 +334,17 @@ export default function DashboardProducts() {
                           </button>
                         </div>
                       ))}
-                      <label className="flex flex-col items-center justify-center aspect-square rounded-2xl border-2 border-dashed border-primary/15 hover:border-primary/35 bg-white hover:bg-primary/5 cursor-pointer transition-all duration-300 group">
+                      <label className="flex flex-col items-center justify-center aspect-square rounded-2xl border-2 border-dashed border-primary/20 bg-gradient-to-br from-white/90 to-[#faf8f5]/90 hover:from-white hover:to-[#faf6ee] hover:border-primary/45 cursor-pointer transition-all duration-300 group shadow-sm hover:shadow-md">
                         <input
                           type="file"
                           className="hidden"
                           accept="image/*"
                           onChange={(e) => handleImageUpload(e, false)}
                         />
-                        <Plus size={22} className="text-primary opacity-60 group-hover:scale-110 transition-transform duration-300" />
-                        <span className="text-[9px] font-black tracking-widest uppercase mt-1 text-muted-foreground opacity-65">Add Artifact</span>
+                        <div className="w-9 h-9 rounded-full bg-primary/5 group-hover:bg-primary/10 flex items-center justify-center mb-1 transition-colors duration-300">
+                          <Plus size={16} className="text-primary opacity-70 group-hover:scale-110 transition-transform duration-300" />
+                        </div>
+                        <span className="text-[8px] font-black tracking-[0.15em] uppercase text-muted-foreground/80 group-hover:text-primary transition-colors duration-300">Add Artifact</span>
                       </label>
                     </div>
                     <Textarea 
