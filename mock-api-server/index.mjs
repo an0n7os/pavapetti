@@ -351,6 +351,88 @@ app.get('/api/categories', async (req, res) => {
   }
 });
 
+app.post('/api/categories', async (req, res) => {
+  if (isSupabaseConfigured) {
+    try {
+      const dbCategory = mapCategoryToDb({
+        ...req.body,
+        productCount: 0
+      });
+
+      const { data, error } = await supabase
+        .from('categories')
+        .insert([dbCategory])
+        .select()
+        .single();
+
+      if (error) throw error;
+      return res.status(201).json(mapCategoryFromDb(data));
+    } catch (err) {
+      console.error('Database error on category creation:', err);
+      return res.status(500).json({ error: err.message });
+    }
+  } else {
+    const newCat = {
+      ...req.body,
+      id: categories.reduce((max, c) => Math.max(max, c.id), 0) + 1,
+      productCount: 0
+    };
+    categories.push(newCat);
+    res.status(201).json(newCat);
+  }
+});
+
+app.delete('/api/categories/:id', async (req, res) => {
+  const idStr = req.params.id;
+  if (isSupabaseConfigured) {
+    try {
+      const { error } = await supabase
+        .from('categories')
+        .delete()
+        .eq('id', idStr);
+
+      if (error) throw error;
+      return res.sendStatus(204);
+    } catch (err) {
+      console.error('Database error on category deletion:', err);
+      return res.status(500).json({ error: err.message });
+    }
+  } else {
+    categories = categories.filter(c => c.id !== parseInt(idStr));
+    res.sendStatus(204);
+  }
+});
+
+app.put('/api/categories/:id', async (req, res) => {
+  const idStr = req.params.id;
+  if (isSupabaseConfigured) {
+    try {
+      const dbCategory = mapCategoryToDb(req.body);
+
+      const { data, error } = await supabase
+        .from('categories')
+        .update(dbCategory)
+        .eq('id', idStr)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return res.json(mapCategoryFromDb(data));
+    } catch (err) {
+      console.error('Database error on category update:', err);
+      return res.status(500).json({ error: err.message });
+    }
+  } else {
+    const idx = categories.findIndex(c => c.id === parseInt(idStr));
+    if (idx !== -1) {
+      categories[idx] = { ...categories[idx], ...req.body };
+      res.json(categories[idx]);
+    } else {
+      res.status(404).json({ error: 'Not found' });
+    }
+  }
+});
+
 app.get('/api/products', async (req, res) => {
   const { category, search, featured } = req.query;
 

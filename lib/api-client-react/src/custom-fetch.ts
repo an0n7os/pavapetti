@@ -650,6 +650,59 @@ export async function customFetch<T = unknown>(
       }
     }
 
+    // 1c. PUT Category (Update)
+    if (method === "PUT" && cleanUrl.match(/^\/api\/categories\/\d+$/)) {
+      try {
+        const id = parseInt(cleanUrl.split("/").pop() || "0", 10);
+        const bodyData = typeof requestBody === "string" ? JSON.parse(requestBody) : requestBody;
+
+        if (supabaseUrl && supabaseKey) {
+          const dbCategory = {
+            name: bodyData.name,
+            description: bodyData.description,
+            image_url: bodyData.imageUrl
+          };
+
+          const putRes = await fetch(`${supabaseUrl}/rest/v1/categories?id=eq.${id}`, {
+            headers: getSupabaseHeaders(),
+            method: "PATCH",
+            body: JSON.stringify(dbCategory)
+          });
+          if (!putRes.ok) {
+            await handleFetchError(putRes, "Failed to update category in Supabase");
+          }
+          const updatedList = await putRes.json();
+          const updated = updatedList[0];
+          if (!updated) {
+            throw new Error("No category returned from Supabase");
+          }
+          return {
+            id: Number(updated.id),
+            name: updated.name,
+            description: updated.description,
+            imageUrl: updated.image_url,
+            productCount: Number(updated.product_count || 0),
+            createdAt: updated.created_at
+          } as unknown as T;
+        } else {
+          const idx = FALLBACK_CATEGORIES.findIndex(cat => cat.id === id);
+          if (idx !== -1) {
+            FALLBACK_CATEGORIES[idx] = {
+              ...FALLBACK_CATEGORIES[idx],
+              name: bodyData.name,
+              description: bodyData.description,
+              imageUrl: bodyData.imageUrl
+            };
+            return FALLBACK_CATEGORIES[idx] as unknown as T;
+          }
+          throw new Error("Category not found");
+        }
+      } catch (e) {
+        console.error("Failed to parse PUT categories body", e);
+        throw e;
+      }
+    }
+
     if (method === "POST" && cleanUrl === "/api/products") {
       try {
         const bodyData = typeof requestBody === "string" ? JSON.parse(requestBody) : requestBody;
@@ -817,7 +870,7 @@ export async function customFetch<T = unknown>(
     }
 
     // 4. Categories List
-    if (cleanUrl === "/api/categories") {
+    if (method === "GET" && cleanUrl === "/api/categories") {
       if (supabaseUrl && supabaseKey) {
         try {
           const catRes = await fetch(`${supabaseUrl}/rest/v1/categories?order=id.asc`, {
@@ -839,6 +892,56 @@ export async function customFetch<T = unknown>(
         }
       } else {
         return FALLBACK_CATEGORIES as unknown as T;
+      }
+    }
+
+    // 4b. Create Category
+    if (method === "POST" && cleanUrl === "/api/categories") {
+      try {
+        const bodyData = typeof requestBody === "string" ? JSON.parse(requestBody) : requestBody;
+        if (supabaseUrl && supabaseKey) {
+          const dbCategory = {
+            name: bodyData.name,
+            description: bodyData.description,
+            image_url: bodyData.imageUrl,
+            product_count: 0
+          };
+          const postRes = await fetch(`${supabaseUrl}/rest/v1/categories`, {
+            headers: getSupabaseHeaders(),
+            method: "POST",
+            body: JSON.stringify(dbCategory)
+          });
+          if (!postRes.ok) {
+            await handleFetchError(postRes, "Failed to create category in Supabase");
+          }
+          const createdList = await postRes.json();
+          const created = createdList[0];
+          if (!created) {
+            throw new Error("No category returned from Supabase");
+          }
+          return {
+            id: Number(created.id),
+            name: created.name,
+            description: created.description,
+            imageUrl: created.image_url,
+            productCount: Number(created.product_count || 0),
+            createdAt: created.created_at
+          } as unknown as T;
+        } else {
+          const newCat = {
+            id: FALLBACK_CATEGORIES.reduce((max, c) => Math.max(max, c.id), 0) + 1,
+            name: bodyData.name,
+            description: bodyData.description,
+            imageUrl: bodyData.imageUrl,
+            productCount: 0,
+            createdAt: new Date().toISOString()
+          };
+          FALLBACK_CATEGORIES.push(newCat);
+          return newCat as unknown as T;
+        }
+      } catch (e) {
+        console.error("Failed to parse POST categories body", e);
+        throw e;
       }
     }
     
