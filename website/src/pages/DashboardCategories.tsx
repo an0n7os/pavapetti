@@ -1,15 +1,26 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Grid3X3, X, Check } from "lucide-react";
+import { Plus, Grid3X3, X, Check, Trash2 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import DashboardLayout from "@/components/DashboardLayout";
 import {
   useListCategories,
   useCreateCategory,
+  useDeleteCategory,
   getListCategoriesQueryKey,
   getGetDashboardStatsQueryKey,
   type CreateCategoryBody,
@@ -27,11 +38,13 @@ export default function DashboardCategories() {
   const { toast } = useToast();
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState<CreateCategoryBody>(emptyForm);
+  const [deleteId, setDeleteId] = useState<number | null>(null);
 
   const { data: categories, isLoading } = useListCategories({
     query: { queryKey: getListCategoriesQueryKey() },
   });
   const createCategory = useCreateCategory();
+  const deleteCategory = useDeleteCategory();
 
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: getListCategoriesQueryKey() });
@@ -50,6 +63,21 @@ export default function DashboardCategories() {
           invalidate();
         },
         onError: () => toast({ title: "Failed to create category", variant: "destructive" }),
+      }
+    );
+  };
+
+  const handleDelete = () => {
+    if (deleteId == null) return;
+    deleteCategory.mutate(
+      { id: deleteId },
+      {
+        onSuccess: () => {
+          toast({ title: "Category deleted" });
+          setDeleteId(null);
+          invalidate();
+        },
+        onError: () => toast({ title: "Failed to delete category", variant: "destructive" }),
       }
     );
   };
@@ -129,21 +157,57 @@ export default function DashboardCategories() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.04, duration: 0.35 }}
               data-testid={`card-category-${cat.id}`}
+              className="relative group"
             >
               <Card className="border-border hover:border-primary/40 hover:shadow-md transition-all overflow-hidden">
                 <div className="aspect-video bg-muted overflow-hidden">
                   <img src={cat.imageUrl} alt={cat.name} className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
                 </div>
                 <CardContent className="p-4">
-                  <h3 className="font-serif font-semibold text-foreground mb-1">{cat.name}</h3>
-                  <p className="text-xs text-muted-foreground line-clamp-2 mb-2">{cat.description}</p>
-                  <p className="text-xs font-medium text-primary">{cat.productCount} product{cat.productCount !== 1 ? "s" : ""}</p>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-serif font-semibold text-foreground mb-1 truncate">{cat.name}</h3>
+                      <p className="text-xs text-muted-foreground line-clamp-2 mb-2">{cat.description}</p>
+                      <p className="text-xs font-medium text-primary">{cat.productCount} product{cat.productCount !== 1 ? "s" : ""}</p>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => setDeleteId(cat.id)}
+                      className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10 shrink-0"
+                      data-testid={`button-delete-category-${cat.id}`}
+                    >
+                      <Trash2 size={14} />
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             </motion.div>
           ))}
         </div>
       )}
+
+      {/* Delete confirmation */}
+      <AlertDialog open={deleteId !== null} onOpenChange={(open) => !open && setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="font-serif">Delete Category?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. The category will be permanently removed. Products in this category will not be deleted but will become uncategorized.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              data-testid="button-confirm-delete-category"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </DashboardLayout>
   );
 }

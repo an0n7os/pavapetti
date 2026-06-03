@@ -626,7 +626,30 @@ export async function customFetch<T = unknown>(
       }
     }
 
-    // 2. POST Product (Create)
+    // 1b. DELETE Category
+    if (method === "DELETE" && cleanUrl.match(/^\/api\/categories\/\d+$/)) {
+      const id = parseInt(cleanUrl.split("/").pop() || "0", 10);
+
+      if (supabaseUrl && supabaseKey) {
+        try {
+          const delRes = await fetch(`${supabaseUrl}/rest/v1/categories?id=eq.${id}`, {
+            headers: getSupabaseHeaders(),
+            method: "DELETE"
+          });
+          if (!delRes.ok) {
+            await handleFetchError(delRes, "Failed to delete category from Supabase");
+          }
+          return {} as unknown as T;
+        } catch (err) {
+          console.error("Direct Supabase DELETE category error:", err);
+          throw err;
+        }
+      } else {
+        FALLBACK_CATEGORIES = FALLBACK_CATEGORIES.filter(cat => cat.id !== id);
+        return {} as unknown as T;
+      }
+    }
+
     if (method === "POST" && cleanUrl === "/api/products") {
       try {
         const bodyData = typeof requestBody === "string" ? JSON.parse(requestBody) : requestBody;
