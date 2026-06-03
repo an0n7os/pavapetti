@@ -53,7 +53,7 @@ export default function Wishlist() {
             </Link>
           </motion.div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-16">
             {items.map((item, i) => (
               <ProductCard 
                 key={item.productId} 

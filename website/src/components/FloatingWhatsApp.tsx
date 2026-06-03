@@ -19,7 +19,7 @@ export default function FloatingWhatsApp() {
   return (
     <div 
       className="fixed right-6 z-[100] flex flex-col items-end gap-3"
-      style={{ bottom: `calc(env(safe-area-inset-bottom) + 8.5rem)` }}
+      style={{ bottom: `calc(env(safe-area-inset-bottom) + 1.5rem)` }}
     >
       {/* Popup card */}
       <AnimatePresence>
