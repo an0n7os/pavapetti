@@ -86,7 +86,10 @@ export default function ProductDetail() {
     const el = ctaRef.current;
     if (!el) return;
     const obs = new IntersectionObserver(
-      ([entry]) => setShowSticky(!entry.isIntersecting),
+      ([entry]) => {
+        // Show sticky bar only if the CTA element is out of view AND we have scrolled past it
+        setShowSticky(!entry.isIntersecting && entry.boundingClientRect.top <= 0);
+      },
       { threshold: 0 }
     );
     obs.observe(el);
@@ -309,7 +312,7 @@ export default function ProductDetail() {
             </div>
 
             {/* Specifications Section — Premium Responsive Grid */}
-            <div className="grid grid-cols-3 gap-1 sm:gap-6 bg-[#f9f7f4] p-4 sm:p-6 md:p-10 rounded-[2rem] md:rounded-[3rem] text-center sm:text-left shadow-sm">
+            <div className="grid grid-cols-3 gap-1 sm:gap-6 bg-[#f9f7f4] p-4 sm:p-6 md:p-10 rounded-[2rem] md:rounded-[3rem] text-center sm:text-left shadow-sm mt-8">
               <div className="flex flex-col justify-center">
                 <h4 className="text-[8px] sm:text-[10px] uppercase tracking-[0.1em] sm:tracking-[0.3em] font-black text-primary mb-2">Material</h4>
                 <p className="text-[11px] xs:text-[12px] sm:text-lg font-serif font-light text-foreground line-clamp-2 leading-tight">{product.material || "Traditional Brass"}</p>
@@ -326,27 +329,27 @@ export default function ProductDetail() {
           </div>
 
           {/* Info Section — Sticky */}
-          <div className="lg:col-span-6 lg:sticky lg:top-32 space-y-10">
+          <div className="lg:col-span-6 lg:sticky lg:top-32 space-y-7">
             <div>
               <motion.div 
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8, delay: 0.1 }}
-                className="flex items-center gap-4 mb-6"
+                className="flex items-center gap-4 mb-3"
               >
                 {product.categoryName && (
-                  <span className="text-primary text-[10px] tracking-[0.4em] uppercase font-bold opacity-60">
+                  <span className="text-[#c5a880] text-[9px] tracking-[0.35em] uppercase font-black">
                     {product.categoryName}
                   </span>
                 )}
-                <div className="h-[1px] flex-1 bg-border/40" />
+                <div className="h-[0.5px] flex-1 bg-[#c5a880]/15" />
               </motion.div>
 
               <motion.h1 
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.2 }}
-                className="font-serif text-3xl sm:text-5xl md:text-6xl font-light text-foreground mb-6 leading-[1.15]"
+                className="font-serif text-3xl sm:text-4xl md:text-5xl font-extralight text-foreground mb-4 tracking-wide leading-[1.1]"
               >
                 {product.name}
               </motion.h1>
@@ -355,22 +358,26 @@ export default function ProductDetail() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.3 }}
-                className="flex items-center gap-6 mb-8" 
+                className="flex items-center gap-4 mb-5" 
                 ref={ctaRef}
               >
                 <div className="flex flex-col">
                   {product.mrp && product.mrp > product.price && (
-                    <span className="text-sm text-muted-foreground line-through mb-1">
+                    <span className="text-xs text-muted-foreground/60 line-through mb-0.5 whitespace-nowrap">
                       ₹{product.mrp.toLocaleString("en-IN")}
                     </span>
                   )}
-                  <span className="text-4xl md:text-5xl font-light text-primary tracking-tight">
+                  <span className="text-2xl sm:text-3xl font-light text-primary/95 tracking-tight whitespace-nowrap">
                     ₹{product.price.toLocaleString("en-IN")}
                   </span>
                 </div>
-                <div className="h-10 w-[1px] bg-border/40" />
-                <span className="text-xs uppercase tracking-[0.2em] font-bold text-muted-foreground">
-                  {product.stock > 0 ? `${product.stock} In Collection` : "Awaiting Restoration"}
+                <div className="h-6 w-[0.5px] bg-[#c5a880]/30" />
+                <span className={`text-[8.5px] font-black tracking-[0.2em] uppercase px-3 py-1 rounded-full ${
+                  product.stock > 0 
+                    ? "bg-emerald-50 text-emerald-800 border border-emerald-100/50" 
+                    : "bg-[#faf6ee] text-[#8c6239] border border-[#f5eae0]/50"
+                }`}>
+                  {product.stock > 0 ? `In Vault • ${product.stock} Available` : "Awaiting Restoration"}
                 </span>
               </motion.div>
 
@@ -378,62 +385,60 @@ export default function ProductDetail() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.4 }}
-                className="text-muted-foreground font-light leading-relaxed text-lg mb-10 border-l-2 border-primary/10 pl-6"
+                className="text-muted-foreground/80 font-serif font-light leading-relaxed text-sm mb-6 border-l border-[#c5a880]/20 pl-4 italic"
               >
                 {product.description}
               </motion.p>
             </div>
 
             {/* CTAs */}
-            <div className="space-y-4">
-              <div className="flex gap-4">
+            <div className="space-y-3">
+              <div className="flex gap-3">
                 <Button
                   size="lg"
-                  className={`flex-1 rounded-full font-bold text-sm py-5 transition-all duration-500 shadow-xl ${
+                  className={`flex-1 rounded-full font-bold text-xs py-3.5 h-12 transition-all duration-500 shadow-lg ${
                     inCart
-                      ? "bg-secondary text-secondary-foreground shadow-secondary/20"
-                      : "bg-primary text-primary-foreground shadow-primary/30 hover:scale-[1.02]"
+                      ? "bg-[#2b261f] text-white hover:bg-[#3d372d] shadow-[#2b261f]/10"
+                      : "bg-[#1c1917] text-white hover:bg-[#2e2a27] border border-[#c5a880]/20 shadow-black/5 hover:scale-[1.01]"
                   }`}
                   disabled={product.stock === 0}
                   onClick={handleAddToCart}
                 >
-                  {product.stock === 0 ? "Awaiting Restock" : inCart ? <><Check size={20} className="mr-2" /> View in Cart</> : <><ShoppingBag size={20} className="mr-2" /> ADD TO CART</>}
+                  {product.stock === 0 ? "Awaiting Restock" : inCart ? <><Check size={16} className="mr-1.5" /> View in Cart</> : <><ShoppingBag size={16} className="mr-1.5" /> ADD TO CART</>}
                 </Button>
                 <button
                   onClick={handleWishlist}
-                  className={`w-16 h-16 rounded-full border border-border flex items-center justify-center transition-all duration-500 hover:scale-105 ${
-                    wishlisted ? "bg-primary/5 border-primary/20" : "bg-white hover:border-primary/40"
-                  }`}
+                  className={`w-12 h-12 rounded-full border border-primary/10 flex items-center justify-center transition-all duration-500 hover:scale-105 shrink-0 bg-white hover:border-[#c5a880]/30 shadow-sm`}
                 >
-                  <Heart size={20} className={wishlisted ? "fill-primary text-primary" : "text-muted-foreground"} />
+                  <Heart size={16} className={wishlisted ? "fill-[#c5a880] text-[#c5a880]" : "text-muted-foreground"} />
                 </button>
               </div>
 
               <Button
                 size="lg"
-                className="w-full rounded-full py-7 text-xs font-black tracking-[0.25em] uppercase gap-3 bg-gradient-to-r from-secondary to-[#1f2e2e] hover:from-[#1f2e2e] hover:to-secondary border-2 border-primary/20 text-white shadow-xl hover:shadow-2xl hover:scale-[1.01] active:scale-100 transition-all duration-300 relative overflow-hidden group"
+                className="w-full rounded-full py-4 text-xs font-bold uppercase tracking-[0.25em] gap-2 bg-[#FAF8F5] hover:bg-[#f5f1e9] border border-[#c5a880]/30 text-primary transition-all duration-300 relative overflow-hidden group h-12 shadow-sm"
                 onClick={() => window.open(`https://wa.me/${PHONE}?text=${waMsg}`, "_blank")}
               >
                 {/* Active curator pulse */}
-                <span className="absolute left-6 top-1/2 -translate-y-1/2 flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                <span className="absolute left-5 top-1/2 -translate-y-1/2 flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#c5a880] opacity-50"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[#c5a880]"></span>
                 </span>
-                <MessageCircle size={16} className="text-[#25D366] group-hover:scale-110 transition-transform ml-4" />
-                <span>Acquire via Secured Chat</span>
+                <MessageCircle size={14} className="text-[#c5a880] group-hover:scale-110 transition-transform ml-3" />
+                <span className="text-foreground">Inquire via Curator Concierge</span>
               </Button>
             </div>
 
             {/* Wax Seal Authenticity Stamp */}
-            <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-4 sm:gap-5 p-6 rounded-[2rem] bg-gradient-to-br from-[#faf8f5] to-[#f5f1e9] border border-primary/10 shadow-sm">
-              <div className="relative w-14 h-14 rounded-full border border-primary/20 flex items-center justify-center bg-white shadow-inner shrink-0 select-none">
-                <span className="font-serif italic text-primary text-xl font-bold">P</span>
+            <div className="flex items-center gap-4 p-5 rounded-[2rem] bg-[#FAF8F5] border border-[#c5a880]/20 shadow-sm">
+              <div className="relative w-12 h-12 rounded-full border border-[#c5a880]/40 flex items-center justify-center bg-white shadow-md shadow-[#c5a880]/5 shrink-0 select-none">
+                <span className="font-serif italic text-[#c5a880] text-lg font-bold">P</span>
                 {/* Gold outer rim */}
-                <div className="absolute inset-1 rounded-full border border-dashed border-primary/15 animate-[spin_40s_linear_infinite]" />
+                <div className="absolute inset-0.5 rounded-full border border-dashed border-[#c5a880]/20 animate-[spin_60s_linear_infinite]" />
               </div>
-              <div className="space-y-1">
-                <h5 className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.15em] sm:tracking-[0.2em] text-primary mb-1">Archival Authenticity Guarantee</h5>
-                <p className="text-[10px] sm:text-[11px] text-muted-foreground/80 leading-relaxed font-light">
+              <div className="space-y-0.5 flex-1 min-w-0">
+                <h5 className="text-[#c5a880] text-[10px] font-black uppercase tracking-[0.2em]">Archival Authenticity Guarantee</h5>
+                <p className="text-[10.5px] text-muted-foreground/80 leading-relaxed font-serif font-light italic">
                   Directly sourced from state-registered master craft clusters. Bearing the official Pavapetti Seal of Preservation & Ethical Sourcing.
                 </p>
               </div>
