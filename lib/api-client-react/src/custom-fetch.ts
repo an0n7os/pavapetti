@@ -557,7 +557,12 @@ export async function customFetch<T = unknown>(
   options: CustomFetchOptions = {},
 ): Promise<T> {
   const urlStr = resolveUrl(input);
-  const isFallbackNeeded = !_baseUrl || _baseUrl === "" || window.location.hostname.includes("netlify.app");
+  // Always use the fallback path when there's no dedicated API server base URL.
+  // The "fallback" logic will then use Supabase directly if credentials are present,
+  // or fall back to in-memory mock data if they are not.
+  // NOTE: Previously this checked `window.location.hostname.includes("netlify.app")`,
+  // which broke custom domains hosted on Netlify (products disappeared on refresh).
+  const isFallbackNeeded = !_baseUrl || _baseUrl === "";
 
   // Read client-side Supabase credentials from Vite environment
   const supabaseUrl = (typeof import.meta !== "undefined" && import.meta.env?.VITE_SUPABASE_URL) || "";
