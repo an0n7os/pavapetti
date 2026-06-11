@@ -159,7 +159,7 @@ export default function Navbar() {
                         <div className="mt-10 pt-8 border-t border-border/40 flex items-center justify-between">
                           <div className="max-w-md">
                             <p className="text-[11px] text-muted-foreground/80 italic font-serif leading-relaxed">
-                              Pavapetti is an editorial boutique dedicated to the preservation of Kerala’s sacred artistic traditions. We serve as a direct bridge between master artisans and global collectors.
+                              Pavapetti Heritage Artifacts is an editorial boutique dedicated to the preservation of Kerala's sacred artistic traditions. We serve as a direct bridge between master artisans and global collectors.
                             </p>
                           </div>
                           <Link href="/products" className="text-[10px] font-bold tracking-[0.25em] uppercase text-primary hover:text-primary/80 transition-colors border-b border-primary/20 pb-0.5 hover:border-primary">

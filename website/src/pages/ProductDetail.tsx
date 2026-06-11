@@ -97,10 +97,10 @@ export default function ProductDetail() {
   useEffect(() => {
     if (product) {
       setSelectedImage(product.imageUrl);
-      document.title = `${product.name} | Pavapetti Heritage`;
+      document.title = `${product.name} | Pavapetti Heritage Artifacts`;
     }
     return () => {
-      document.title = "Pavapetti | Heritage Boutique";
+      document.title = "Pavapetti Heritage Artifacts | Authentic Kerala Treasures";
     };
   }, [product]);
 

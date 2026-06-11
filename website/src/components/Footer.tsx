@@ -80,7 +80,7 @@ export default function Footer() {
                 className="flex items-center gap-4 hover:text-primary transition-colors duration-300 group"
               >
                 <MapPin size={13} className="text-primary group-hover:scale-110 transition-transform" />
-                Pavapetti Heritage Archive, Near Vallathol Museum, Cheruthuruthy, Thrissur, Kerala
+                Pavapetti Heritage Artifacts, Near Vallathol Museum, Cheruthuruthy, Thrissur, Kerala
               </a>
             </div>
           </div>
@@ -172,7 +172,7 @@ export default function Footer() {
 
         {/* Bottom tag strip */}
         <div className="border-t border-white/5 mt-20 pt-10 flex flex-col md:flex-row items-center justify-between gap-6 text-[10px] text-white/30 tracking-[0.2em] uppercase font-bold">
-          <span>© {new Date().getFullYear()} Pavapetti® Heritage Archives.</span>
+          <span>© {new Date().getFullYear()} Pavapetti Heritage Artifacts®</span>
           <span className="flex items-center gap-2">
             Preserving Kerala's Artistic Legacy <span className="text-primary text-base">✦</span> Made with Devotion
           </span>

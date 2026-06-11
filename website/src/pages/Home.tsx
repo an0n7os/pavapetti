@@ -70,7 +70,7 @@ const CATEGORY_OVERRIDE: Record<string, string> = {
 const TESTIMONIALS = [
   { name: "Priya Nair", place: "Kochi, Kerala", text: "Beautiful brass lamps! The quality is exactly like what you get from Kerala artisans. Very happy with the purchase.", stars: 5 },
   { name: "Arjun Menon", place: "Bangalore", text: "Ordered Kathakali masks as gifts — absolutely stunning. Fast delivery and great packaging.", stars: 5 },
-  { name: "Deepa Krishnan", place: "Chennai", text: "The incense sticks are heavenly. Pavapetti brings authentic Kerala home to us.", stars: 5 },
+  { name: "Deepa Krishnan", place: "Chennai", text: "The incense sticks are heavenly. Pavapetti Heritage Artifacts brings authentic Kerala home to us.", stars: 5 },
 ];
 
 function MarqueeBand() {
@@ -326,7 +326,7 @@ export default function Home() {
               className="space-y-6"
             >
               <p className="text-xl text-muted-foreground font-light leading-relaxed">
-                Pavapetti is an editorial boutique dedicated to the preservation of Kerala’s sacred artistic traditions. We serve as a direct bridge between master artisans and global collectors.
+                Pavapetti Heritage Artifacts is an editorial boutique dedicated to the preservation of Kerala's sacred artistic traditions. We serve as a direct bridge between master artisans and global collectors.
               </p>
               <p className="text-sm text-muted-foreground/60 uppercase tracking-widest font-bold">
                 Authentic Handcrafts • Sacred Artifacts • Timeless Mural Art
@@ -630,7 +630,7 @@ export default function Home() {
               <div className="pt-4">
                 <Magnetic>
                   <a
-                    href="https://wa.me/919846356057?text=Hi!%20I%20need%20help%20choosing%20a%20product."
+                    href="https://wa.me/919292016901?text=Hi!%20I%20need%20help%20choosing%20a%20product."
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex items-center gap-4 bg-white text-[#0a0a0a] font-black px-10 py-5 rounded-full text-[11px] tracking-[0.3em] uppercase shadow-2xl hover:bg-primary hover:text-white hover:shadow-primary/20 transition-all duration-500 outline-none"

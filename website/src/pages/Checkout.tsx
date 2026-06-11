@@ -86,7 +86,7 @@ export default function Checkout() {
           </p>
           <div className="bg-white p-6 rounded-2xl border border-primary/5 text-left text-xs space-y-2">
             <p className="text-primary font-bold uppercase tracking-widest text-[9px]">Acquisitions Department</p>
-            <p><strong>Seller:</strong> Pavapetti Heritage Boutique</p>
+            <p><strong>Seller:</strong> Pavapetti Heritage Artifacts</p>
             <p><strong>Delivery Time:</strong> 3-5 Business Days</p>
             <p><strong>Payment Mode:</strong> WhatsApp Secured UPI / NetBanking</p>
           </div>

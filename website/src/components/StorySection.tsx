@@ -76,7 +76,7 @@ export default function StorySection() {
               className="space-y-6 text-muted-foreground font-light leading-relaxed text-lg max-w-lg"
             >
               <p>
-                Every artifact within the Pavapetti archives is more than a possession—it is a vessel for Kerala’s ancient spirit. From the primordial resonance of hand-cast bell metal to the rhythmic precision of loom-woven heirlooms, we safeguard the <span className="italic text-primary/80 font-medium">Samskaram</span> of a thousand-year-old civilization.
+                Every artifact within the Pavapetti Heritage Artifacts archives is more than a possession—it is a vessel for Kerala's ancient spirit. From the primordial resonance of hand-cast bell metal to the rhythmic precision of loom-woven heirlooms, we safeguard the <span className="italic text-primary/80 font-medium">Samskaram</span> of a thousand-year-old civilization.
               </p>
               <p>
                 Our curators seek the sacred workshops tucked away in the emerald valleys of the Malabar Coast, handpicking pieces that represent the zenith of <span className="italic text-primary/80 font-medium">Parampara</span>. We do not merely offer objects; we curate the bridge between the timeless wisdom of the past and the soul of the modern home.

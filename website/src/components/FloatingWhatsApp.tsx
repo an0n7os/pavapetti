@@ -35,10 +35,10 @@ export default function FloatingWhatsApp() {
             <div className="bg-[#008069] px-6 py-5 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-md">
-                  <span className="text-white font-serif font-black text-lg">P</span>
+                  <span className="text-white font-serif font-black text-lg">H</span>
                 </div>
                 <div>
-                  <p className="text-white font-bold text-sm tracking-tight leading-tight">Pavapetti Heritage</p>
+                  <p className="text-white font-bold text-sm tracking-tight leading-tight">Pavapetti Heritage Artifacts</p>
                   <div className="flex items-center gap-1.5">
                     <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
                     <p className="text-white/70 text-[10px] font-bold tracking-wider uppercase">Live Support</p>

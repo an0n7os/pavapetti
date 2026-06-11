@@ -15,7 +15,7 @@ export default function CartDrawer() {
       (item) => `• ${item.name} (×${item.quantity}) — ₹${(item.price * item.quantity).toLocaleString("en-IN")}`
     );
     const msg =
-      `Hi! I'd like to place an order from Pavapetti:\n\n` +
+      `Hi! I'd like to place an order from Pavapetti Heritage Artifacts:\n\n` +
       lines.join("\n") +
       `\n\n*Total: ₹${total.toLocaleString("en-IN")}*\n\nPlease confirm availability.`;
     return encodeURIComponent(msg);
@@ -66,12 +66,12 @@ export default function CartDrawer() {
                 
                 {/* Avatar */}
                 <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center relative select-none">
-                  <span className="font-serif font-black text-lg text-white">P</span>
+                  <span className="font-serif font-black text-lg text-white">H</span>
                   <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-[#008069] animate-pulse" />
                 </div>
 
                 <div>
-                  <h2 className="font-sans font-bold text-sm leading-tight">Pavapetti Boutique</h2>
+                  <h2 className="font-sans font-bold text-sm leading-tight">Pavapetti Heritage Artifacts</h2>
                   <p className="text-[10px] text-emerald-100 font-medium">online</p>
                 </div>
               </div>

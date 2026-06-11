@@ -20,7 +20,7 @@ export default function PavapettiLogo({
     <div className={`flex items-center group cursor-pointer ${className}`}>
       <motion.img 
         src="/pavapetti-logo.png" 
-        alt="Pavapetti Heritage Archives" 
+        alt="Heritage Artifacts" 
         style={{ height: size * 2.4 }}
         className="w-auto object-contain transition-transform duration-500 group-hover:scale-105 filter drop-shadow-sm -my-3"
         whileTap={{ scale: 0.98 }}
