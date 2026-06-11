@@ -1,5 +1,6 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
+import { Link } from "wouter";
 
 export default function StorySection() {
   const containerRef = useRef(null);
@@ -90,20 +91,22 @@ export default function StorySection() {
               transition={{ delay: 0.3 }}
               className="pt-6"
             >
-              <button className="group flex items-center gap-6">
-                <div className="w-16 h-16 rounded-full border border-primary flex items-center justify-center group-hover:bg-primary transition-all duration-500">
-                  <svg 
-                    width="24" height="24" viewBox="0 0 24 24" fill="none" 
-                    className="text-primary group-hover:text-primary-foreground transition-colors duration-500"
-                  >
-                    <path d="M5 12h14M13 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[11px] font-bold tracking-widest uppercase text-primary">Discover</span>
-                  <span className="font-serif text-xl">The Maker's Story</span>
-                </div>
-              </button>
+              <Link href="/products">
+                <button className="group flex items-center gap-6 text-left">
+                  <div className="w-16 h-16 rounded-full border border-primary flex items-center justify-center group-hover:bg-primary transition-all duration-500">
+                    <svg 
+                      width="24" height="24" viewBox="0 0 24 24" fill="none" 
+                      className="text-primary group-hover:text-primary-foreground transition-colors duration-500"
+                    >
+                      <path d="M5 12h14M13 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[11px] font-bold tracking-widest uppercase text-primary">Discover</span>
+                    <span className="font-serif text-xl">The Maker's Story</span>
+                  </div>
+                </button>
+              </Link>
             </motion.div>
           </div>
 

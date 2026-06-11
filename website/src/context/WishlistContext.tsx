@@ -18,7 +18,7 @@ interface WishlistContextValue {
 }
 
 const WishlistContext = createContext<WishlistContextValue | null>(null);
-const KEY = "chenda-kada-wishlist";
+const KEY = "pavapetti-wishlist";
 
 function load(): WishlistItem[] {
   try { return JSON.parse(localStorage.getItem(KEY) ?? "[]"); } catch { return []; }

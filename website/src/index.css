@@ -21,6 +21,7 @@
     --card-foreground: 24 56% 15%;
     --input: 70 8% 88%;
     --ring: 25 75% 29%;
+    --primary-rgb: 129, 65, 18;
     --app-font-sans: 'Manrope', sans-serif;
     --app-font-serif: 'Cormorant Garamond', serif;
     --radius: 0.5rem;
@@ -90,4 +91,9 @@ html.lenis, html.lenis body {
 
 .lenis.lenis-smooth iframe {
   pointer-events: none;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-33.3333%); }
 }

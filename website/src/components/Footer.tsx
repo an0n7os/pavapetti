@@ -30,12 +30,11 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-10 md:gap-16">
           {/* Brand Column */}
           <div className="md:col-span-2 lg:col-span-2 space-y-8">
-            <div 
-              onClick={() => { window.location.href = "/"; }}
-              className="cursor-pointer inline-block"
-            >
-              <PavapettiLogo size={54} variant="dark" />
-            </div>
+            <Link href="/">
+              <div className="cursor-pointer inline-block">
+                <PavapettiLogo size={54} variant="dark" />
+              </div>
+            </Link>
 
             <p className="text-base text-white/60 leading-relaxed max-w-sm font-serif font-light italic">
               "Preserving the Sacred <span className="text-primary italic font-medium">Parampara</span> of the Malabar Coast—where every artifact is a whispered legacy of our ancestors."
@@ -175,6 +174,9 @@ export default function Footer() {
           <span>© {new Date().getFullYear()} Pavapetti Heritage Artifacts®</span>
           <span className="flex items-center gap-2">
             Preserving Kerala's Artistic Legacy <span className="text-primary text-base">✦</span> Made with Devotion
+          </span>
+          <span className="flex items-center gap-1.5">
+            Crafted by <a href="https://brandliftonline.in" target="_blank" rel="noreferrer" className="text-primary/60 hover:text-primary transition-colors duration-300 font-black tracking-[0.25em]">Brandlift</a>
           </span>
         </div>
       </div>

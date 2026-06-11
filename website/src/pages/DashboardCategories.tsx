@@ -345,7 +345,7 @@ export default function DashboardCategories() {
             <AlertDialogAction
               onClick={handleDelete}
               disabled={passcode !== "0000"}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-red-600 hover:bg-red-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
               data-testid="button-confirm-delete-category"
             >
               Delete

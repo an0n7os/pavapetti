@@ -141,7 +141,7 @@ export default function CartDrawer() {
                           {/* Name & Remove */}
                           <div className="flex justify-between items-start gap-2 mb-1">
                             <p className="text-[12.5px] font-bold text-slate-800 leading-tight truncate">{item.name}</p>
-                            <button onClick={() => removeItem(item.productId)} className="text-slate-400 hover:text-red-500 transition-colors p-0.5">
+                            <button onClick={() => removeItem(item.productId)} className="text-red-500 hover:text-red-600 transition-colors p-0.5">
                               <Trash2 size={13} />
                             </button>
                           </div>

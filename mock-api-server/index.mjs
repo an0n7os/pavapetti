@@ -701,11 +701,12 @@ app.post('/api/products', async (req, res) => {
   } else {
     const newP = { 
       ...req.body, 
-      id: products.length + 1, 
+      id: products.reduce((max, p) => Math.max(max, p.id), 0) + 1, 
       createdAt: new Date().toISOString(),
       categoryName: categories.find(c => c.id === req.body.categoryId)?.name || "Uncategorized"
     };
     products.push(newP);
+    categories = categories.map(c => c.id === req.body.categoryId ? { ...c, productCount: c.productCount + 1 } : c);
     res.status(201).json(newP);
   }
 });
@@ -751,7 +752,17 @@ app.put('/api/products/:id', async (req, res) => {
   } else {
     const idx = products.findIndex(p => p.id === parseInt(idStr));
     if (idx !== -1) {
-      products[idx] = { ...products[idx], ...req.body };
+      const oldCatId = products[idx].categoryId;
+      const newCatId = req.body.categoryId;
+      const catName = categories.find(c => c.id === newCatId)?.name || "Uncategorized";
+      products[idx] = { ...products[idx], ...req.body, categoryName: catName };
+      if (oldCatId !== newCatId && newCatId !== undefined) {
+        categories = categories.map(c => {
+          if (c.id === oldCatId) return { ...c, productCount: Math.max(0, c.productCount - 1) };
+          if (c.id === newCatId) return { ...c, productCount: c.productCount + 1 };
+          return c;
+        });
+      }
       res.json(products[idx]);
     } else {
       res.status(404).json({ error: 'Not found' });
@@ -788,6 +799,10 @@ app.delete('/api/products/:id', async (req, res) => {
       return res.status(500).json({ error: err.message });
     }
   } else {
+    const p = products.find(p => p.id === parseInt(idStr));
+    if (p) {
+      categories = categories.map(c => c.id === p.categoryId ? { ...c, productCount: Math.max(0, c.productCount - 1) } : c);
+    }
     products = products.filter(p => p.id !== parseInt(idStr));
     res.sendStatus(204);
   }

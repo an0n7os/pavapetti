@@ -19,6 +19,22 @@ export default function Navbar() {
   const { count, openCart } = useCart();
   const { count: wishlistCount } = useWishlist();
   const { data: categories } = useListCategories();
+  const clickTimeout = useRef<any>(null);
+
+  const handleLogoClick = (e: React.MouseEvent) => {
+    if (e.detail === 2) {
+      if (clickTimeout.current) {
+        window.clearTimeout(clickTimeout.current);
+        clickTimeout.current = null;
+      }
+      setLocation("/admin");
+    } else if (e.detail === 1) {
+      clickTimeout.current = window.setTimeout(() => {
+        clickTimeout.current = null;
+        setLocation("/");
+      }, 300);
+    }
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 50);
@@ -63,10 +79,7 @@ export default function Navbar() {
           <div className="flex items-center justify-between h-16 gap-8">
             {/* Logo with Secret Dashboard Trigger */}
             <div 
-              onDoubleClick={() => setLocation("/admin")}
-              onClick={() => {
-                window.location.href = "/";
-              }}
+              onClick={handleLogoClick}
               className="cursor-pointer"
             >
               <PavapettiLogo size={36} />
