@@ -89,7 +89,7 @@ export default function DashboardProducts() {
   const openEdit = (product: Product) => {
     setEditProduct(product);
     const initialPrice = product.price;
-    const initialMrp = product.mrp || Math.round(product.price * 1.2);
+    const initialMrp = (product.mrp && product.mrp > 0) ? product.mrp : product.price;
     const discount = initialMrp > initialPrice ? Math.round(((initialMrp - initialPrice) / initialMrp) * 100) : 0;
     setDiscountPercent(discount);
     setForm({
@@ -123,11 +123,16 @@ export default function DashboardProducts() {
 
   const handleMrpChange = (newMrp: number) => {
     let newPrice = form.price;
-    if (discountPercent > 0) {
+    if (newMrp > 0 && discountPercent > 0) {
+      // Recalculate price from existing discount
       newPrice = Math.round(newMrp * (1 - discountPercent / 100) * 100) / 100;
-    } else if (newMrp > form.price) {
+    } else if (newMrp > form.price && form.price > 0) {
+      // Auto-calculate discount from existing price
       const calculatedDiscount = Math.round(((newMrp - form.price) / newMrp) * 100);
       setDiscountPercent(calculatedDiscount);
+    } else if (newMrp <= form.price) {
+      // MRP is less than or equal to price — no discount
+      setDiscountPercent(0);
     }
     setForm(prev => ({ ...prev, mrp: newMrp, price: newPrice }));
   };

@@ -58,7 +58,7 @@ export default function Checkout() {
     // Construct WhatsApp Message
     const orderSummary = items.map(item => `• ${item.name} (x${item.quantity}) - ₹${item.price.toLocaleString("en-IN")}`).join("\n");
     const message = encodeURIComponent(
-      `*NEW ORDER - PAVAPETTI HERITAGE*\n\n` +
+      `*NEW ORDER - PAVAPETTI HERITAGE ARTIFACTS*\n\n` +
       `*Order Details:*\n${orderSummary}\n\n` +
       `*Total Amount:* ₹${total.toLocaleString("en-IN")}\n\n` +
       `*Customer Information:*\n` +
@@ -66,17 +66,14 @@ export default function Checkout() {
       `Phone: ${formData.phone}\n` +
       `Email: ${formData.email || "N/A"}\n\n` +
       `*Shipping Address:*\n` +
-      `${formData.address}, ${formData.city} - ${formData.zip}\n\n` +
+      `${formData.address}${formData.city ? ", " + formData.city : ""}${formData.zip ? " - " + formData.zip : ""}\n\n` +
       `_Please confirm my order and let me know the payment details._`
     );
 
     window.open(`https://wa.me/${PHONE}?text=${message}`, "_blank");
-    
-    setTimeout(() => {
-      setLoading(false);
-      setIsOrdered(true);
-      clearCart();
-    }, 1000);
+    setLoading(false);
+    setIsOrdered(true);
+    clearCart();
   };
 
   if (isOrdered) {
