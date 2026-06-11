@@ -17,6 +17,11 @@ const navItems = [
 export default function DashboardLayout({ children, title, subtitle }: DashboardLayoutProps) {
   const [location] = useLocation();
 
+  const handleLogout = () => {
+    localStorage.removeItem("admin_auth");
+    window.location.href = "/admin";
+  };
+
   return (
     <div className="min-h-screen bg-background flex font-sans">
       {/* Sidebar — Luxury Volcanic Dark Mode */}
@@ -52,13 +57,24 @@ export default function DashboardLayout({ children, title, subtitle }: Dashboard
           })}
         </nav>
 
-        <div className="p-4 border-t border-white/5 bg-black/30">
+        <div className="p-4 border-t border-white/5 bg-black/30 space-y-2">
           <Link href="/">
             <div className="flex items-center justify-center gap-3 px-4 py-3 rounded-xl text-[11px] font-black tracking-widest uppercase bg-white/5 hover:bg-white/10 text-white transition-all cursor-pointer border border-white/5">
               <Home size={14} className="text-primary" />
               View Gallery Store
             </div>
           </Link>
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl text-[11px] font-black tracking-widest uppercase bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 transition-all cursor-pointer border border-red-500/10"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+            Sign Out
+          </button>
         </div>
       </aside>
 
@@ -70,21 +86,36 @@ export default function DashboardLayout({ children, title, subtitle }: Dashboard
             <h1 className="font-serif text-2xl font-light text-foreground">{title}</h1>
             {subtitle && <p className="text-xs text-muted-foreground/80 mt-1 uppercase tracking-wider font-semibold">{subtitle}</p>}
           </div>
-          {/* Mobile nav */}
-          <div className="flex md:hidden gap-2 bg-[#0a0a0a] p-1.5 rounded-full border border-white/5 shadow-md">
-            {navItems.map(({ href, label, icon: Icon }) => {
-              const active = location === href;
-              return (
-                <Link key={href} href={href}>
-                  <div 
-                    title={label}
-                    className={`p-2.5 rounded-full transition-all ${active ? "text-primary bg-primary/10" : "text-white/40 hover:text-white/70"}`}
-                  >
-                    <Icon size={16} />
-                  </div>
-                </Link>
-              );
-            })}
+          {/* Mobile nav + logout */}
+          <div className="flex items-center gap-3">
+            <div className="flex md:hidden gap-2 bg-[#0a0a0a] p-1.5 rounded-full border border-white/5 shadow-md">
+              {navItems.map(({ href, label, icon: Icon }) => {
+                const active = location === href;
+                return (
+                  <Link key={href} href={href}>
+                    <div 
+                      title={label}
+                      className={`p-2.5 rounded-full transition-all ${active ? "text-primary bg-primary/10" : "text-white/40 hover:text-white/70"}`}
+                    >
+                      <Icon size={16} />
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+            {/* Logout button visible on all screens in header */}
+            <button
+              onClick={handleLogout}
+              title="Sign Out"
+              className="flex items-center gap-2 px-4 py-2 rounded-full text-[10px] font-black tracking-widest uppercase text-red-400 hover:text-red-300 bg-red-500/5 hover:bg-red-500/10 border border-red-500/10 transition-all"
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+              </svg>
+              <span className="hidden sm:inline">Sign Out</span>
+            </button>
           </div>
         </header>
 

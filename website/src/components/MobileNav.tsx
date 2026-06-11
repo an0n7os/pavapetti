@@ -5,12 +5,7 @@ import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 
 export default function MobileNav() {
-  const [location] = useLocation();
-  const { count: wishlistCount } = useWishlist();
-  const isAuth = typeof window !== "undefined" ? localStorage.getItem("admin_auth") === "true" : false;
-  const isDashboard = location.startsWith("/dashboard");
-
-  if (isDashboard) return null;
+  return null;
 
   const navItems = [
     { href: "/", label: "Home", icon: Home },

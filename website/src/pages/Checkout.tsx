@@ -42,6 +42,17 @@ export default function Checkout() {
       return;
     }
 
+    // Validate phone number — must be 10 digits (Indian format)
+    const cleanPhone = formData.phone.replace(/[\s\-\+()]/g, "");
+    if (!/^[6-9]\d{9}$/.test(cleanPhone) && !/^\d{10,13}$/.test(cleanPhone)) {
+      toast({
+        title: "Invalid Phone Number",
+        description: "Please enter a valid 10-digit phone number.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setLoading(true);
     
     // Construct WhatsApp Message
@@ -130,7 +141,7 @@ export default function Checkout() {
     <div className="min-h-screen bg-background">
       <Navbar />
       
-      <main className="max-w-7xl mx-auto px-6 pt-32 pb-24">
+      <main className="w-full px-6 lg:px-12 xl:px-20 pt-32 pb-24">
         <div className="flex items-center gap-4 mb-12">
           <button onClick={() => setLocation("/")} className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors">
             <ArrowLeft size={18} />
