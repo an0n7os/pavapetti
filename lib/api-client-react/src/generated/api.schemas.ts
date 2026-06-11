@@ -14,11 +14,19 @@ export interface Product {
   name: string;
   description: string;
   price: number;
+  mrp?: number;
   imageUrl: string;
   categoryId: number;
   categoryName?: string;
   stock: number;
   featured: boolean;
+  isVisible?: boolean;
+  isNewArrival?: boolean;
+  material?: string;
+  size?: string;
+  weight?: string;
+  images?: string[];
+  reviews?: any[];
   createdAt: string;
 }
 
@@ -26,10 +34,17 @@ export interface CreateProductBody {
   name: string;
   description: string;
   price: number;
+  mrp?: number;
   imageUrl: string;
   categoryId: number;
   stock: number;
   featured: boolean;
+  isVisible?: boolean;
+  isNewArrival?: boolean;
+  material?: string;
+  size?: string;
+  weight?: string;
+  images?: string[];
 }
 
 export interface Category {
@@ -58,4 +73,5 @@ export type ListProductsParams = {
   category?: string;
   search?: string;
   featured?: boolean;
+  isNewArrival?: string | boolean;
 };

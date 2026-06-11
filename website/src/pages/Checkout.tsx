@@ -10,7 +10,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useToast } from "@/hooks/use-toast";
 
-const PHONE = "919042525110";
+const PHONE = "919292016901";
 
 export default function Checkout() {
   const [, setLocation] = useLocation();
@@ -256,7 +256,19 @@ export default function Checkout() {
                       <h4 className="text-sm font-bold truncate mb-1">{item.name}</h4>
                       <div className="flex justify-between items-center">
                         <p className="text-xs text-muted-foreground">Qty: {item.quantity}</p>
-                        <p className="text-sm font-bold text-primary">₹{(item.price * item.quantity).toLocaleString("en-IN")}</p>
+                        <div className="flex flex-col items-end gap-0.5">
+                          {item.mrp && item.mrp > item.price && (
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-[10px] text-muted-foreground/50 line-through">
+                                ₹{(item.mrp * item.quantity).toLocaleString("en-IN")}
+                              </span>
+                              <span className="text-[8px] font-black tracking-[0.1em] uppercase px-1.5 py-0.5 rounded-full bg-emerald-500 text-white">
+                                {Math.round(((item.mrp - item.price) / item.mrp) * 100)}% OFF
+                              </span>
+                            </div>
+                          )}
+                          <p className="text-sm font-bold text-primary">₹{(item.price * item.quantity).toLocaleString("en-IN")}</p>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -281,7 +293,7 @@ export default function Checkout() {
               <Button 
                 onClick={handleConfirmOrder}
                 disabled={loading}
-                className="w-full rounded-full py-8 bg-primary text-primary-foreground font-black text-xs tracking-[0.3em] uppercase shadow-2xl shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all gap-3"
+                className="w-full rounded-full py-8 bg-[#25D366] hover:bg-[#1ebe5d] text-white font-black text-xs tracking-[0.3em] uppercase shadow-2xl shadow-green-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all gap-3 border-none"
               >
                 {loading ? (
                   "Processing..."

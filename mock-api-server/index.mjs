@@ -594,7 +594,7 @@ app.put('/api/categories/:id', async (req, res) => {
 });
 
 app.get('/api/products', async (req, res) => {
-  const { category, search, featured } = req.query;
+  const { category, search, featured, isNewArrival } = req.query;
 
   if (isSupabaseConfigured) {
     try {
@@ -608,6 +608,9 @@ app.get('/api/products', async (req, res) => {
       }
       if (featured === 'true') {
         query = query.eq('featured', true);
+      }
+      if (isNewArrival === 'true') {
+        query = query.eq('is_new_arrival', true);
       }
 
       const { data, error } = await query.order('id', { ascending: true });
@@ -623,6 +626,7 @@ app.get('/api/products', async (req, res) => {
     if (category) filtered = filtered.filter(p => p.categoryName === category);
     if (search) filtered = filtered.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
     if (featured === 'true') filtered = filtered.filter(p => p.featured);
+    if (isNewArrival === 'true') filtered = filtered.filter(p => p.isNewArrival);
     return res.json(filtered);
   }
 });

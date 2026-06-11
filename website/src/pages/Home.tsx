@@ -15,9 +15,16 @@ import {
 } from "@workspace/api-client-react";
 
 const MARQUEE_ITEMS = [
-  "Ancient Parampara", "Tharavadu Heritage", "Vishuddha Art",
-  "Malabar Whispers", "Ancestral Heirlooms", "Hand-cast Legacies",
-  "God's Own Soul", "Sacred Geometries", "Timeless Craft", "Est. 2020",
+  "Tharavadu Royal Heirlooms", 
+  "Authentic Aranmula Kannadi", 
+  "Teakwood Nettoor Petti", 
+  "Hand-cast Nilavilakku", 
+  "Sacred Temple Art", 
+  "Bespoke Kathakali Vesham", 
+  "Ancient Malabar Murals", 
+  "Fine Kasavu Weaves", 
+  "Vedic Craftsmanship", 
+  "Timeless Legacies"
 ];
 
 const HERO_SLIDES = [
@@ -623,7 +630,7 @@ export default function Home() {
               <div className="pt-4">
                 <Magnetic>
                   <a
-                    href="https://wa.me/919042525110?text=Hi!%20I%20need%20help%20choosing%20a%20product."
+                    href="https://wa.me/919846356057?text=Hi!%20I%20need%20help%20choosing%20a%20product."
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex items-center gap-4 bg-white text-[#0a0a0a] font-black px-10 py-5 rounded-full text-[11px] tracking-[0.3em] uppercase shadow-2xl hover:bg-primary hover:text-white hover:shadow-primary/20 transition-all duration-500 outline-none"

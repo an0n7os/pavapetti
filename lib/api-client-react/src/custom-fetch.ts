@@ -565,8 +565,8 @@ export async function customFetch<T = unknown>(
   const isFallbackNeeded = !_baseUrl || _baseUrl === "";
 
   // Read client-side Supabase credentials from Vite environment
-  const supabaseUrl = (typeof import.meta !== "undefined" && import.meta.env?.VITE_SUPABASE_URL) || "";
-  const supabaseKey = (typeof import.meta !== "undefined" && import.meta.env?.VITE_SUPABASE_ANON_KEY) || "";
+  const supabaseUrl = (typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_SUPABASE_URL) || "";
+  const supabaseKey = (typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_SUPABASE_ANON_KEY) || "";
   
   const getSupabaseHeaders = () => ({
     "apikey": supabaseKey,

@@ -42,6 +42,7 @@ export default function DashboardCategories() {
   const [form, setForm] = useState<CreateCategoryBody>(emptyForm);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [editCategory, setEditCategory] = useState<Category | null>(null);
+  const [passcode, setPasscode] = useState("");
 
   const { data: categories, isLoading } = useListCategories({
     query: { queryKey: getListCategoriesQueryKey() },
@@ -118,12 +119,17 @@ export default function DashboardCategories() {
 
   const handleDelete = () => {
     if (deleteId == null) return;
+    if (passcode !== "0000") {
+      toast({ title: "Incorrect passcode", variant: "destructive" });
+      return;
+    }
     deleteCategory.mutate(
       { id: deleteId },
       {
         onSuccess: () => {
           toast({ title: "Category deleted" });
           setDeleteId(null);
+          setPasscode("");
           invalidate();
         },
         onError: () => toast({ title: "Failed to delete category", variant: "destructive" }),
@@ -308,7 +314,12 @@ export default function DashboardCategories() {
       )}
 
       {/* Delete confirmation */}
-      <AlertDialog open={deleteId !== null} onOpenChange={(open) => !open && setDeleteId(null)}>
+      <AlertDialog open={deleteId !== null} onOpenChange={(open) => {
+        if (!open) {
+          setDeleteId(null);
+          setPasscode("");
+        }
+      }}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="font-serif">Delete Category?</AlertDialogTitle>
@@ -316,11 +327,25 @@ export default function DashboardCategories() {
               This action cannot be undone. The category will be permanently removed. Products in this category will not be deleted but will become uncategorized.
             </AlertDialogDescription>
           </AlertDialogHeader>
+          
+          <div className="space-y-1.5 my-4">
+            <Label htmlFor="delete-passcode" className="text-[10px] font-black tracking-widest uppercase text-muted-foreground">Admin Passcode *</Label>
+            <Input
+              id="delete-passcode"
+              type="password"
+              placeholder="Enter passcode to confirm (Hint: 0000)..."
+              value={passcode}
+              onChange={(e) => setPasscode(e.target.value)}
+              className="rounded-xl border-border"
+            />
+          </div>
+
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => setPasscode("")}>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={passcode !== "0000"}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 disabled:opacity-50 disabled:cursor-not-allowed"
               data-testid="button-confirm-delete-category"
             >
               Delete

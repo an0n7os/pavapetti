@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "wouter";
-import { X, Minus, Plus, Trash2, ShoppingBag, Phone, MessageCircle, ArrowRight } from "lucide-react";
+import { X, Minus, Plus, Trash2, ShoppingBag, Phone, MessageCircle, ArrowRight, ArrowLeft, MoreVertical, Video, CheckCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/context/CartContext";
 
@@ -8,7 +8,7 @@ export default function CartDrawer() {
   const { items, count, total, isOpen, closeCart, removeItem, updateQty, clearCart } = useCart();
   const [, setLocation] = useLocation();
 
-  const PHONE = "919042525110";
+  const PHONE = "919292016901";
 
   function buildWhatsAppMessage() {
     const lines = items.map(
@@ -52,76 +52,134 @@ export default function CartDrawer() {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="fixed top-0 right-0 h-full w-full max-w-[480px] bg-white shadow-2xl z-[110] flex flex-col"
+            className="fixed top-0 right-0 h-full w-full max-w-[480px] bg-[#efeae2] shadow-2xl z-[110] flex flex-col"
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-8 py-6 border-b border-border/50">
-              <div>
-                <h2 className="font-serif text-2xl font-light text-foreground">Your Boutique Bag</h2>
-                <p className="text-[10px] text-muted-foreground uppercase tracking-[0.2em] mt-1">
-                  {count} {count === 1 ? "Exquisite Piece" : "Treasured Pieces"}
-                </p>
+            <div className="flex items-center justify-between px-4 py-3 bg-[#008069] text-white shadow-md z-10">
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={closeCart}
+                  className="p-1 rounded-full hover:bg-white/10 transition-colors text-white"
+                >
+                  <ArrowLeft size={20} />
+                </button>
+                
+                {/* Avatar */}
+                <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center relative select-none">
+                  <span className="font-serif font-black text-lg text-white">P</span>
+                  <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-[#008069] animate-pulse" />
+                </div>
+
+                <div>
+                  <h2 className="font-sans font-bold text-sm leading-tight">Pavapetti Boutique</h2>
+                  <p className="text-[10px] text-emerald-100 font-medium">online</p>
+                </div>
               </div>
-              <button
-                onClick={closeCart}
-                className="p-3 rounded-full hover:bg-[#f9f7f4] transition-all text-muted-foreground hover:text-primary group"
-              >
-                <X size={20} className="group-hover:rotate-90 transition-transform duration-300" />
-              </button>
+
+              <div className="flex items-center gap-2.5 text-white/90">
+                <button className="p-2 rounded-full hover:bg-white/10 transition-colors hidden sm:block">
+                  <Video size={18} />
+                </button>
+                <button className="p-2 rounded-full hover:bg-white/10 transition-colors hidden sm:block" onClick={handleCall}>
+                  <Phone size={16} />
+                </button>
+                <button className="p-2 rounded-full hover:bg-white/10 transition-colors">
+                  <MoreVertical size={18} />
+                </button>
+              </div>
             </div>
 
-            {/* Items */}
-            <div className="flex-1 overflow-y-auto px-8 py-6">
+            {/* Items / Chat Area */}
+            <div 
+              className="flex-1 overflow-y-auto px-4 py-4 space-y-4"
+              style={{
+                backgroundColor: "#efeae2",
+                backgroundImage: "radial-gradient(#dfd9d0 1px, transparent 1px)",
+                backgroundSize: "16px 16px"
+              }}
+            >
+              {/* WhatsApp System Encrypted Notice */}
+              <div className="mx-auto my-2 px-3 py-1.5 rounded-lg bg-[#ffe596]/30 border border-[#ffe596]/40 text-[10px] text-amber-800 text-center max-w-[85%] flex items-center gap-1 justify-center leading-normal">
+                <span>🔒</span>
+                <span>Items in your cart are temporarily reserved. Proceed to order via WhatsApp.</span>
+              </div>
+
               {items.length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center text-center opacity-40">
-                  <ShoppingBag size={40} strokeWidth={1} className="mb-6" />
-                  <p className="font-serif text-xl mb-2">Your bag is empty</p>
-                  <p className="text-sm">Add some heritage treasures to your collection</p>
+                <div className="h-full flex flex-col items-center justify-center text-center opacity-70 py-12 px-6">
+                  <div className="w-16 h-16 rounded-full bg-white/50 backdrop-blur-sm flex items-center justify-center text-slate-400 mb-4 shadow-sm border border-black/5">
+                    <ShoppingBag size={28} strokeWidth={1.5} />
+                  </div>
+                  <p className="font-sans font-bold text-slate-700 text-lg mb-1">Your Boutique Bag is Empty</p>
+                  <p className="text-xs text-slate-500 max-w-[280px]">
+                    Browse our collection and add heritage treasures to start this chat.
+                  </p>
                 </div>
               ) : (
-                <div className="space-y-8">
+                <div className="space-y-4">
                   {items.map((item, i) => (
                     <motion.div
                       key={item.productId}
-                      initial={{ opacity: 0, y: 20 }}
+                      initial={{ opacity: 0, y: 15 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.1 }}
-                      className="flex gap-6 group"
+                      transition={{ delay: i * 0.05 }}
+                      className="bg-[#d9fdd3] text-foreground rounded-2xl rounded-tr-none shadow-[0_1px_1px_rgba(0,0,0,0.1)] relative p-3.5 ml-6 mr-1"
                     >
-                      <div className="w-24 h-32 rounded-xl overflow-hidden bg-[#f9f7f4] shrink-0 border border-border/30 shadow-sm">
-                        <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                      </div>
-                      <div className="flex-1 flex flex-col py-1">
-                        <div className="flex justify-between items-start mb-2">
-                          <p className="text-[13px] font-bold text-foreground leading-tight">{item.name}</p>
-                          <button onClick={() => removeItem(item.productId)} className="text-muted-foreground hover:text-primary transition-colors p-1">
-                            <X size={14} />
-                          </button>
+                      {/* Tail SVG */}
+                      <span className="absolute top-0 right-[-8px] text-[#d9fdd3] select-none pointer-events-none">
+                        <svg width="9" height="12" viewBox="0 0 9 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M0 0C4.5 0 9 0 9 0V12C9 12 7 6 0 0Z" fill="currentColor"/>
+                        </svg>
+                      </span>
+
+                      <div className="flex gap-4">
+                        {/* Thumbnail */}
+                        <div className="w-16 h-20 rounded-lg overflow-hidden bg-white shrink-0 border border-black/5 shadow-sm">
+                          <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
                         </div>
-                        <p className="text-[11px] text-muted-foreground italic mb-4">{item.categoryName || "Handcrafted Piece"}</p>
                         
-                        <div className="mt-auto flex items-center justify-between">
-                          <div className="flex items-center gap-4 bg-[#f9f7f4] px-4 py-1.5 rounded-full border border-border/50">
-                            <button onClick={() => updateQty(item.productId, item.quantity - 1)} className="text-muted-foreground hover:text-primary transition-colors">
-                              <Minus size={12} />
-                            </button>
-                            <span className="text-xs font-bold w-4 text-center">{item.quantity}</span>
-                            <button onClick={() => updateQty(item.productId, item.quantity + 1)} className="text-muted-foreground hover:text-primary transition-colors">
-                              <Plus size={12} />
+                        <div className="flex-1 flex flex-col min-w-0">
+                          {/* Name & Remove */}
+                          <div className="flex justify-between items-start gap-2 mb-1">
+                            <p className="text-[12.5px] font-bold text-slate-800 leading-tight truncate">{item.name}</p>
+                            <button onClick={() => removeItem(item.productId)} className="text-slate-400 hover:text-red-500 transition-colors p-0.5">
+                              <Trash2 size={13} />
                             </button>
                           </div>
-                          <div className="flex flex-col items-end gap-0.5">
-                            {item.mrp && item.mrp > item.price && (
-                              <div className="flex items-center gap-1.5">
-                                <span className="text-[11px] text-muted-foreground/50 line-through">
-                                  ₹{(item.mrp * item.quantity).toLocaleString("en-IN")}
+                          
+                          <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-2">
+                            {item.categoryName || "Handcrafted Piece"}
+                          </p>
+                          
+                          {/* Controls & Price */}
+                          <div className="mt-auto flex items-end justify-between gap-2">
+                            <div className="flex items-center gap-3 bg-white/70 px-2.5 py-1 rounded-full border border-black/5 shadow-sm">
+                              <button onClick={() => updateQty(item.productId, item.quantity - 1)} className="text-slate-500 hover:text-slate-800 transition-colors">
+                                <Minus size={11} />
+                              </button>
+                              <span className="text-[11px] font-bold w-3.5 text-center text-slate-800">{item.quantity}</span>
+                              <button onClick={() => updateQty(item.productId, item.quantity + 1)} className="text-slate-500 hover:text-slate-800 transition-colors">
+                                <Plus size={11} />
+                              </button>
+                            </div>
+                            
+                            <div className="flex flex-col items-end">
+                              {item.mrp && item.mrp > item.price && (
+                                <div className="flex items-center gap-1 mb-0.5">
+                                  <span className="text-[10px] text-slate-400/80 line-through">
+                                    ₹{(item.mrp * item.quantity).toLocaleString("en-IN")}
+                                  </span>
+                                  <span className="text-[8px] font-black tracking-wider uppercase px-1.5 py-0.2 rounded-full bg-emerald-500 text-white leading-none">
+                                    {Math.round(((item.mrp - item.price) / item.mrp) * 100)}% OFF
+                                  </span>
+                                </div>
+                              )}
+                              <div className="flex items-center gap-1">
+                                <span className="text-[13px] font-black text-slate-800">
+                                  ₹{(item.price * item.quantity).toLocaleString("en-IN")}
                                 </span>
-                                <span className="text-[8px] font-black tracking-[0.1em] uppercase px-1.5 py-0.5 rounded-full bg-emerald-500 text-white">
-                                  {Math.round(((item.mrp - item.price) / item.mrp) * 100)}% OFF
-                                </span>
+                                <CheckCheck size={14} className="text-[#34b7f1] shrink-0" />
                               </div>
-                            )}
-                            <span className="text-[13px] font-bold text-primary">₹{(item.price * item.quantity).toLocaleString("en-IN")}</span>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -133,33 +191,51 @@ export default function CartDrawer() {
 
             {/* Footer */}
             {items.length > 0 && (
-              <div className="px-8 py-8 bg-gradient-to-b from-[#f9f7f4] to-[#f4f0ea] border-t border-border/50 rounded-t-[2rem]">
-
-
-                <div className="flex justify-between items-end mb-6">
-                  <span className="font-serif text-lg">Subtotal</span>
-                  <span className="text-2xl font-serif text-primary">₹{total.toLocaleString("en-IN")}</span>
+              <div className="px-5 py-4 bg-[#f0f2f5] border-t border-black/5 z-10 flex flex-col gap-3">
+                {/* Order Summary styled as WhatsApp Invoice Card */}
+                <div className="bg-white rounded-xl p-4 shadow-sm border border-black/5 space-y-2.5">
+                  <div className="flex justify-between items-center text-xs border-b border-slate-100 pb-2">
+                    <span className="font-bold text-slate-600 uppercase tracking-widest text-[9px]">Acquisitions Invoice</span>
+                    <span className="text-[10px] text-slate-400 font-medium">🔒 Secure Checkout</span>
+                  </div>
+                  <div className="flex justify-between text-xs text-slate-500">
+                    <span>Treasures ({count})</span>
+                    <span>₹{total.toLocaleString("en-IN")}</span>
+                  </div>
+                  <div className="flex justify-between text-xs text-slate-500">
+                    <span>Shipping</span>
+                    <span className="text-emerald-600 font-bold uppercase tracking-wider text-[9px]">Calculated in Chat</span>
+                  </div>
+                  <div className="flex justify-between items-end pt-2 border-t border-dashed border-slate-200">
+                    <span className="font-bold text-slate-800">Total Amount</span>
+                    <span className="text-lg font-black text-[#008069]">₹{total.toLocaleString("en-IN")}</span>
+                  </div>
                 </div>
 
-                <div className="grid gap-3.5">
+                {/* Bottom Buttons */}
+                <div className="flex flex-col gap-2">
                   <Button
-                    className="w-full py-5 h-auto bg-primary text-primary-foreground rounded-full text-[12px] font-bold tracking-[0.25em] uppercase hover:gap-4 transition-all group shadow-lg shadow-primary/20"
+                    className="w-full py-4 h-auto bg-[#25D366] hover:bg-[#1ebe5d] text-white rounded-xl text-xs font-black tracking-widest uppercase shadow-md shadow-green-500/20 flex items-center justify-center gap-2 border-none transition-all hover:scale-[1.01]"
+                    onClick={handleWhatsApp}
+                  >
+                    <MessageCircle size={15} className="fill-white/10" />
+                    Order via WhatsApp
+                  </Button>
+                  
+                  <Button
+                    className="w-full py-4 h-auto bg-[#008069] hover:bg-[#006e5a] text-white rounded-xl text-xs font-bold tracking-[0.25em] uppercase hover:gap-3 transition-all flex items-center justify-center gap-2 border-none shadow-sm"
                     onClick={() => {
                       closeCart();
                       setLocation("/checkout");
                     }}
                   >
-                    Proceed to Checkout <ArrowRight size={16} className="ml-2" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="w-full py-5 h-auto border-primary/10 hover:border-primary/30 rounded-full text-[10px] font-bold tracking-[0.2em] uppercase hover:bg-white transition-all"
-                    onClick={handleWhatsApp}
-                  >
-                    Order via WhatsApp <MessageCircle size={14} className="ml-2 text-green-500" />
+                    Proceed to Checkout <ArrowRight size={14} />
                   </Button>
                 </div>
-                <p className="text-[10px] text-center text-muted-foreground mt-4 italic">Worldwide heritage delivery available.</p>
+                
+                <p className="text-[9px] text-center text-slate-400 font-medium uppercase tracking-widest">
+                  ⚡ Direct Support & UPI/Bank Transfer in Chat
+                </p>
               </div>
             )}
           </motion.div>

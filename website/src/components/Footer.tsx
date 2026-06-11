@@ -45,7 +45,7 @@ export default function Footer() {
               {[
                 { icon: <Instagram size={16} />, href: "https://instagram.com/pavapetti" },
                 { icon: <Facebook size={16} />, href: "https://facebook.com/pavapetti" },
-                { icon: <MessageCircle size={16} />, href: "https://wa.me/919042525110" }
+                { icon: <MessageCircle size={16} />, href: "https://wa.me/919292016901" }
               ].map((social, i) => (
                 <Magnetic key={i}>
                   <a 
@@ -61,22 +61,26 @@ export default function Footer() {
             </div>
 
             <div className="space-y-4 text-xs tracking-widest uppercase font-bold text-white/50">
-              <a href="tel:+919042525110" className="flex items-center gap-4 hover:text-primary transition-colors duration-300 group">
+              <a href="tel:+919292016901" className="flex items-center gap-4 hover:text-primary transition-colors duration-300 group">
                 <Phone size={13} className="text-primary group-hover:scale-110 transition-transform" />
-                +91 90425 25110
+                +91 92920 16901
+              </a>
+              <a href="tel:+919544816900" className="flex items-center gap-4 hover:text-primary transition-colors duration-300 group">
+                <Phone size={13} className="text-primary group-hover:scale-110 transition-transform" />
+                +91 95448 16900
               </a>
               <a href="mailto:curator@pavapetti.com" className="flex items-center gap-4 hover:text-primary transition-colors duration-300 group">
                 <Mail size={13} className="text-primary group-hover:scale-110 transition-transform" />
                 curator@pavapetti.com
               </a>
               <a 
-                href="https://maps.google.com/?q=Heritage+Tower+Fort+Kochi+Kerala" 
+                href="https://maps.google.com/?q=Vallathol+Museum+Cheruthuruthy+Thrissur+Kerala" 
                 target="_blank" 
                 rel="noreferrer"
                 className="flex items-center gap-4 hover:text-primary transition-colors duration-300 group"
               >
                 <MapPin size={13} className="text-primary group-hover:scale-110 transition-transform" />
-                Heritage Tower, Fort Kochi, Kerala
+                Pavapetti Heritage Archive, Near Vallathol Museum, Cheruthuruthy, Thrissur, Kerala
               </a>
             </div>
           </div>
@@ -147,7 +151,7 @@ export default function Footer() {
             <h4 className="font-serif text-lg font-light mb-8 text-primary tracking-widest uppercase">Our Gallery</h4>
             <div className="relative group rounded-[2.5rem] overflow-hidden transition-all duration-1000 h-56 border border-white/5 shadow-2xl">
               <iframe 
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3929.589617264875!2d76.2415174744771!3d9.968051274149022!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b081121d5a8c27f%3A0xf67026e6417730e2!2sFort%20Kochi%2C%20Kochi%2C%20Kerala!5e0!3m2!1sen!2sin!4v1715080000000!5m2!1sen!2sin" 
+                src="https://maps.google.com/maps?q=Vallathol%20Museum%20Cheruthuruthy%20Thrissur&t=&z=15&ie=UTF8&iwloc=&output=embed" 
                 width="100%" 
                 height="100%" 
                 style={{ border: 0 }} 
@@ -161,7 +165,7 @@ export default function Footer() {
               <div className="absolute inset-0 pointer-events-none border border-white/5 rounded-[2.5rem]" />
             </div>
             <p className="mt-5 text-[9px] text-primary/80 font-black tracking-[0.4em] uppercase text-center">
-              Visit the Archive • Fort Kochi
+              Visit the Archive • Cheruthuruthy
             </p>
           </div>
         </div>

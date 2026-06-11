@@ -64,6 +64,7 @@ export default function DashboardProducts() {
   const [editProduct, setEditProduct] = useState<Product | null>(null);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [form, setForm] = useState<CreateProductBody>(emptyForm);
+  const [discountPercent, setDiscountPercent] = useState<number>(0);
 
   const { data: products, isLoading } = useListProducts(undefined, {
     query: { queryKey: getListProductsQueryKey() },
@@ -81,16 +82,21 @@ export default function DashboardProducts() {
   const openAdd = () => {
     setEditProduct(null);
     setForm(emptyForm);
+    setDiscountPercent(0);
     setShowForm(true);
   };
 
   const openEdit = (product: Product) => {
     setEditProduct(product);
+    const initialPrice = product.price;
+    const initialMrp = product.mrp || Math.round(product.price * 1.2);
+    const discount = initialMrp > initialPrice ? Math.round(((initialMrp - initialPrice) / initialMrp) * 100) : 0;
+    setDiscountPercent(discount);
     setForm({
       name: product.name,
       description: product.description,
-      price: product.price,
-      mrp: product.mrp || Math.round(product.price * 1.2),
+      price: initialPrice,
+      mrp: initialMrp,
       imageUrl: product.imageUrl,
       images: product.images || [product.imageUrl],
       categoryId: product.categoryId,
@@ -103,6 +109,37 @@ export default function DashboardProducts() {
       weight: product.weight || "",
     });
     setShowForm(true);
+  };
+
+  const handlePriceChange = (newPrice: number) => {
+    const mrp = form.mrp || 0;
+    let newDiscount = 0;
+    if (mrp > newPrice) {
+      newDiscount = Math.round(((mrp - newPrice) / mrp) * 100);
+    }
+    setDiscountPercent(newDiscount);
+    setForm(prev => ({ ...prev, price: newPrice }));
+  };
+
+  const handleMrpChange = (newMrp: number) => {
+    let newPrice = form.price;
+    if (discountPercent > 0) {
+      newPrice = Math.round(newMrp * (1 - discountPercent / 100) * 100) / 100;
+    } else if (newMrp > form.price) {
+      const calculatedDiscount = Math.round(((newMrp - form.price) / newMrp) * 100);
+      setDiscountPercent(calculatedDiscount);
+    }
+    setForm(prev => ({ ...prev, mrp: newMrp, price: newPrice }));
+  };
+
+  const handleDiscountChange = (newDiscount: number) => {
+    const mrp = form.mrp || 0;
+    let newPrice = form.price;
+    if (mrp > 0) {
+      newPrice = Math.round(mrp * (1 - newDiscount / 100) * 100) / 100;
+    }
+    setDiscountPercent(newDiscount);
+    setForm(prev => ({ ...prev, price: newPrice }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -246,7 +283,7 @@ export default function DashboardProducts() {
 
                   <div className="space-y-2">
                     <Label htmlFor="price" className="text-[10px] font-black tracking-[0.2em] uppercase text-primary/80">Curated Price (₹)</Label>
-                    <Input id="price" type="number" min="0" step="0.01" placeholder="0.00" className="bg-white border border-primary/10 hover:border-primary/20 rounded-2xl py-6 px-5 text-sm tracking-wide focus:border-primary/30 focus:ring-1 focus:ring-primary/10 transition-all shadow-sm outline-none placeholder:text-muted-foreground/35" value={form.price || ""} onChange={(e) => setForm({ ...form, price: parseFloat(e.target.value) || 0 })} data-testid="input-price" />
+                    <Input id="price" type="number" min="0" step="0.01" placeholder="0.00" className="bg-white border border-primary/10 hover:border-primary/20 rounded-2xl py-6 px-5 text-sm tracking-wide focus:border-primary/30 focus:ring-1 focus:ring-primary/10 transition-all shadow-sm outline-none placeholder:text-muted-foreground/35" value={form.price || ""} onChange={(e) => handlePriceChange(parseFloat(e.target.value) || 0)} data-testid="input-price" />
                   </div>
 
                   <div className="space-y-2">
@@ -256,7 +293,12 @@ export default function DashboardProducts() {
 
                   <div className="space-y-2">
                     <Label htmlFor="mrp" className="text-[10px] font-black tracking-[0.2em] uppercase text-primary/80">Standard MRP (₹)</Label>
-                    <Input id="mrp" type="number" min="0" step="0.01" placeholder="0.00" className="bg-white border border-primary/10 hover:border-primary/20 rounded-2xl py-6 px-5 text-sm tracking-wide focus:border-primary/30 focus:ring-1 focus:ring-primary/10 transition-all shadow-sm outline-none placeholder:text-muted-foreground/35" value={form.mrp || ""} onChange={(e) => setForm({ ...form, mrp: parseFloat(e.target.value) || 0 })} data-testid="input-mrp" />
+                    <Input id="mrp" type="number" min="0" step="0.01" placeholder="0.00" className="bg-white border border-primary/10 hover:border-primary/20 rounded-2xl py-6 px-5 text-sm tracking-wide focus:border-primary/30 focus:ring-1 focus:ring-primary/10 transition-all shadow-sm outline-none placeholder:text-muted-foreground/35" value={form.mrp || ""} onChange={(e) => handleMrpChange(parseFloat(e.target.value) || 0)} data-testid="input-mrp" />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="discount" className="text-[10px] font-black tracking-[0.2em] uppercase text-primary/80">Discount Percentage (%)</Label>
+                    <Input id="discount" type="number" min="0" max="100" placeholder="0" className="bg-white border border-primary/10 hover:border-primary/20 rounded-2xl py-6 px-5 text-sm tracking-wide focus:border-primary/30 focus:ring-1 focus:ring-primary/10 transition-all shadow-sm outline-none placeholder:text-muted-foreground/35" value={discountPercent || ""} onChange={(e) => handleDiscountChange(parseFloat(e.target.value) || 0)} data-testid="input-discount" />
                   </div>
 
                   <div className="space-y-2">
@@ -440,7 +482,17 @@ export default function DashboardProducts() {
                         </div>
                       </td>
                       <td className="px-4 py-3 text-muted-foreground hidden md:table-cell">{product.categoryName ?? "—"}</td>
-                      <td className="px-4 py-3 font-semibold text-primary">₹{product.price.toLocaleString("en-IN")}</td>
+                      <td className="px-4 py-3 text-left">
+                        <span className="font-semibold text-primary">₹{product.price.toLocaleString("en-IN")}</span>
+                        {product.mrp && product.mrp > product.price ? (
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            <span className="text-[10px] text-muted-foreground line-through">₹{product.mrp.toLocaleString("en-IN")}</span>
+                            <span className="text-[9px] font-black text-amber-600 uppercase bg-amber-50 px-1.5 rounded">
+                              {Math.round(((product.mrp - product.price) / product.mrp) * 100)}% OFF
+                            </span>
+                          </div>
+                        ) : null}
+                      </td>
                       <td className="px-4 py-3 hidden sm:table-cell">
                         <span className={product.stock <= 5 ? "text-red-600 font-semibold" : "text-foreground"}>{product.stock}</span>
                       </td>

@@ -21,7 +21,15 @@ import MobileNav from "@/components/MobileNav";
 import { useState, useEffect } from "react";
 import PavapettiLogo from "./components/PavapettiLogo";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // Cache queries for 5 minutes
+      refetchOnWindowFocus: false, // Prevent refetching when window is focused
+      retry: 1, // Limit retries to prevent long hangs on network errors
+    },
+  },
+});
 // Page Wrapper for smooth transitions
 
 function PageWrapper({ children }: { children: React.ReactNode }) {

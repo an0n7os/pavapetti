@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useLocation } from "wouter";
 import { X, MessageCircle } from "lucide-react";
 
-const PHONE = "919042525110";
+const PHONE = "919292016901";
 
 export default function FloatingWhatsApp() {
   const [location] = useLocation();
@@ -32,7 +32,7 @@ export default function FloatingWhatsApp() {
             className="glass-premium rounded-[2.5rem] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.2)] w-80 overflow-hidden border border-white/40 mb-4"
           >
             {/* Header */}
-            <div className="bg-primary/95 px-6 py-5 flex items-center justify-between">
+            <div className="bg-[#008069] px-6 py-5 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-md">
                   <span className="text-white font-serif font-black text-lg">P</span>
@@ -70,7 +70,7 @@ export default function FloatingWhatsApp() {
                 href={`https://wa.me/${PHONE}?text=${defaultMsg}`}
                 target="_blank"
                 rel="noreferrer"
-                className="flex items-center justify-center gap-3 w-full bg-primary text-primary-foreground font-black text-[11px] tracking-[0.2em] uppercase py-4 rounded-xl transition-all hover:shadow-xl hover:scale-[1.02]"
+                className="flex items-center justify-center gap-3 w-full bg-[#25D366] text-white font-black text-[11px] tracking-[0.2em] uppercase py-4 rounded-xl transition-all hover:shadow-xl hover:scale-[1.02] shadow-md shadow-green-500/20"
               >
                 <MessageCircle size={16} />
                 Connect Now

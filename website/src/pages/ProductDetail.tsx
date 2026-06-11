@@ -67,7 +67,7 @@ export default function ProductDetail() {
   // Related products (same category, exclude current)
   const { data: allCategoryProducts } = useListProducts(
     product?.categoryName ? { category: product.categoryName } : undefined,
-    { query: { enabled: !!product?.categoryName } }
+    { query: { enabled: !!product?.categoryName } as any }
   );
   const related = (allCategoryProducts ?? []).filter((p: any) => p.id !== id).slice(0, 4);
 
@@ -97,7 +97,11 @@ export default function ProductDetail() {
   useEffect(() => {
     if (product) {
       setSelectedImage(product.imageUrl);
+      document.title = `${product.name} | Pavapetti Heritage`;
     }
+    return () => {
+      document.title = "Pavapetti | Heritage Boutique";
+    };
   }, [product]);
 
   useEffect(() => {
@@ -209,7 +213,7 @@ export default function ProductDetail() {
     );
   }
 
-  const PHONE = "919042525110";
+  const PHONE = "919292016901";
   const waMsg = encodeURIComponent(
     `Hi! I'm interested in *${product.name}* (₹${product.price.toLocaleString("en-IN")}). Please share availability and delivery details.`
   );
@@ -252,13 +256,13 @@ export default function ProductDetail() {
                   href={`https://wa.me/${PHONE}?text=${waMsg}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="hidden md:flex items-center gap-2 bg-gradient-to-r from-secondary to-[#1f2e2e] border border-primary/20 text-white text-[10px] font-black tracking-widest uppercase px-6 py-3.5 rounded-full transition-all hover:scale-105 shadow-lg relative pl-8"
+                  className="hidden md:flex items-center gap-2 bg-[#25D366] hover:bg-[#1ebe5d] text-white text-[10px] font-black tracking-widest uppercase px-6 py-3.5 rounded-full transition-all hover:scale-105 shadow-lg relative pl-8 shadow-green-500/20 border border-green-400/20"
                 >
                   <span className="absolute left-3.5 top-1/2 -translate-y-1/2 flex h-1.5 w-1.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500"></span>
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white"></span>
                   </span>
-                  <MessageCircle size={12} className="text-[#25D366]" /> WhatsApp Chat
+                  <MessageCircle size={12} className="text-white fill-white/20" /> WhatsApp Chat
                 </a>
               </div>
             </div>
@@ -448,16 +452,16 @@ export default function ProductDetail() {
 
               <Button
                 size="lg"
-                className="w-full rounded-full py-4 text-xs font-bold uppercase tracking-[0.25em] gap-2 bg-[#FAF8F5] hover:bg-[#f5f1e9] border border-[#c5a880]/30 text-primary transition-all duration-300 relative overflow-hidden group h-12 shadow-sm"
+                className="w-full rounded-full py-4 text-xs font-bold uppercase tracking-[0.25em] gap-2 bg-[#25D366] hover:bg-[#1ebe5d] text-white transition-all duration-300 relative overflow-hidden group h-12 shadow-md shadow-green-500/20 border-none"
                 onClick={() => window.open(`https://wa.me/${PHONE}?text=${waMsg}`, "_blank")}
               >
                 {/* Active curator pulse */}
                 <span className="absolute left-5 top-1/2 -translate-y-1/2 flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#c5a880] opacity-50"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[#c5a880]"></span>
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-50"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
                 </span>
-                <MessageCircle size={14} className="text-[#c5a880] group-hover:scale-110 transition-transform ml-3" />
-                <span className="text-foreground">Inquire via WhatsApp Concierge</span>
+                <MessageCircle size={14} className="text-white fill-white/10 group-hover:scale-110 transition-transform ml-3" />
+                <span className="text-white">Inquire via WhatsApp Concierge</span>
               </Button>
             </div>
 
