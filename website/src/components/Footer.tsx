@@ -87,7 +87,7 @@ export default function Footer() {
             <ul className="space-y-4 text-[11px] font-black tracking-[0.25em] uppercase text-white/40">
               {[
                 { href: "/products", label: "All Artifacts" },
-                { href: "/products?featured=true", label: "Curated Collection" },
+                { href: "/products?featured=true", label: "Featured Collection" },
                 { href: "/products?category=Pooja Category", label: "Ritual" },
                 { href: "/products?category=Elephant Heritage", label: "Heritage" },
                 { href: "/products?category=Miniatures %26 Mini Chenda", label: "Miniatures" },

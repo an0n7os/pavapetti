@@ -41,7 +41,7 @@ export default function FloatingWhatsApp() {
                   <p className="text-white font-bold text-sm tracking-tight leading-tight">Pavapetti Heritage</p>
                   <div className="flex items-center gap-1.5">
                     <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-                    <p className="text-white/70 text-[10px] font-bold tracking-wider uppercase">Live Curator</p>
+                    <p className="text-white/70 text-[10px] font-bold tracking-wider uppercase">Live Support</p>
                   </div>
                 </div>
               </div>
@@ -58,8 +58,7 @@ export default function FloatingWhatsApp() {
               <div className="bg-white/50 backdrop-blur-sm rounded-2xl rounded-tl-none px-5 py-4 shadow-sm border border-white/20">
                 <p className="text-sm text-foreground/80 leading-relaxed font-medium">
                   👋 <span className="italic font-serif">Namaskaram!</span> <br />
-                  I'm your heritage curator. <br />
-                  How can I assist your collection today?
+                  Hello! How can I help you find the perfect piece today?
                 </p>
                 <p className="text-[9px] text-muted-foreground/50 mt-3 text-right font-bold uppercase tracking-widest">Just Now</p>
               </div>

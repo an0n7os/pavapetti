@@ -110,7 +110,19 @@ export default function CartDrawer() {
                               <Plus size={12} />
                             </button>
                           </div>
-                          <span className="text-[13px] font-bold text-primary">₹{(item.price * item.quantity).toLocaleString("en-IN")}</span>
+                          <div className="flex flex-col items-end gap-0.5">
+                            {item.mrp && item.mrp > item.price && (
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-[11px] text-muted-foreground/50 line-through">
+                                  ₹{(item.mrp * item.quantity).toLocaleString("en-IN")}
+                                </span>
+                                <span className="text-[8px] font-black tracking-[0.1em] uppercase px-1.5 py-0.5 rounded-full bg-emerald-500 text-white">
+                                  {Math.round(((item.mrp - item.price) / item.mrp) * 100)}% OFF
+                                </span>
+                              </div>
+                            )}
+                            <span className="text-[13px] font-bold text-primary">₹{(item.price * item.quantity).toLocaleString("en-IN")}</span>
+                          </div>
                         </div>
                       </div>
                     </motion.div>

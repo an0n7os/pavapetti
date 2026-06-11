@@ -90,7 +90,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
               className="absolute top-6 right-6 z-20 p-2.5 rounded-full bg-white/80 backdrop-blur-md border border-white/40 shadow-sm hover:scale-110 active:scale-95 transition-all duration-300 group/fav"
             >
               <Heart 
-                className={`w-4 h-4 transition-colors duration-300 ${wishlisted ? "fill-primary text-primary" : "text-primary/40 group-hover/fav:text-primary"}`} 
+                className={`w-4 h-4 transition-colors duration-300 ${wishlisted ? "fill-red-500 text-red-500" : "text-primary/40 group-hover/fav:text-primary"}`} 
               />
             </button>
 
@@ -103,7 +103,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
               )}
               {product.featured && (
                 <div className="bg-white/90 px-4 py-1 rounded-full shadow-lg backdrop-blur-md border border-white/20">
-                  <p className="text-[9px] font-black tracking-[0.3em] uppercase text-black">Curated Piece</p>
+                  <p className="text-[9px] font-black tracking-[0.3em] uppercase text-black">Featured Piece</p>
                 </div>
               )}
             </div>
@@ -119,6 +119,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
                       productId: product.id,
                       name: product.name,
                       price: product.price,
+                      mrp: product.mrp ?? undefined,
                       imageUrl: product.imageUrl,
                       categoryName: product.categoryName ?? undefined,
                     });
@@ -159,6 +160,11 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
                 <p className="text-[14px] md:text-[18px] font-bold text-primary tracking-tight">
                   ₹{product.price.toLocaleString("en-IN")}
                 </p>
+                {product.mrp && product.mrp > product.price && (
+                  <span className="text-[8px] font-black tracking-[0.1em] uppercase px-2 py-0.5 rounded-full bg-emerald-500 text-white">
+                    {Math.round(((product.mrp - product.price) / product.mrp) * 100)}% OFF
+                  </span>
+                )}
               </div>
             </div>
             

@@ -1,6 +1,6 @@
 import { useParams, Link } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Package, Tag, Star, Phone, Share2, ShoppingBag, Check, MessageCircle, Heart, ChevronRight } from "lucide-react";
+import { ArrowLeft, Package, Tag, Star, Phone, Share2, ShoppingBag, Check, MessageCircle, Heart, ChevronRight, ChevronLeft, X } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -75,12 +75,44 @@ export default function ProductDetail() {
   const ctaRef = useRef<HTMLDivElement>(null);
   const [showSticky, setShowSticky] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [lightboxZoom, setLightboxZoom] = useState(false);
+
+  const images = product ? [product.imageUrl, ...(product.images || [])].filter((img, i, self) => self.indexOf(img) === i) : [];
+
+  function handleNextImage() {
+    if (images.length <= 1) return;
+    const idx = images.indexOf(selectedImage || "");
+    const nextIdx = (idx + 1) % images.length;
+    setSelectedImage(images[nextIdx]);
+  }
+
+  function handlePrevImage() {
+    if (images.length <= 1) return;
+    const idx = images.indexOf(selectedImage || "");
+    const prevIdx = (idx - 1 + images.length) % images.length;
+    setSelectedImage(images[prevIdx]);
+  }
 
   useEffect(() => {
     if (product) {
       setSelectedImage(product.imageUrl);
     }
   }, [product]);
+
+  useEffect(() => {
+    if (!isLightboxOpen) {
+      setLightboxZoom(false);
+      return;
+    }
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsLightboxOpen(false);
+      if (e.key === "ArrowRight") handleNextImage();
+      if (e.key === "ArrowLeft") handlePrevImage();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isLightboxOpen, selectedImage, product]);
 
   useEffect(() => {
     const el = ctaRef.current;
@@ -112,6 +144,7 @@ export default function ProductDetail() {
       productId: product.id,
       name: product.name,
       price: product.price,
+      mrp: product.mrp ?? undefined,
       imageUrl: product.imageUrl,
       categoryName: product.categoryName ?? undefined,
     });
@@ -225,7 +258,7 @@ export default function ProductDetail() {
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500"></span>
                   </span>
-                  <MessageCircle size={12} className="text-[#25D366]" /> Curator Chat
+                  <MessageCircle size={12} className="text-[#25D366]" /> WhatsApp Chat
                 </a>
               </div>
             </div>
@@ -245,8 +278,13 @@ export default function ProductDetail() {
               <div className="md:hidden -mx-4">
                 <div className="flex overflow-x-auto scroll-snap-x mandatory scrollbar-hide gap-5 px-6 pb-4">
                   {[product.imageUrl, ...(product.images || [])].filter((img, i, self) => self.indexOf(img) === i).map((img, idx) => (
-                    <div key={idx} className="flex-shrink-0 w-[82vw] scroll-snap-align-start p-3 rounded-[2.5rem] border border-primary/10 bg-gradient-to-br from-white to-[#fcfaf7] shadow-lg">
-                      <div className="aspect-square rounded-[2rem] overflow-hidden bg-[#f9f7f4] border border-border/50">
+                    <div key={idx} className="flex-shrink-0 w-[82vw] scroll-snap-align-start p-4 rounded-[3rem] border border-[#c5a880]/20 bg-gradient-to-br from-[#FAF8F5] via-[#FAF8F5]/95 to-[#F3EFE9] shadow-xl relative">
+                      {/* Thin inner gold border for premium aesthetic */}
+                      <div className="absolute inset-1.5 rounded-[2.5rem] border border-[#c5a880]/30 pointer-events-none" />
+                      <div 
+                        onClick={() => { setSelectedImage(img); setIsLightboxOpen(true); }}
+                        className="aspect-square rounded-[2.2rem] overflow-hidden bg-[#FAF8F5] border border-[#c5a880]/15 shadow-inner cursor-zoom-in"
+                      >
                         <img src={img} alt={`${product.name} ${idx}`} className="w-full h-full object-cover" />
                       </div>
                     </div>
@@ -261,12 +299,15 @@ export default function ProductDetail() {
               </div>
 
               {/* Desktop Main Image with Double Archival Frame */}
-              <div className="hidden md:block relative p-4 rounded-[3.5rem] border border-primary/10 bg-gradient-to-br from-white to-[#fcfaf7] shadow-xl">
+              <div className="hidden md:block relative p-5 rounded-[4rem] border border-[#c5a880]/20 bg-gradient-to-br from-[#FAF8F5] via-[#FAF8F5]/95 to-[#F3EFE9] shadow-2xl shadow-[#c5a880]/5">
+                {/* Internal thin gold accent border */}
+                <div className="absolute inset-2 rounded-[3.5rem] border border-[#c5a880]/30 pointer-events-none" />
                 <motion.div
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                  className="relative aspect-square rounded-[3rem] overflow-hidden bg-[#f9f7f4] shadow-2xl group cursor-zoom-in"
+                  onClick={() => setIsLightboxOpen(true)}
+                  className="relative aspect-square rounded-[3rem] overflow-hidden bg-[#FAF8F5] border border-[#c5a880]/15 shadow-inner group cursor-zoom-in"
                 >
                   <AnimatePresence mode="wait">
                     <motion.img
@@ -311,21 +352,7 @@ export default function ProductDetail() {
               )}
             </div>
 
-            {/* Specifications Section — Premium Responsive Grid */}
-            <div className="grid grid-cols-3 gap-1 sm:gap-6 bg-[#f9f7f4] p-4 sm:p-6 md:p-10 rounded-[2rem] md:rounded-[3rem] text-center sm:text-left shadow-sm mt-8">
-              <div className="flex flex-col justify-center">
-                <h4 className="text-[8px] sm:text-[10px] uppercase tracking-[0.1em] sm:tracking-[0.3em] font-black text-primary mb-2">Material</h4>
-                <p className="text-[11px] xs:text-[12px] sm:text-lg font-serif font-light text-foreground line-clamp-2 leading-tight">{product.material || "Traditional Brass"}</p>
-              </div>
-              <div className="border-x border-border/40 px-1 sm:px-6 flex flex-col justify-center">
-                <h4 className="text-[8px] sm:text-[10px] uppercase tracking-[0.1em] sm:tracking-[0.3em] font-black text-primary mb-2">Dimensions</h4>
-                <p className="text-[11px] xs:text-[12px] sm:text-lg font-serif font-light text-foreground line-clamp-2 leading-tight">{product.size || "Standard"}</p>
-              </div>
-              <div className="pl-1 sm:pl-6 flex flex-col justify-center">
-                <h4 className="text-[8px] sm:text-[10px] uppercase tracking-[0.1em] sm:tracking-[0.3em] font-black text-primary mb-2">Weight</h4>
-                <p className="text-[11px] xs:text-[12px] sm:text-lg font-serif font-light text-foreground line-clamp-2 leading-tight">{product.weight || "N/A"}</p>
-              </div>
-            </div>
+
           </div>
 
           {/* Info Section — Sticky */}
@@ -371,6 +398,11 @@ export default function ProductDetail() {
                     ₹{product.price.toLocaleString("en-IN")}
                   </span>
                 </div>
+                {product.mrp && product.mrp > product.price && (
+                  <span className="text-[9px] font-black tracking-[0.15em] uppercase px-3 py-1 rounded-full bg-emerald-500 text-white shadow-sm shadow-emerald-500/30">
+                    {Math.round(((product.mrp - product.price) / product.mrp) * 100)}% OFF
+                  </span>
+                )}
                 <div className="h-6 w-[0.5px] bg-[#c5a880]/30" />
                 <span className={`text-[8.5px] font-black tracking-[0.2em] uppercase px-3 py-1 rounded-full ${
                   product.stock > 0 
@@ -408,9 +440,9 @@ export default function ProductDetail() {
                 </Button>
                 <button
                   onClick={handleWishlist}
-                  className={`w-12 h-12 rounded-full border border-primary/10 flex items-center justify-center transition-all duration-500 hover:scale-105 shrink-0 bg-white hover:border-[#c5a880]/30 shadow-sm`}
+                  className={`w-12 h-12 rounded-full border border-primary/10 flex items-center justify-center transition-all duration-500 hover:scale-105 shrink-0 bg-white hover:border-red-500/30 shadow-sm`}
                 >
-                  <Heart size={16} className={wishlisted ? "fill-[#c5a880] text-[#c5a880]" : "text-muted-foreground"} />
+                  <Heart size={16} className={wishlisted ? "fill-red-500 text-red-500" : "text-muted-foreground"} />
                 </button>
               </div>
 
@@ -425,23 +457,8 @@ export default function ProductDetail() {
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-[#c5a880]"></span>
                 </span>
                 <MessageCircle size={14} className="text-[#c5a880] group-hover:scale-110 transition-transform ml-3" />
-                <span className="text-foreground">Inquire via Curator Concierge</span>
+                <span className="text-foreground">Inquire via WhatsApp Concierge</span>
               </Button>
-            </div>
-
-            {/* Wax Seal Authenticity Stamp */}
-            <div className="flex items-center gap-4 p-5 rounded-[2rem] bg-[#FAF8F5] border border-[#c5a880]/20 shadow-sm">
-              <div className="relative w-12 h-12 rounded-full border border-[#c5a880]/40 flex items-center justify-center bg-white shadow-md shadow-[#c5a880]/5 shrink-0 select-none">
-                <span className="font-serif italic text-[#c5a880] text-lg font-bold">P</span>
-                {/* Gold outer rim */}
-                <div className="absolute inset-0.5 rounded-full border border-dashed border-[#c5a880]/20 animate-[spin_60s_linear_infinite]" />
-              </div>
-              <div className="space-y-0.5 flex-1 min-w-0">
-                <h5 className="text-[#c5a880] text-[10px] font-black uppercase tracking-[0.2em]">Archival Authenticity Guarantee</h5>
-                <p className="text-[10.5px] text-muted-foreground/80 leading-relaxed font-serif font-light italic">
-                  Directly sourced from state-registered master craft clusters. Bearing the official Pavapetti Seal of Preservation & Ethical Sourcing.
-                </p>
-              </div>
             </div>
 
             {/* Interactive Premium Details Accordion */}
@@ -452,11 +469,11 @@ export default function ProductDetail() {
               />
               <AccordionItem 
                 title="Logistics & Preserved Packaging" 
-                content="Housed in our bespoke sandalwood-toned archival vault box. Double-cushioned and protected to survive global air transit. Includes a numbered certificate of curation." 
+                content="Housed in our bespoke sandalwood-toned archival vault box. Double-cushioned and protected to survive global air transit. Includes a numbered certificate of authenticity." 
               />
               <AccordionItem 
-                title="Curator Acquisition Protocol" 
-                content="Once checkout or chat is initiated, a dedicated curator handles your purchase directly. We accept UPI, NetBanking, and all international major credit cards." 
+                title="Ordering & Payment Process" 
+                content="Once checkout or chat is initiated, our team handles your order directly. We accept UPI, NetBanking, and all international major credit cards." 
               />
             </div>
           </div>
@@ -542,7 +559,7 @@ export default function ProductDetail() {
           <section className="mt-20 md:mt-40">
             <div className="flex items-end justify-between mb-16 px-2">
               <div>
-                <p className="text-primary text-[10px] tracking-[0.5em] uppercase font-bold mb-4 opacity-60">The Curation</p>
+                <p className="text-primary text-[10px] tracking-[0.5em] uppercase font-bold mb-4 opacity-60">Suggestions</p>
                 <h2 className="font-serif text-4xl font-light text-foreground">You May Also <span className="italic">Appreciate</span></h2>
               </div>
               {product.categoryName && (
@@ -562,6 +579,107 @@ export default function ProductDetail() {
           </section>
         )}
       </div>
+
+      {/* ── Premium Image Lightbox Modal ── */}
+      <AnimatePresence>
+        {isLightboxOpen && selectedImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4 }}
+            className="fixed inset-0 z-[999] bg-black/95 backdrop-blur-xl flex flex-col items-center justify-center select-none"
+          >
+            {/* Background click to close */}
+            <div className="absolute inset-0 cursor-zoom-out" onClick={() => setIsLightboxOpen(false)} />
+
+            {/* Header controls */}
+            <div className="absolute top-6 left-6 right-6 flex items-center justify-between z-10 text-white/60 pointer-events-none">
+              <div className="flex flex-col">
+                <span className="text-[10px] font-black uppercase tracking-[0.25em] text-[#c5a880] mb-0.5">Heritage Collection</span>
+                <h4 className="text-xs font-light font-serif text-white/90">{product.name}</h4>
+              </div>
+              <div className="pointer-events-auto flex items-center gap-4">
+                {images.length > 1 && (
+                  <span className="text-[10px] font-black tracking-widest bg-white/5 border border-white/10 px-4 py-1.5 rounded-full">
+                    {images.indexOf(selectedImage) + 1} / {images.length}
+                  </span>
+                )}
+                <button
+                  onClick={() => setIsLightboxOpen(false)}
+                  className="bg-white/10 hover:bg-white/20 hover:text-white p-3 rounded-full backdrop-blur-md border border-white/10 shadow-lg transition-all duration-300 pointer-events-auto"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+            </div>
+
+            {/* Image Container */}
+            <div className="relative max-w-5xl max-h-[80vh] w-full px-4 flex items-center justify-center z-10">
+              {/* Prev Button */}
+              {images.length > 1 && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); handlePrevImage(); }}
+                  className="absolute left-6 lg:left-8 bg-white/10 hover:bg-white/20 text-white hover:scale-105 active:scale-95 p-4 rounded-full backdrop-blur-md border border-white/10 shadow-lg transition-all duration-300 z-20"
+                >
+                  <ChevronLeft size={20} />
+                </button>
+              )}
+
+              {/* Main Lightbox Image */}
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                transition={{ type: "spring", damping: 30, stiffness: 200 }}
+                className="relative overflow-hidden rounded-[2rem] border border-[#c5a880]/20 bg-black/40 shadow-2xl max-w-full max-h-[75vh]"
+              >
+                <img
+                  src={selectedImage}
+                  alt={product.name}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setLightboxZoom(!lightboxZoom);
+                  }}
+                  className={`max-w-full max-h-[75vh] object-contain transition-all duration-500 ease-out select-none ${
+                    lightboxZoom ? "scale-150 cursor-zoom-out" : "cursor-zoom-in"
+                  }`}
+                />
+              </motion.div>
+
+              {/* Next Button */}
+              {images.length > 1 && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); handleNextImage(); }}
+                  className="absolute right-6 lg:right-8 bg-white/10 hover:bg-white/20 text-white hover:scale-105 active:scale-95 p-4 rounded-full backdrop-blur-md border border-white/10 shadow-lg transition-all duration-300 z-20"
+                >
+                  <ChevronRight size={20} />
+                </button>
+              )}
+            </div>
+
+            {/* Thumbnails indicator */}
+            {images.length > 1 && (
+              <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-3 max-w-[90vw] overflow-x-auto p-2 bg-white/5 backdrop-blur-md rounded-full border border-white/10 scrollbar-hide z-10">
+                {images.map((img, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => {
+                      setLightboxZoom(false);
+                      setSelectedImage(img);
+                    }}
+                    className={`w-10 h-10 rounded-full overflow-hidden shrink-0 border-2 transition-all duration-300 ${
+                      selectedImage === img ? "border-[#c5a880] scale-110 shadow-lg shadow-[#c5a880]/20" : "border-transparent opacity-50 hover:opacity-100"
+                    }`}
+                  >
+                    <img src={img} className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <Footer />
     </div>

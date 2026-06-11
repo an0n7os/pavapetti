@@ -127,15 +127,15 @@ export default function Products() {
             className="relative z-10"
           >
             <p className="text-primary text-[10px] tracking-[0.6em] uppercase font-black mb-4">
-              The Curated Archive
+              Our Collection
             </p>
             <h1 className="font-serif text-5xl md:text-7xl font-light text-foreground mb-6 tracking-tight leading-[1.15]">
               Explore <span className="italic text-primary">Masterpieces</span>
             </h1>
             <p className="text-muted-foreground/80 text-sm md:text-base font-light tracking-wide max-w-2xl mx-auto leading-relaxed">
-              {isLoading ? "Curating sacred collections..." : (
+              {isLoading ? "Loading collection..." : (
                 <>
-                  A highly curated collection of <strong className="text-foreground font-semibold">{products?.length ?? 0} authentic Kerala artifacts</strong>. 
+                  A handpicked collection of <strong className="text-foreground font-semibold">{products?.length ?? 0} authentic Kerala artifacts</strong>. 
                   Each piece represents generations of master-craftsman devotion and ancient geometries.
                 </>
               )}
@@ -176,7 +176,7 @@ export default function Products() {
                   data-testid="button-filter-featured"
                 >
                   <Star size={12} className={featuredOnly ? "fill-current mr-2" : "mr-2 text-primary"} />
-                  {featuredOnly ? "Curated Pieces" : "Featured Only"}
+                  {featuredOnly ? "Featured Pieces" : "Featured Only"}
                 </Button>
               </Magnetic>
               
@@ -250,7 +250,7 @@ export default function Products() {
             )}
             {featuredOnly && (
               <Badge variant="secondary" className="gap-2 rounded-full px-4 py-2 border border-primary/10 bg-primary/5 text-primary text-xs font-medium">
-                ⭐ <strong className="font-bold">Curated Selection</strong>
+                ⭐ <strong className="font-bold">Featured Items</strong>
               </Badge>
             )}
           </motion.div>
@@ -279,7 +279,7 @@ export default function Products() {
             <SlidersHorizontal size={40} className="mx-auto text-primary/30 mb-6" />
             <p className="font-serif text-2xl text-foreground mb-3 italic">Awaiting Restoration</p>
             <p className="text-xs text-muted-foreground/80 uppercase tracking-widest leading-relaxed max-w-xs mx-auto mb-8">
-              No matching masterpieces are currently curated in this wing of the archives.
+              No matching masterpieces are currently available in this section of our collection.
             </p>
             <Button onClick={clearFilters} variant="outline" className="rounded-full px-8 py-5 border-primary/10 hover:border-primary/30 hover:bg-[#f9f7f4] transition-all">
               Return to Main Archive

@@ -399,7 +399,7 @@ export default function Navbar() {
                 <a href="#" className="text-white/60 hover:text-primary transition-colors"><Youtube size={20} /></a>
               </div>
               <p className="text-[9px] text-white/40 uppercase tracking-[0.4em] font-black leading-relaxed">
-                Authentic Heritage · Curated for the Connoisseur
+                Authentic Heritage · Handpicked for the Connoisseur
               </p>
             </div>
           </motion.div>

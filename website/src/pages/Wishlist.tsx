@@ -35,7 +35,7 @@ export default function Wishlist() {
             transition={{ delay: 0.1 }}
             className="text-muted-foreground text-lg max-w-xl mx-auto"
           >
-            A curated list of heritage pieces you've saved for your future collection.
+            A list of saved heritage pieces you've selected for your collection.
           </motion.p>
         </header>
 

@@ -82,11 +82,11 @@ export default function Checkout() {
           </div>
           <h2 className="font-serif text-3xl text-foreground">Order Initiated</h2>
           <p className="text-muted-foreground text-sm leading-relaxed">
-            Your collection has been sent to our curator on WhatsApp! We will confirm your delivery and share secure payment details (UPI/Bank Transfer) in the chat shortly.
+            Your collection has been sent to our team on WhatsApp! We will confirm your delivery and share secure payment details (UPI/Bank Transfer) in the chat shortly.
           </p>
           <div className="bg-white p-6 rounded-2xl border border-primary/5 text-left text-xs space-y-2">
             <p className="text-primary font-bold uppercase tracking-widest text-[9px]">Acquisitions Department</p>
-            <p><strong>Curator:</strong> Pavapetti Heritage Boutique</p>
+            <p><strong>Seller:</strong> Pavapetti Heritage Boutique</p>
             <p><strong>Delivery Time:</strong> 3-5 Business Days</p>
             <p><strong>Payment Mode:</strong> WhatsApp Secured UPI / NetBanking</p>
           </div>
@@ -232,9 +232,9 @@ export default function Checkout() {
               <div className="flex gap-4">
                 <CreditCard className="text-primary shrink-0" size={24} />
                 <div>
-                  <h4 className="font-serif text-lg mb-1">Direct Order Fulfillment</h4>
+                   <h4 className="font-serif text-lg mb-1">Direct Order Fulfillment</h4>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    Once you confirm, we will connect you directly with our curator on WhatsApp to finalize payment and shipping. We accept UPI, Bank Transfer, and International wire.
+                    Once you confirm, we will connect you directly with our team on WhatsApp to finalize payment and shipping. We accept UPI, Bank Transfer, and International wire.
                   </p>
                 </div>
               </div>
@@ -295,7 +295,7 @@ export default function Checkout() {
               
               <div className="flex items-center justify-center gap-2 mt-6 text-[#25D366]">
                 <Check size={14} />
-                <span className="text-[10px] font-bold uppercase tracking-widest">Safe & Secure Curator Chat</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest">Safe & Secure WhatsApp Chat</span>
               </div>
             </div>
           </div>
