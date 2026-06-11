@@ -55,7 +55,17 @@ export default function ProductDetail() {
   const id = parseInt(params.id ?? "0", 10);
 
   const { data: product, isLoading, isError } = useGetProduct(id, {
-    query: { enabled: !!id, queryKey: getGetProductQueryKey(id) },
+    query: {
+      enabled: !!id,
+      queryKey: getGetProductQueryKey(id),
+      initialData: () => {
+        try {
+          const cached = localStorage.getItem(`cached-product-${id}`);
+          if (cached) return JSON.parse(cached);
+        } catch {}
+        return undefined;
+      }
+    },
   });
 
   const { addItem, isInCart, openCart } = useCart();
@@ -96,6 +106,7 @@ export default function ProductDetail() {
 
   useEffect(() => {
     if (product) {
+      localStorage.setItem(`cached-product-${product.id}`, JSON.stringify(product));
       setSelectedImage(product.imageUrl);
       document.title = `${product.name} | Pavapetti Heritage Artifacts`;
     }

@@ -11,7 +11,8 @@ import ProductCard from "@/components/ProductCard";
 import StorySection from "@/components/StorySection";
 import Magnetic from "@/components/Magnetic";
 import { 
-  useGetFeaturedProducts, useListCategories, useListProducts 
+  useGetFeaturedProducts, useListCategories, useListProducts,
+  getGetFeaturedProductsQueryKey, getListCategoriesQueryKey, getListProductsQueryKey
 } from "@workspace/api-client-react";
 
 const MARQUEE_ITEMS = [
@@ -130,9 +131,63 @@ export default function Home() {
   }, [mouseX, mouseY, resetSliderInterval]);
 
   const slide = HERO_SLIDES[heroIdx];
-  const { data: featured = [], isLoading: featuredLoading } = useGetFeaturedProducts();
-  const { data: newArrivals = [] } = useListProducts({ isNewArrival: "true" });
-  const { data: categories, isLoading: catLoading } = useListCategories();
+  const { data: featured = [], isLoading: featuredLoading } = useGetFeaturedProducts({
+    query: {
+      queryKey: getGetFeaturedProductsQueryKey(),
+      initialData: () => {
+        try {
+          const cached = localStorage.getItem("cached-featured");
+          if (cached) return JSON.parse(cached);
+        } catch {}
+        return undefined;
+      }
+    }
+  });
+  const { data: newArrivals = [] } = useListProducts(
+    { isNewArrival: "true" },
+    {
+      query: {
+        queryKey: getListProductsQueryKey({ isNewArrival: "true" }),
+        initialData: () => {
+          try {
+            const cached = localStorage.getItem("cached-new-arrivals");
+            if (cached) return JSON.parse(cached);
+          } catch {}
+          return undefined;
+        }
+      }
+    }
+  );
+  const { data: categories, isLoading: catLoading } = useListCategories({
+    query: {
+      queryKey: getListCategoriesQueryKey(),
+      initialData: () => {
+        try {
+          const cached = localStorage.getItem("cached-categories");
+          if (cached) return JSON.parse(cached);
+        } catch {}
+        return undefined;
+      }
+    }
+  });
+
+  React.useEffect(() => {
+    if (featured && featured.length > 0) {
+      localStorage.setItem("cached-featured", JSON.stringify(featured));
+    }
+  }, [featured]);
+
+  React.useEffect(() => {
+    if (newArrivals && newArrivals.length > 0) {
+      localStorage.setItem("cached-new-arrivals", JSON.stringify(newArrivals));
+    }
+  }, [newArrivals]);
+
+  React.useEffect(() => {
+    if (categories && categories.length > 0) {
+      localStorage.setItem("cached-categories", JSON.stringify(categories));
+    }
+  }, [categories]);
 
   const { scrollY } = useScroll();
   const y1 = useTransform(scrollY, [0, 500], [0, 200]);

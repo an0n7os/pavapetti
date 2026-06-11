@@ -9,7 +9,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 import Magnetic from "@/components/Magnetic";
-import { useListProducts, useListCategories, getListProductsQueryKey } from "@workspace/api-client-react";
+import { useListProducts, useListCategories, getListProductsQueryKey, getListCategoriesQueryKey } from "@workspace/api-client-react";
 
 export default function Products() {
   const [currentSearchStr, setCurrentSearchStr] = useState(
@@ -83,7 +83,18 @@ export default function Products() {
 
 
 
-  const { data: categories } = useListCategories();
+  const { data: categories } = useListCategories({
+    query: {
+      queryKey: getListCategoriesQueryKey(),
+      initialData: () => {
+        try {
+          const cached = localStorage.getItem("cached-categories");
+          if (cached) return JSON.parse(cached);
+        } catch {}
+        return undefined;
+      }
+    }
+  });
   const params = {
     ...(activeCategory ? { category: activeCategory } : {}),
     ...(search ? { search } : {}),
@@ -91,8 +102,37 @@ export default function Products() {
   };
   const { data: products, isLoading } = useListProducts(
     Object.keys(params).length > 0 ? params : undefined,
-    { query: { queryKey: getListProductsQueryKey(Object.keys(params).length > 0 ? params : undefined) } }
+    {
+      query: {
+        queryKey: getListProductsQueryKey(Object.keys(params).length > 0 ? params : undefined),
+        initialData: () => {
+          try {
+            const cached = localStorage.getItem("cached-products");
+            if (cached) {
+              const parsed = JSON.parse(cached);
+              if (activeCategory) {
+                return parsed.filter((p: any) => p.categoryName === activeCategory);
+              }
+              return parsed;
+            }
+          } catch {}
+          return undefined;
+        }
+      }
+    }
   );
+
+  useEffect(() => {
+    if (products && products.length > 0 && !activeCategory && !search && !featuredOnly) {
+      localStorage.setItem("cached-products", JSON.stringify(products));
+    }
+  }, [products, activeCategory, search, featuredOnly]);
+
+  useEffect(() => {
+    if (categories && categories.length > 0) {
+      localStorage.setItem("cached-categories", JSON.stringify(categories));
+    }
+  }, [categories]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
