@@ -27,17 +27,23 @@ export async function uploadImageToStorage(
   const filename = `${Date.now()}-${safeName}.${ext}`;
 
   // 2. Upload to Supabase Storage
-  const { error } = await supabase.storage
-    .from("products")
-    .upload(filename, blob, { contentType: blob.type, upsert: false });
+  try {
+    const { error } = await supabase.storage
+      .from("products")
+      .upload(filename, blob, { contentType: blob.type, upsert: false });
 
-  if (error) {
-    throw new Error(`Storage upload failed: ${error.message}`);
+    if (error) {
+      throw error;
+    }
+
+    // 3. Return the public URL
+    const { data } = supabase.storage.from("products").getPublicUrl(filename);
+    return data.publicUrl;
+  } catch (err: any) {
+    console.warn("Supabase Storage upload failed, falling back to base64 data URL:", err);
+    // Fall back to the compressed base64 data URL
+    return compressed;
   }
-
-  // 3. Return the public URL
-  const { data } = supabase.storage.from("products").getPublicUrl(filename);
-  return data.publicUrl;
 }
 
 function compressImage(
