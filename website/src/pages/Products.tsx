@@ -83,10 +83,10 @@ export default function Products() {
 
 
 
-  const { data: categories } = useListCategories({
+  const { data: categories, isSuccess: isCategoriesSuccess } = useListCategories({
     query: {
       queryKey: getListCategoriesQueryKey(),
-      initialData: () => {
+      placeholderData: () => {
         try {
           const cached = localStorage.getItem("cached-categories");
           if (cached) return JSON.parse(cached);
@@ -100,12 +100,12 @@ export default function Products() {
     ...(search ? { search } : {}),
     ...(featuredOnly ? { featured: featuredOnly } : {}),
   };
-  const { data: products, isLoading } = useListProducts(
+  const { data: products, isLoading, isSuccess } = useListProducts(
     Object.keys(params).length > 0 ? params : undefined,
     {
       query: {
         queryKey: getListProductsQueryKey(Object.keys(params).length > 0 ? params : undefined),
-        initialData: () => {
+        placeholderData: () => {
           try {
             const cached = localStorage.getItem("cached-products");
             if (cached) {
@@ -126,16 +126,16 @@ export default function Products() {
   );
 
   useEffect(() => {
-    if (products && products.length > 0 && !activeCategory && !search && !featuredOnly) {
+    if (isSuccess && products && !activeCategory && !search && !featuredOnly) {
       localStorage.setItem("cached-products", JSON.stringify(products));
     }
-  }, [products, activeCategory, search, featuredOnly]);
+  }, [products, isSuccess, activeCategory, search, featuredOnly]);
 
   useEffect(() => {
-    if (categories && categories.length > 0) {
+    if (isCategoriesSuccess && categories) {
       localStorage.setItem("cached-categories", JSON.stringify(categories));
     }
-  }, [categories]);
+  }, [categories, isCategoriesSuccess]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

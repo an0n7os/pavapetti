@@ -58,7 +58,7 @@ export default function ProductDetail() {
     query: {
       enabled: !!id,
       queryKey: getGetProductQueryKey(id),
-      initialData: () => {
+      placeholderData: () => {
         try {
           const cached = localStorage.getItem(`cached-product-${id}`);
           if (cached) return JSON.parse(cached);
@@ -114,6 +114,12 @@ export default function ProductDetail() {
       document.title = "Pavapetti Heritage Artifacts | Authentic Kerala Treasures";
     };
   }, [product]);
+
+  useEffect(() => {
+    if (isError) {
+      localStorage.removeItem(`cached-product-${id}`);
+    }
+  }, [isError, id]);
 
   useEffect(() => {
     if (!isLightboxOpen) {

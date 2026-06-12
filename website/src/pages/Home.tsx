@@ -131,10 +131,10 @@ export default function Home() {
   }, [mouseX, mouseY, resetSliderInterval]);
 
   const slide = HERO_SLIDES[heroIdx];
-  const { data: featured = [], isLoading: featuredLoading } = useGetFeaturedProducts({
+  const { data: featured = [], isLoading: featuredLoading, isSuccess: isFeaturedSuccess } = useGetFeaturedProducts({
     query: {
       queryKey: getGetFeaturedProductsQueryKey(),
-      initialData: () => {
+      placeholderData: () => {
         try {
           const cached = localStorage.getItem("cached-featured");
           if (cached) return JSON.parse(cached);
@@ -143,12 +143,12 @@ export default function Home() {
       }
     }
   });
-  const { data: newArrivals = [] } = useListProducts(
+  const { data: newArrivals = [], isSuccess: isNewArrivalsSuccess } = useListProducts(
     { isNewArrival: "true" },
     {
       query: {
         queryKey: getListProductsQueryKey({ isNewArrival: "true" }),
-        initialData: () => {
+        placeholderData: () => {
           try {
             const cached = localStorage.getItem("cached-new-arrivals");
             if (cached) return JSON.parse(cached);
@@ -158,10 +158,10 @@ export default function Home() {
       }
     }
   );
-  const { data: categories, isLoading: catLoading } = useListCategories({
+  const { data: categories, isLoading: catLoading, isSuccess: isCategoriesSuccess } = useListCategories({
     query: {
       queryKey: getListCategoriesQueryKey(),
-      initialData: () => {
+      placeholderData: () => {
         try {
           const cached = localStorage.getItem("cached-categories");
           if (cached) return JSON.parse(cached);
@@ -172,22 +172,22 @@ export default function Home() {
   });
 
   React.useEffect(() => {
-    if (featured && featured.length > 0) {
+    if (isFeaturedSuccess && featured) {
       localStorage.setItem("cached-featured", JSON.stringify(featured));
     }
-  }, [featured]);
+  }, [featured, isFeaturedSuccess]);
 
   React.useEffect(() => {
-    if (newArrivals && newArrivals.length > 0) {
+    if (isNewArrivalsSuccess && newArrivals) {
       localStorage.setItem("cached-new-arrivals", JSON.stringify(newArrivals));
     }
-  }, [newArrivals]);
+  }, [newArrivals, isNewArrivalsSuccess]);
 
   React.useEffect(() => {
-    if (categories && categories.length > 0) {
+    if (isCategoriesSuccess && categories) {
       localStorage.setItem("cached-categories", JSON.stringify(categories));
     }
-  }, [categories]);
+  }, [categories, isCategoriesSuccess]);
 
   const { scrollY } = useScroll();
   const y1 = useTransform(scrollY, [0, 500], [0, 200]);
