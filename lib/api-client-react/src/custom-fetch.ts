@@ -387,9 +387,11 @@ let FALLBACK_PRODUCTS = [
     description: "Authentic Rudraksha beads with pure silver casing. Designed for spiritual balance and modern elegance.",
     price: 4500,
     mrp: 5000,
-    imageUrl: "/rudraksha_bracelet.png",
+    imageUrl: "/rudraksha_bracelet.webp",
     categoryId: 2,
     categoryName: "Chains and Bracelets",
+    additionalCategoryIds: [1],
+    additionalCategoryNames: ["Pooja Category"],
     stock: 15,
     material: "Rudraksha & 925 Silver",
     size: "Standard",
@@ -542,6 +544,18 @@ let FALLBACK_PRODUCTS = [
     isNewArrival: true
   }
 ];
+
+FALLBACK_CATEGORIES = FALLBACK_CATEGORIES.map(c => ({
+  ...c,
+  imageUrl: c.imageUrl ? c.imageUrl.replace('.png', '.webp') : c.imageUrl
+}));
+
+FALLBACK_PRODUCTS = FALLBACK_PRODUCTS.map(p => ({
+  ...p,
+  imageUrl: p.imageUrl ? p.imageUrl.replace('.png', '.webp') : p.imageUrl,
+  additionalCategoryIds: p.additionalCategoryIds || [],
+  additionalCategoryNames: p.additionalCategoryNames || []
+}));
 
 async function handleFetchError(res: Response, prefix: string): Promise<never> {
   let errMsg = res.statusText;
@@ -719,6 +733,17 @@ export async function customFetch<T = unknown>(
             catName = cats[0]?.name || "Uncategorized";
           }
 
+          const additionalCatIds = bodyData.additionalCategoryIds || [];
+          let additionalCatNames: string[] = [];
+          if (additionalCatIds.length > 0) {
+            const catRes = await fetch(`${supabaseUrl}/rest/v1/categories?id=in.(${additionalCatIds.join(',')})&select=name`, {
+              headers: getSupabaseHeaders(),
+              method: "GET"
+            });
+            const cats = await catRes.json();
+            additionalCatNames = cats.map((c: any) => c.name);
+          }
+
           const dbProduct = {
             name: bodyData.name,
             description: bodyData.description,
@@ -727,6 +752,8 @@ export async function customFetch<T = unknown>(
             image_url: bodyData.imageUrl,
             category_id: bodyData.categoryId && bodyData.categoryId !== 0 ? bodyData.categoryId : null,
             category_name: catName,
+            additional_category_ids: JSON.stringify(additionalCatIds),
+            additional_category_names: additionalCatNames,
             stock: bodyData.stock,
             material: bodyData.material,
             size: bodyData.size,
@@ -745,6 +772,9 @@ export async function customFetch<T = unknown>(
           }
           const createdList = await postRes.json();
           const created = createdList[0];
+          const createdAddIds = created.additional_category_ids
+            ? (Array.isArray(created.additional_category_ids) ? created.additional_category_ids : JSON.parse(created.additional_category_ids))
+            : [];
 
           // Increment category count
           if (bodyData.categoryId && bodyData.categoryId !== 0) {
@@ -764,6 +794,8 @@ export async function customFetch<T = unknown>(
             imageUrl: created.image_url,
             categoryId: Number(created.category_id),
             categoryName: created.category_name,
+            additionalCategoryIds: createdAddIds.map(Number),
+            additionalCategoryNames: created.additional_category_names || [],
             stock: Number(created.stock),
             material: created.material,
             size: created.size,
@@ -774,10 +806,14 @@ export async function customFetch<T = unknown>(
           } as unknown as T;
         } else {
           const catName = FALLBACK_CATEGORIES.find(c => c.id === bodyData.categoryId)?.name || "Uncategorized";
+          const additionalCatIds = bodyData.additionalCategoryIds || [];
+          const additionalCatNames = additionalCatIds.map(id => FALLBACK_CATEGORIES.find(c => c.id === id)?.name).filter(Boolean) as string[];
           const newProduct = {
             ...bodyData,
             id: FALLBACK_PRODUCTS.reduce((max, p) => Math.max(max, p.id), 0) + 1,
             categoryName: catName,
+            additionalCategoryIds: additionalCatIds,
+            additionalCategoryNames: additionalCatNames,
             createdAt: new Date().toISOString()
           };
           FALLBACK_PRODUCTS.push(newProduct);
@@ -807,6 +843,17 @@ export async function customFetch<T = unknown>(
             catName = cats[0]?.name || "Uncategorized";
           }
 
+          const additionalCatIds = bodyData.additionalCategoryIds || [];
+          let additionalCatNames: string[] = [];
+          if (additionalCatIds.length > 0) {
+            const catRes = await fetch(`${supabaseUrl}/rest/v1/categories?id=in.(${additionalCatIds.join(',')})&select=name`, {
+              headers: getSupabaseHeaders(),
+              method: "GET"
+            });
+            const cats = await catRes.json();
+            additionalCatNames = cats.map((c: any) => c.name);
+          }
+
           const dbProduct = {
             name: bodyData.name,
             description: bodyData.description,
@@ -815,6 +862,8 @@ export async function customFetch<T = unknown>(
             image_url: bodyData.imageUrl,
             category_id: bodyData.categoryId && bodyData.categoryId !== 0 ? bodyData.categoryId : null,
             category_name: catName,
+            additional_category_ids: JSON.stringify(additionalCatIds),
+            additional_category_names: additionalCatNames,
             stock: bodyData.stock,
             material: bodyData.material,
             size: bodyData.size,
@@ -833,6 +882,9 @@ export async function customFetch<T = unknown>(
           }
           const updatedList = await putRes.json();
           const updated = updatedList[0];
+          const updatedAddIds = updated.additional_category_ids
+            ? (Array.isArray(updated.additional_category_ids) ? updated.additional_category_ids : JSON.parse(updated.additional_category_ids))
+            : [];
 
           return {
             id: Number(updated.id),
@@ -843,6 +895,8 @@ export async function customFetch<T = unknown>(
             imageUrl: updated.image_url,
             categoryId: Number(updated.category_id),
             categoryName: updated.category_name,
+            additionalCategoryIds: updatedAddIds.map(Number),
+            additionalCategoryNames: updated.additional_category_names || [],
             stock: Number(updated.stock),
             material: updated.material,
             size: updated.size,
@@ -855,10 +909,14 @@ export async function customFetch<T = unknown>(
           const idx = FALLBACK_PRODUCTS.findIndex(prod => prod.id === id);
           if (idx !== -1) {
             const catName = FALLBACK_CATEGORIES.find(c => c.id === bodyData.categoryId)?.name || FALLBACK_PRODUCTS[idx].categoryName;
+            const additionalCatIds = bodyData.additionalCategoryIds || [];
+            const additionalCatNames = additionalCatIds.map(id => FALLBACK_CATEGORIES.find(c => c.id === id)?.name).filter(Boolean) as string[];
             FALLBACK_PRODUCTS[idx] = {
               ...FALLBACK_PRODUCTS[idx],
               ...bodyData,
-              categoryName: catName
+              categoryName: catName,
+              additionalCategoryIds: additionalCatIds,
+              additionalCategoryNames: additionalCatNames
             };
             return FALLBACK_PRODUCTS[idx] as unknown as T;
           }
@@ -957,7 +1015,7 @@ export async function customFetch<T = unknown>(
           let queryParams = new URLSearchParams();
           queryParams.append("select", "*");
           queryParams.append("order", "id.desc");
-          if (cat) queryParams.append("category_name", `eq.${cat}`);
+          if (cat) queryParams.append("or", `(category_name.eq."${cat}",additional_category_names.cs.{"${cat}"})`);
           if (search) queryParams.append("name", `ilike.*${search}*`);
           if (featured) queryParams.append("featured", "eq.true");
 
@@ -966,34 +1024,50 @@ export async function customFetch<T = unknown>(
             method: "GET"
           });
           const prods = await prodRes.json();
-          return prods.map((p: any) => ({
-            id: Number(p.id),
-            name: p.name,
-            description: p.description,
-            price: Number(p.price),
-            mrp: p.mrp ? Number(p.mrp) : undefined,
-            imageUrl: p.image_url,
-            categoryId: Number(p.category_id),
-            categoryName: p.category_name,
-            stock: Number(p.stock),
-            material: p.material,
-            size: p.size,
-            featured: Boolean(p.featured),
-            isVisible: Boolean(p.is_visible),
-            isNewArrival: Boolean(p.is_new_arrival),
-            createdAt: p.created_at
-          })) as unknown as T;
+          if (!prodRes.ok || (prods && prods.error) || !Array.isArray(prods)) {
+            throw new Error(prods?.message || prods?.error || JSON.stringify(prods));
+          }
+          return prods.map((p: any) => {
+            const additionalIds = p.additional_category_ids
+              ? (Array.isArray(p.additional_category_ids) ? p.additional_category_ids : JSON.parse(p.additional_category_ids))
+              : [];
+            return {
+              id: Number(p.id),
+              name: p.name,
+              description: p.description,
+              price: Number(p.price),
+              mrp: p.mrp ? Number(p.mrp) : undefined,
+              imageUrl: p.image_url,
+              categoryId: Number(p.category_id),
+              categoryName: p.category_name,
+              additionalCategoryIds: additionalIds.map(Number),
+              additionalCategoryNames: p.additional_category_names || [],
+              stock: Number(p.stock),
+              material: p.material,
+              size: p.size,
+              featured: Boolean(p.featured),
+              isVisible: Boolean(p.is_visible),
+              isNewArrival: Boolean(p.is_new_arrival),
+              createdAt: p.created_at
+            };
+          }) as unknown as T;
         } catch (err) {
           console.error("Direct Supabase load products error:", err);
           let filtered = [...FALLBACK_PRODUCTS];
-          if (cat) filtered = filtered.filter(p => p.categoryName === cat);
+          if (cat) filtered = filtered.filter(p => 
+            p.categoryName === cat || 
+            (p.additionalCategoryNames && p.additionalCategoryNames.includes(cat))
+          );
           if (search) filtered = filtered.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
           if (featured) filtered = filtered.filter(p => p.featured);
           return filtered as unknown as T;
         }
       } else {
         let filtered = [...FALLBACK_PRODUCTS];
-        if (cat) filtered = filtered.filter(p => p.categoryName === cat);
+        if (cat) filtered = filtered.filter(p => 
+          p.categoryName === cat || 
+          (p.additionalCategoryNames && p.additionalCategoryNames.includes(cat))
+        );
         if (search) filtered = filtered.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
         if (featured) filtered = filtered.filter(p => p.featured);
         
@@ -1011,8 +1085,14 @@ export async function customFetch<T = unknown>(
             method: "GET"
           });
           const prods = await prodRes.json();
+          if (!prodRes.ok || (prods && prods.error) || !Array.isArray(prods)) {
+            throw new Error(prods?.message || prods?.error || JSON.stringify(prods));
+          }
           const p = prods[0];
           if (p) {
+            const additionalIds = p.additional_category_ids
+              ? (Array.isArray(p.additional_category_ids) ? p.additional_category_ids : JSON.parse(p.additional_category_ids))
+              : [];
             return {
               id: Number(p.id),
               name: p.name,
@@ -1022,6 +1102,8 @@ export async function customFetch<T = unknown>(
               imageUrl: p.image_url,
               categoryId: Number(p.category_id),
               categoryName: p.category_name,
+              additionalCategoryIds: additionalIds.map(Number),
+              additionalCategoryNames: p.additional_category_names || [],
               stock: Number(p.stock),
               material: p.material,
               size: p.size,

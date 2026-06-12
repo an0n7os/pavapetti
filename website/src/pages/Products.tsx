@@ -111,7 +111,10 @@ export default function Products() {
             if (cached) {
               const parsed = JSON.parse(cached);
               if (activeCategory) {
-                return parsed.filter((p: any) => p.categoryName === activeCategory);
+                return parsed.filter((p: any) => 
+                  p.categoryName === activeCategory || 
+                  (p.additionalCategoryNames && p.additionalCategoryNames.includes(activeCategory))
+                );
               }
               return parsed;
             }

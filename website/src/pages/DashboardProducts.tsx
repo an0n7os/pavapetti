@@ -49,6 +49,7 @@ const emptyForm: CreateProductBody = {
   imageUrl: "",
   images: [],
   categoryId: 0,
+  additionalCategoryIds: [],
   stock: 0,
   featured: false,
   isVisible: true,
@@ -103,6 +104,7 @@ export default function DashboardProducts() {
       imageUrl: product.imageUrl,
       images: product.images || [product.imageUrl],
       categoryId: product.categoryId,
+      additionalCategoryIds: (product as any).additionalCategoryIds || [],
       stock: product.stock,
       featured: product.featured,
       isVisible: product.isVisible !== undefined ? product.isVisible : true,
@@ -298,6 +300,42 @@ export default function DashboardProducts() {
                         ))}
                       </SelectContent>
                     </Select>
+                  </div>
+
+                  {/* Additional Categories multi-select */}
+                  <div className="space-y-3">
+                    <Label className="text-[10px] font-black tracking-[0.2em] uppercase text-primary/80">Also Show In</Label>
+                    <div className="bg-white border border-primary/10 rounded-2xl p-4 space-y-2 shadow-sm">
+                      {(categories ?? []).filter((cat: any) => cat.id !== form.categoryId).map((cat: any) => {
+                        const checked = (form.additionalCategoryIds || []).includes(cat.id);
+                        return (
+                          <label key={cat.id} className="flex items-center gap-3 cursor-pointer group">
+                            <div
+                              className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-all duration-200 shrink-0 ${
+                                checked
+                                  ? "bg-primary border-primary"
+                                  : "border-primary/20 bg-white group-hover:border-primary/50"
+                              }`}
+                              onClick={() => {
+                                const curr = form.additionalCategoryIds || [];
+                                const updated = checked
+                                  ? curr.filter(id => id !== cat.id)
+                                  : [...curr, cat.id];
+                                setForm({ ...form, additionalCategoryIds: updated });
+                              }}
+                            >
+                              {checked && <Check size={10} className="text-white" strokeWidth={3} />}
+                            </div>
+                            <span className={`text-xs font-medium transition-colors ${
+                              checked ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
+                            }`}>{cat.name}</span>
+                          </label>
+                        );
+                      })}
+                      {(categories ?? []).length <= 1 && (
+                        <p className="text-[11px] text-muted-foreground/50 italic">No other categories available</p>
+                      )}
+                    </div>
                   </div>
 
                   <div className="space-y-2">
@@ -507,7 +545,14 @@ export default function DashboardProducts() {
                           </div>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-muted-foreground hidden md:table-cell">{product.categoryName ?? "—"}</td>
+                      <td className="px-4 py-3 text-muted-foreground hidden md:table-cell">
+                        <div className="flex flex-wrap gap-1 items-center">
+                          <span>{product.categoryName ?? "—"}</span>
+                          {(product.additionalCategoryNames || []).map((name: string) => (
+                            <span key={name} className="text-[9px] font-black tracking-widest uppercase bg-primary/8 text-primary/70 border border-primary/15 px-2 py-0.5 rounded-full">{name}</span>
+                          ))}
+                        </div>
+                      </td>
                       <td className="px-4 py-3 text-left">
                         <span className="font-semibold text-primary">₹{product.price.toLocaleString("en-IN")}</span>
                         {product.mrp && product.mrp > product.price ? (

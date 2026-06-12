@@ -24,6 +24,8 @@ CREATE TABLE IF NOT EXISTS products (
   featured BOOLEAN DEFAULT FALSE,
   is_visible BOOLEAN DEFAULT TRUE,
   is_new_arrival BOOLEAN DEFAULT FALSE,
+  additional_category_ids JSONB DEFAULT '[]'::jsonb,
+  additional_category_names TEXT[] DEFAULT '{}'::text[],
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -71,4 +73,9 @@ BEGIN
   WHERE id = row_id;
 END;
 $$ LANGUAGE plpgsql;
+
+-- Migration script for existing databases:
+ALTER TABLE products ADD COLUMN IF NOT EXISTS additional_category_ids JSONB DEFAULT '[]'::jsonb;
+ALTER TABLE products ADD COLUMN IF NOT EXISTS additional_category_names TEXT[] DEFAULT '{}'::text[];
+
 

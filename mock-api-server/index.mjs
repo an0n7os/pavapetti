@@ -36,6 +36,9 @@ if (supabaseUrl && supabaseKey && !supabaseUrl.includes('your-project-id')) {
 // --- Mappings between Local CamelCase and Supabase snake_case ---
 function mapProductFromDb(p) {
   if (!p) return null;
+  const additionalIds = p.additional_category_ids
+    ? (Array.isArray(p.additional_category_ids) ? p.additional_category_ids : JSON.parse(p.additional_category_ids))
+    : [];
   return {
     id: Number(p.id),
     name: p.name,
@@ -45,6 +48,8 @@ function mapProductFromDb(p) {
     imageUrl: p.image_url,
     categoryId: Number(p.category_id),
     categoryName: p.category_name,
+    additionalCategoryIds: additionalIds.map(Number),
+    additionalCategoryNames: p.additional_category_names || [],
     stock: Number(p.stock),
     material: p.material,
     size: p.size,
@@ -65,6 +70,8 @@ function mapProductToDb(p) {
   if (p.imageUrl !== undefined) mapped.image_url = p.imageUrl;
   if (p.categoryId !== undefined) mapped.category_id = p.categoryId;
   if (p.categoryName !== undefined) mapped.category_name = p.categoryName;
+  if (p.additionalCategoryIds !== undefined) mapped.additional_category_ids = JSON.stringify(p.additionalCategoryIds || []);
+  if (p.additionalCategoryNames !== undefined) mapped.additional_category_names = p.additionalCategoryNames || [];
   if (p.stock !== undefined) mapped.stock = p.stock;
   if (p.material !== undefined) mapped.material = p.material;
   if (p.size !== undefined) mapped.size = p.size;
@@ -163,9 +170,11 @@ let products = [
     description: "Authentic Rudraksha beads with pure silver casing. Designed for spiritual balance and modern elegance.",
     price: 4500,
     mrp: 5000,
-    imageUrl: "/rudraksha_bracelet.png",
+    imageUrl: "/rudraksha_bracelet.webp",
     categoryId: 2,
     categoryName: "Chains and Bracelets",
+    additionalCategoryIds: [1],
+    additionalCategoryNames: ["Pooja Category"],
     stock: 15,
     material: "Rudraksha & 925 Silver",
     size: "Standard",
@@ -487,6 +496,18 @@ let products = [
   }
 ];
 
+categories = categories.map(c => ({
+  ...c,
+  imageUrl: c.imageUrl ? c.imageUrl.replace('.png', '.webp') : c.imageUrl
+}));
+
+products = products.map(p => ({
+  ...p,
+  imageUrl: p.imageUrl ? p.imageUrl.replace('.png', '.webp') : p.imageUrl,
+  additionalCategoryIds: p.additionalCategoryIds || [],
+  additionalCategoryNames: p.additionalCategoryNames || []
+}));
+
 // --- Endpoints ---
 app.get('/api/healthz', (req, res) => {
   res.json({ status: 'ok', database: isSupabaseConfigured ? 'supabase' : 'in-memory' });
@@ -601,7 +622,7 @@ app.get('/api/products', async (req, res) => {
       let query = supabase.from('products').select('*');
 
       if (category) {
-        query = query.eq('category_name', category);
+        query = query.or(`category_name.eq."${category}",additional_category_names.cs.{"${category}"}`);
       }
       if (search) {
         query = query.ilike('name', `%${search}%`);
@@ -623,7 +644,10 @@ app.get('/api/products', async (req, res) => {
     }
   } else {
     let filtered = [...products];
-    if (category) filtered = filtered.filter(p => p.categoryName === category);
+    if (category) filtered = filtered.filter(p => 
+      p.categoryName === category || 
+      (p.additionalCategoryNames && p.additionalCategoryNames.includes(category))
+    );
     if (search) filtered = filtered.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
     if (featured === 'true') filtered = filtered.filter(p => p.featured);
     if (isNewArrival === 'true') filtered = filtered.filter(p => p.isNewArrival);
@@ -674,10 +698,22 @@ app.post('/api/products', async (req, res) => {
         catName = catData?.name || "Uncategorized";
       }
 
+      const additionalCatIds = req.body.additionalCategoryIds || [];
+      let additionalCatNames = [];
+      if (additionalCatIds.length > 0) {
+        const { data: addCatsData } = await supabase
+          .from('categories')
+          .select('name')
+          .in('id', additionalCatIds);
+        additionalCatNames = (addCatsData || []).map(c => c.name);
+      }
+
       const dbProduct = mapProductToDb({
         ...req.body,
         categoryId: hasCategory ? req.body.categoryId : null,
-        categoryName: catName
+        categoryName: catName,
+        additionalCategoryIds: additionalCatIds,
+        additionalCategoryNames: additionalCatNames
       });
 
       const { data, error } = await supabase
@@ -699,11 +735,15 @@ app.post('/api/products', async (req, res) => {
       return res.status(500).json({ error: err.message });
     }
   } else {
+    const additionalCatIds = req.body.additionalCategoryIds || [];
+    const additionalCatNames = additionalCatIds.map(id => categories.find(c => c.id === id)?.name).filter(Boolean);
     const newP = { 
       ...req.body, 
       id: products.reduce((max, p) => Math.max(max, p.id), 0) + 1, 
       createdAt: new Date().toISOString(),
-      categoryName: categories.find(c => c.id === req.body.categoryId)?.name || "Uncategorized"
+      categoryName: categories.find(c => c.id === req.body.categoryId)?.name || "Uncategorized",
+      additionalCategoryIds: additionalCatIds,
+      additionalCategoryNames: additionalCatNames
     };
     products.push(newP);
     categories = categories.map(c => c.id === req.body.categoryId ? { ...c, productCount: c.productCount + 1 } : c);
@@ -730,10 +770,22 @@ app.put('/api/products/:id', async (req, res) => {
         catName = "Uncategorized";
       }
 
+      const additionalCatIds = req.body.additionalCategoryIds || [];
+      let additionalCatNames = [];
+      if (additionalCatIds.length > 0) {
+        const { data: addCatsData } = await supabase
+          .from('categories')
+          .select('name')
+          .in('id', additionalCatIds);
+        additionalCatNames = (addCatsData || []).map(c => c.name);
+      }
+
       const dbProduct = mapProductToDb({
         ...req.body,
         categoryId: hasCategory ? req.body.categoryId : (req.body.categoryId === 0 || req.body.categoryId === null ? null : undefined),
-        ...(catName !== undefined ? { categoryName: catName } : {})
+        ...(catName !== undefined ? { categoryName: catName } : {}),
+        additionalCategoryIds: additionalCatIds,
+        additionalCategoryNames: additionalCatNames
       });
 
       const { data, error } = await supabase
@@ -755,7 +807,15 @@ app.put('/api/products/:id', async (req, res) => {
       const oldCatId = products[idx].categoryId;
       const newCatId = req.body.categoryId;
       const catName = categories.find(c => c.id === newCatId)?.name || "Uncategorized";
-      products[idx] = { ...products[idx], ...req.body, categoryName: catName };
+      const additionalCatIds = req.body.additionalCategoryIds || [];
+      const additionalCatNames = additionalCatIds.map(id => categories.find(c => c.id === id)?.name).filter(Boolean);
+      products[idx] = { 
+        ...products[idx], 
+        ...req.body, 
+        categoryName: catName,
+        additionalCategoryIds: additionalCatIds,
+        additionalCategoryNames: additionalCatNames
+      };
       if (oldCatId !== newCatId && newCatId !== undefined) {
         categories = categories.map(c => {
           if (c.id === oldCatId) return { ...c, productCount: Math.max(0, c.productCount - 1) };

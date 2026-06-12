@@ -18,6 +18,8 @@ export interface Product {
   imageUrl: string;
   categoryId: number;
   categoryName?: string;
+  additionalCategoryIds?: number[];
+  additionalCategoryNames?: string[];
   stock: number;
   featured: boolean;
   isVisible?: boolean;
@@ -37,6 +39,7 @@ export interface CreateProductBody {
   mrp?: number;
   imageUrl: string;
   categoryId: number;
+  additionalCategoryIds?: number[];
   stock: number;
   featured: boolean;
   isVisible?: boolean;

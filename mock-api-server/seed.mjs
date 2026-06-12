@@ -20,12 +20,12 @@ if (!supabaseUrl || !supabaseKey || supabaseUrl.includes('your-project-id')) {
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 const categories = [
-  { id: 1, name: "Pooja Category", description: "Sacred ritual oils, dhoop, and temple essentials", image_url: "/hero-brass.png", product_count: 12 },
-  { id: 2, name: "Chains and Bracelets", description: "Sacred Karungali and Rudraksha silver-capped jewelry", image_url: "/karungali_mala.png", product_count: 15 },
-  { id: 3, name: "Elephant Heritage", description: "Majestic Netipattams and wall-hanging elephant heads", image_url: "/elephant_head.png", product_count: 8 },
-  { id: 4, name: "Heritage Textiles", description: "Premium Kasavu Mundu and traditional Kerala attire", image_url: "/hero-textile.png", product_count: 10 },
-  { id: 5, name: "Miniatures & Mini Chenda", description: "Handcrafted miniature musical instruments and icons", image_url: "/hero-dance.png", product_count: 20 },
-  { id: 6, name: "Fragrances & Organic Soap", description: "Temple-inspired scents and handmade organic soaps", image_url: "/kalabham_perfume.png", product_count: 8 },
+  { id: 1, name: "Pooja Category", description: "Sacred ritual oils, dhoop, and temple essentials", image_url: "/hero-brass.webp", product_count: 12 },
+  { id: 2, name: "Chains and Bracelets", description: "Sacred Karungali and Rudraksha silver-capped jewelry", image_url: "/karungali_mala.webp", product_count: 15 },
+  { id: 3, name: "Elephant Heritage", description: "Majestic Netipattams and wall-hanging elephant heads", image_url: "/elephant_head.webp", product_count: 8 },
+  { id: 4, name: "Heritage Textiles", description: "Premium Kasavu Mundu and traditional Kerala attire", image_url: "/hero-textile.webp", product_count: 10 },
+  { id: 5, name: "Miniatures & Mini Chenda", description: "Handcrafted miniature musical instruments and icons", image_url: "/hero-dance.webp", product_count: 20 },
+  { id: 6, name: "Fragrances & Organic Soap", description: "Temple-inspired scents and handmade organic soaps", image_url: "/kalabham_perfume.webp", product_count: 8 },
 ];
 
 const products = [
@@ -86,9 +86,11 @@ const products = [
     description: "Authentic Rudraksha beads with pure silver casing. Designed for spiritual balance and modern elegance.",
     price: 4500,
     mrp: 5000,
-    image_url: "/rudraksha_bracelet.png",
+    image_url: "/rudraksha_bracelet.webp",
     category_id: 2,
     category_name: "Chains and Bracelets",
+    additional_category_ids: [1],
+    additional_category_names: ["Pooja Category"],
     stock: 15,
     material: "Rudraksha & 925 Silver",
     size: "Standard",
@@ -427,9 +429,15 @@ async function seed() {
 
   // 2. Seed Products
   console.log('Inserting products...');
+  const seededProducts = products.map(p => ({
+    ...p,
+    image_url: p.image_url ? p.image_url.replace('.png', '.webp') : p.image_url,
+    additional_category_ids: p.additional_category_ids || [],
+    additional_category_names: p.additional_category_names || []
+  }));
   const { data: prodData, error: prodError } = await supabase
     .from('products')
-    .upsert(products, { onConflict: 'id' });
+    .upsert(seededProducts, { onConflict: 'id' });
 
   if (prodError) {
     console.error('❌ Error seeding products:', prodError);
