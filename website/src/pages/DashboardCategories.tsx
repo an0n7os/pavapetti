@@ -28,6 +28,7 @@ import {
   type Category,
 } from "@workspace/api-client-react";
 import { useToast } from "@/hooks/use-toast";
+import { uploadImageToStorage } from "@/lib/supabase";
 
 const emptyForm: CreateCategoryBody = {
   name: "",
@@ -43,6 +44,7 @@ export default function DashboardCategories() {
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [editCategory, setEditCategory] = useState<Category | null>(null);
   const [passcode, setPasscode] = useState("");
+  const [uploadingImg, setUploadingImg] = useState(false);
 
   const { data: categories, isLoading } = useListCategories({
     query: { queryKey: getListCategoriesQueryKey() },
@@ -67,41 +69,23 @@ export default function DashboardCategories() {
     setShowForm(true);
   };
 
-  const compressImage = (file: File, maxWidth = 800, quality = 0.75): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      const url = URL.createObjectURL(file);
-      img.onload = () => {
-        URL.revokeObjectURL(url);
-        const canvas = document.createElement("canvas");
-        let { width, height } = img;
-        if (width > maxWidth) {
-          height = Math.round((height * maxWidth) / width);
-          width = maxWidth;
-        }
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) return reject(new Error("Canvas context failed"));
-        ctx.drawImage(img, 0, 0, width, height);
-        resolve(canvas.toDataURL("image/jpeg", quality));
-      };
-      img.onerror = reject;
-      img.src = url;
-    });
-  };
-
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    setUploadingImg(true);
     try {
-      const compressed = await compressImage(file);
-      const sizeKB = Math.round((compressed.length * 3) / 4 / 1024);
-      setForm(prev => ({ ...prev, imageUrl: compressed }));
-      toast({ title: `Category image ready (${sizeKB} KB)` });
-    } catch {
-      toast({ title: "Image processing failed", variant: "destructive" });
+      const publicUrl = await uploadImageToStorage(file);
+      setForm(prev => ({ ...prev, imageUrl: publicUrl }));
+      toast({ title: "✅ Category image uploaded to CDN" });
+    } catch (err: any) {
+      toast({
+        title: "Image upload failed",
+        description: err?.message ?? "Check Supabase Storage bucket permissions.",
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingImg(false);
     }
   };
 
@@ -217,14 +201,21 @@ export default function DashboardCategories() {
                           <Button
                             type="button"
                             variant="secondary"
-                            className="w-full border-2 border-dashed border-primary/20 bg-gradient-to-br from-white/90 to-[#faf8f5]/90 hover:from-white hover:to-[#faf6ee] hover:border-primary/45 rounded-3xl py-10 flex flex-col h-auto justify-center items-center cursor-pointer transition-all duration-300 shadow-md shadow-primary/5 hover:shadow-lg hover:shadow-primary/5 group"
+                            disabled={uploadingImg}
+                            className="w-full border-2 border-dashed border-primary/20 bg-gradient-to-br from-white/90 to-[#faf8f5]/90 hover:from-white hover:to-[#faf6ee] hover:border-primary/45 rounded-3xl py-10 flex flex-col h-auto justify-center items-center cursor-pointer transition-all duration-300 shadow-md shadow-primary/5 hover:shadow-lg hover:shadow-primary/5 group disabled:opacity-70 disabled:cursor-not-allowed"
                             onClick={() => document.getElementById("category-image-upload")?.click()}
                           >
                             <div className="w-10 h-10 rounded-full bg-primary/5 group-hover:bg-primary/10 flex items-center justify-center mb-2 transition-colors duration-300">
-                              <Upload size={16} className="text-primary opacity-70 group-hover:scale-110 transition-transform duration-300" />
+                              {uploadingImg ? (
+                                <svg className="animate-spin text-primary" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" strokeOpacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round"/></svg>
+                              ) : (
+                                <Upload size={16} className="text-primary opacity-70 group-hover:scale-110 transition-transform duration-300" />
+                              )}
                             </div>
                             <div className="flex flex-col items-center">
-                              <span className="text-[10px] font-black tracking-[0.2em] uppercase text-primary/80 group-hover:text-primary transition-colors duration-300">Select Banner Photo</span>
+                              <span className="text-[10px] font-black tracking-[0.2em] uppercase text-primary/80 group-hover:text-primary transition-colors duration-300">
+                                {uploadingImg ? "Uploading to CDN…" : "Select Banner Photo"}
+                              </span>
                               <span className="text-[9px] font-serif italic text-muted-foreground/60 tracking-wider mt-0.5">supports png, jpg, webp</span>
                             </div>
                           </Button>

@@ -39,6 +39,7 @@ import {
   type CreateProductBody,
 } from "@workspace/api-client-react";
 import { useToast } from "@/hooks/use-toast";
+import { uploadImageToStorage } from "@/lib/supabase";
 
 const emptyForm: CreateProductBody = {
   name: "",
@@ -65,6 +66,8 @@ export default function DashboardProducts() {
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [form, setForm] = useState<CreateProductBody>(emptyForm);
   const [discountPercent, setDiscountPercent] = useState<number>(0);
+  const [uploadingMain, setUploadingMain] = useState(false);
+  const [uploadingExtra, setUploadingExtra] = useState(false);
 
   const { data: products, isLoading } = useListProducts(undefined, {
     query: { queryKey: getListProductsQueryKey() },
@@ -203,45 +206,31 @@ export default function DashboardProducts() {
     }
   };
 
-  const compressImage = (file: File, maxWidth = 800, quality = 0.75): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      const url = URL.createObjectURL(file);
-      img.onload = () => {
-        URL.revokeObjectURL(url);
-        const canvas = document.createElement("canvas");
-        let { width, height } = img;
-        if (width > maxWidth) {
-          height = Math.round((height * maxWidth) / width);
-          width = maxWidth;
-        }
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) return reject(new Error("Canvas context failed"));
-        ctx.drawImage(img, 0, 0, width, height);
-        resolve(canvas.toDataURL("image/jpeg", quality));
-      };
-      img.onerror = reject;
-      img.src = url;
-    });
-  };
-
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, isMain: boolean = true) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    if (isMain) setUploadingMain(true);
+    else setUploadingExtra(true);
+
     try {
-      const compressed = await compressImage(file);
-      const sizeKB = Math.round((compressed.length * 3) / 4 / 1024);
+      const publicUrl = await uploadImageToStorage(file);
       if (isMain) {
-        setForm(prev => ({ ...prev, imageUrl: compressed }));
+        setForm(prev => ({ ...prev, imageUrl: publicUrl }));
+        toast({ title: "✅ Image uploaded to CDN" });
       } else {
-        setForm(prev => ({ ...prev, images: [...(prev.images || []), compressed] }));
+        setForm(prev => ({ ...prev, images: [...(prev.images || []), publicUrl] }));
+        toast({ title: "✅ Extra image uploaded to CDN" });
       }
-      toast({ title: `Image ready (${sizeKB} KB)` });
-    } catch {
-      toast({ title: "Image processing failed", variant: "destructive" });
+    } catch (err: any) {
+      toast({
+        title: "Image upload failed",
+        description: err?.message ?? "Check Supabase Storage bucket permissions.",
+        variant: "destructive",
+      });
+    } finally {
+      if (isMain) setUploadingMain(false);
+      else setUploadingExtra(false);
     }
   };
 
@@ -361,14 +350,21 @@ export default function DashboardProducts() {
                           <Button
                             type="button"
                             variant="secondary"
-                            className="w-full border-2 border-dashed border-primary/20 bg-gradient-to-br from-white/90 to-[#faf8f5]/90 hover:from-white hover:to-[#faf6ee] hover:border-primary/45 rounded-3xl py-14 flex flex-col h-auto justify-center items-center cursor-pointer transition-all duration-300 shadow-md shadow-primary/5 hover:shadow-lg hover:shadow-primary/5 group"
+                            disabled={uploadingMain}
+                            className="w-full border-2 border-dashed border-primary/20 bg-gradient-to-br from-white/90 to-[#faf8f5]/90 hover:from-white hover:to-[#faf6ee] hover:border-primary/45 rounded-3xl py-14 flex flex-col h-auto justify-center items-center cursor-pointer transition-all duration-300 shadow-md shadow-primary/5 hover:shadow-lg hover:shadow-primary/5 group disabled:opacity-70 disabled:cursor-not-allowed"
                             onClick={() => document.getElementById("image-upload")?.click()}
                           >
                             <div className="w-12 h-12 rounded-full bg-primary/5 group-hover:bg-primary/10 flex items-center justify-center mb-3 transition-colors duration-300">
-                              <Upload size={18} className="text-primary opacity-70 group-hover:scale-110 transition-transform duration-300" />
+                              {uploadingMain ? (
+                                <svg className="animate-spin text-primary" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" strokeOpacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round"/></svg>
+                              ) : (
+                                <Upload size={18} className="text-primary opacity-70 group-hover:scale-110 transition-transform duration-300" />
+                              )}
                             </div>
                             <div className="flex flex-col items-center">
-                              <span className="text-[10px] font-black tracking-[0.2em] uppercase text-primary/80 group-hover:text-primary transition-colors duration-300">Select Artifact Photo</span>
+                              <span className="text-[10px] font-black tracking-[0.2em] uppercase text-primary/80 group-hover:text-primary transition-colors duration-300">
+                                {uploadingMain ? "Uploading to CDN…" : "Select Artifact Photo"}
+                              </span>
                               <span className="text-[9px] font-serif italic text-muted-foreground/60 tracking-wider mt-1">supports high-res png, jpg, webp</span>
                             </div>
                           </Button>
