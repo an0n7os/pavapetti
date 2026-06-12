@@ -30,28 +30,28 @@ const MARQUEE_ITEMS = [
 
 const HERO_SLIDES = [
   {
-    src: "/hero-dance-v2.png",
+    src: "/hero-dance-v2.webp",
     label: "Kathakali Vesham",
     tag: "Divine Dramaturgy",
     headline: ["Echoes", "of the", "Sacred"],
     sub: "Kathakali masks and dance artifacts — preserving the primordial rhythms and sacred colors of Kerala's soul.",
   },
   {
-    src: "/hero-mural-v2.png",
+    src: "/hero-mural-v2.webp",
     label: "Sacred Mural Art",
     tag: "Temple Sanctum Art",
     headline: ["Whispers", "of the", "Sanctum"],
     sub: "Ancient Kerala mural paintings — handcrafted using natural pigments, breathing life into stories of a thousand years.",
   },
   {
-    src: "/hero-box-v2.png",
+    src: "/hero-box-v2.webp",
     label: "Nettoor Petti",
     tag: "Ancestral Caskets",
     headline: ["Legacy", "of the", "Ancestors"],
     sub: "The legendary jewellery caskets of Kerala — handcrafted rosewood boxes, each a silent witness to a royal past.",
   },
   {
-    src: "/hero-brass-v2.png",
+    src: "/hero-brass-v2.webp",
     label: "Sacred Brass Lamps",
     tag: "Eternal Light",
     headline: ["Glow", "of the", "Parampara"],
@@ -60,12 +60,12 @@ const HERO_SLIDES = [
 ];
 
 const CATEGORY_OVERRIDE: Record<string, string> = {
-  "Pooja Category":            "/hero-brass.png",
-  "Chains and Bracelets":      "/karungali_mala.png",
-  "Elephant Heritage":         "/elephant_head.png",
-  "Heritage Textiles":         "/hero-textile.png",
-  "Miniatures & Mini Chenda":  "/hero-dance.png",
-  "Fragrances & Organic Soap": "/kalabham_perfume.png",
+  "Pooja Category":            "/hero-brass.webp",
+  "Chains and Bracelets":      "/karungali_mala.webp",
+  "Elephant Heritage":         "/elephant_head.webp",
+  "Heritage Textiles":         "/hero-textile.webp",
+  "Miniatures & Mini Chenda":  "/hero-dance.webp",
+  "Fragrances & Organic Soap": "/kalabham_perfume.webp",
 };
 
 const TESTIMONIALS = [
@@ -531,7 +531,7 @@ export default function Home() {
               viewport={{ once: true }}
               className="col-span-2 lg:col-span-2 lg:row-span-2 relative group overflow-hidden rounded-[2rem] md:rounded-[2.5rem] shadow-2xl aspect-[4/3] md:aspect-[4/5] lg:aspect-auto border border-primary/5 hover:border-primary/20 transition-all duration-700"
             >
-              <img src="/netipattam.png" alt="Netipattam" className="w-full h-full object-cover transition-transform duration-[2500ms] ease-out group-hover:scale-105" />
+              <img src="/netipattam.webp" alt="Netipattam" className="w-full h-full object-cover transition-transform duration-[2500ms] ease-out group-hover:scale-105" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent transition-opacity duration-700 group-hover:from-black/75" />
               <div className="absolute bottom-6 left-6 md:bottom-10 md:left-10 text-white z-10">
                 <span className="text-[8px] md:text-[10px] font-black tracking-[0.3em] md:tracking-[0.4em] uppercase text-primary/90 mb-2 block">The Golden Ornament</span>
@@ -541,10 +541,10 @@ export default function Home() {
 
             {/* Smaller Gallery Pieces */}
             {[
-              { img: "/aranmula-mirror.png", title: "Aranmula Kannadi", tag: "The Metal Mirror" },
-              { img: "/elephant_head.png", title: "Temple Artifacts", tag: "Sacred Decor" },
-              { img: "/kasavu-textile.png", title: "Heirloom Kasavu", tag: "Traditional Weaves" },
-              { img: "/hero-box-v2.png", title: "Nettoor Petti", tag: "Royal Caskets" }
+              { img: "/aranmula-mirror.webp", title: "Aranmula Kannadi", tag: "The Metal Mirror" },
+              { img: "/elephant_head.webp", title: "Temple Artifacts", tag: "Sacred Decor" },
+              { img: "/kasavu-textile.webp", title: "Heirloom Kasavu", tag: "Traditional Weaves" },
+              { img: "/hero-box-v2.webp", title: "Nettoor Petti", tag: "Royal Caskets" }
             ].map((item, i) => (
               <motion.div 
                 key={i}
@@ -647,7 +647,7 @@ export default function Home() {
               
               <div className="relative aspect-[4/5] rounded-[2.5rem] overflow-hidden bg-black/40 border border-white/10 shadow-2xl">
                 <img 
-                  src="/hero-brass-v2.png" 
+                  src="/hero-brass-v2.webp" 
                   alt="Curatorial Sanctum" 
                   className="w-full h-full object-cover transition-transform duration-[4000ms] ease-out group-hover:scale-110 brightness-[0.8]"
                 />

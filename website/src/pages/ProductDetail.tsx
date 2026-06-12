@@ -560,7 +560,7 @@ export default function ProductDetail() {
             </div>
             <div className="relative aspect-square lg:aspect-auto">
               <img 
-                src="/hero-brass.png" 
+                src="/hero-brass.webp" 
                 alt="Craftsmanship" 
                 className="absolute inset-0 w-full h-full object-cover"
               />
