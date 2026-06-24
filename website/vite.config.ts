@@ -16,6 +16,7 @@ export default defineConfig({
     },
   },
   resolve: {
+    preserveSymlinks: true,
     alias: {
       "@": path.resolve(import.meta.dirname, "src"),
       "@tanstack/react-query": path.resolve(import.meta.dirname, "node_modules/@tanstack/react-query"),
