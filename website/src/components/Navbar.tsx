@@ -62,6 +62,7 @@ export default function Navbar() {
   const NAV_LINKS = [
     { href: "/", label: "Home" },
     { href: "/products", label: "Shop" },
+    { href: "/bidding", label: "Auctions" },
   ];
 
   return (

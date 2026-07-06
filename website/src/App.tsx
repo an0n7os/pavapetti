@@ -18,6 +18,7 @@ import DashboardCategories from "@/pages/DashboardCategories";
 import Wishlist from "@/pages/Wishlist";
 import Checkout from "@/pages/Checkout";
 import MobileNav from "@/components/MobileNav";
+import Bidding from "@/pages/Bidding";
 import { useState, useEffect } from "react";
 import PavapettiLogo from "./components/PavapettiLogo";
 
@@ -482,6 +483,9 @@ function Router() {
 
         <Route path="/wishlist">
           <PageWrapper><Wishlist /></PageWrapper>
+        </Route>
+        <Route path="/bidding">
+          <PageWrapper><Bidding /></PageWrapper>
         </Route>
         <Route>
           <PageWrapper><NotFound /></PageWrapper>
