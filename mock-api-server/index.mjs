@@ -524,12 +524,10 @@ app.get('/api/categories', async (req, res) => {
       if (error) throw error;
       return res.json(data.map(mapCategoryFromDb));
     } catch (err) {
-      console.error('Database query error on categories:', err);
-      return res.status(500).json({ error: err.message });
+      console.warn('⚠️ Database query error on categories, falling back to local mock data:', err.message);
     }
-  } else {
-    return res.json(categories);
   }
+  return res.json(categories);
 });
 
 app.post('/api/categories', async (req, res) => {
@@ -549,18 +547,16 @@ app.post('/api/categories', async (req, res) => {
       if (error) throw error;
       return res.status(201).json(mapCategoryFromDb(data));
     } catch (err) {
-      console.error('Database error on category creation:', err);
-      return res.status(500).json({ error: err.message });
+      console.warn('⚠️ Database error on category creation, falling back to local mock data:', err.message);
     }
-  } else {
-    const newCat = {
-      ...req.body,
-      id: categories.reduce((max, c) => Math.max(max, c.id), 0) + 1,
-      productCount: 0
-    };
-    categories.push(newCat);
-    res.status(201).json(newCat);
   }
+  const newCat = {
+    ...req.body,
+    id: categories.reduce((max, c) => Math.max(max, c.id), 0) + 1,
+    productCount: 0
+  };
+  categories.push(newCat);
+  res.status(201).json(newCat);
 });
 
 app.delete('/api/categories/:id', async (req, res) => {
@@ -575,13 +571,11 @@ app.delete('/api/categories/:id', async (req, res) => {
       if (error) throw error;
       return res.sendStatus(204);
     } catch (err) {
-      console.error('Database error on category deletion:', err);
-      return res.status(500).json({ error: err.message });
+      console.warn('⚠️ Database error on category deletion, falling back to local mock data:', err.message);
     }
-  } else {
-    categories = categories.filter(c => c.id !== parseInt(idStr));
-    res.sendStatus(204);
   }
+  categories = categories.filter(c => c.id !== parseInt(idStr));
+  res.sendStatus(204);
 });
 
 app.put('/api/categories/:id', async (req, res) => {
@@ -600,17 +594,15 @@ app.put('/api/categories/:id', async (req, res) => {
       if (error) throw error;
       return res.json(mapCategoryFromDb(data));
     } catch (err) {
-      console.error('Database error on category update:', err);
-      return res.status(500).json({ error: err.message });
+      console.warn('⚠️ Database error on category update, falling back to local mock data:', err.message);
     }
+  }
+  const idx = categories.findIndex(c => c.id === parseInt(idStr));
+  if (idx !== -1) {
+    categories[idx] = { ...categories[idx], ...req.body };
+    res.json(categories[idx]);
   } else {
-    const idx = categories.findIndex(c => c.id === parseInt(idStr));
-    if (idx !== -1) {
-      categories[idx] = { ...categories[idx], ...req.body };
-      res.json(categories[idx]);
-    } else {
-      res.status(404).json({ error: 'Not found' });
-    }
+    res.status(404).json({ error: 'Not found' });
   }
 });
 
@@ -639,20 +631,18 @@ app.get('/api/products', async (req, res) => {
 
       return res.json(data.map(mapProductFromDb));
     } catch (err) {
-      console.error('Database query error on products:', err);
-      return res.status(500).json({ error: err.message });
+      console.warn('⚠️ Database query error on products, falling back to local mock data:', err.message);
     }
-  } else {
-    let filtered = [...products];
-    if (category) filtered = filtered.filter(p => 
-      p.categoryName === category || 
-      (p.additionalCategoryNames && p.additionalCategoryNames.includes(category))
-    );
-    if (search) filtered = filtered.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
-    if (featured === 'true') filtered = filtered.filter(p => p.featured);
-    if (isNewArrival === 'true') filtered = filtered.filter(p => p.isNewArrival);
-    return res.json(filtered);
   }
+  let filtered = [...products];
+  if (category) filtered = filtered.filter(p => 
+    p.categoryName === category || 
+    (p.additionalCategoryNames && p.additionalCategoryNames.includes(category))
+  );
+  if (search) filtered = filtered.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
+  if (featured === 'true') filtered = filtered.filter(p => p.featured);
+  if (isNewArrival === 'true') filtered = filtered.filter(p => p.isNewArrival);
+  return res.json(filtered);
 });
 
 app.get('/api/products/:id', async (req, res) => {
@@ -674,13 +664,11 @@ app.get('/api/products/:id', async (req, res) => {
       }
       return res.json(mapProductFromDb(data));
     } catch (err) {
-      console.error('Database query error on product detail:', err);
-      return res.status(500).json({ error: err.message });
+      console.warn('⚠️ Database query error on product detail, falling back to local mock data:', err.message);
     }
-  } else {
-    const p = products.find(p => p.id === parseInt(idStr));
-    return p ? res.json(p) : res.status(404).json({ error: 'Not found' });
   }
+  const p = products.find(p => p.id === parseInt(idStr));
+  return p ? res.json(p) : res.status(404).json({ error: 'Not found' });
 });
 
 app.post('/api/products', async (req, res) => {
@@ -731,24 +719,22 @@ app.post('/api/products', async (req, res) => {
 
       return res.status(201).json(mapProductFromDb(data));
     } catch (err) {
-      console.error('Database error on product creation:', err);
-      return res.status(500).json({ error: err.message });
+      console.warn('⚠️ Database error on product creation, falling back to local mock data:', err.message);
     }
-  } else {
-    const additionalCatIds = req.body.additionalCategoryIds || [];
-    const additionalCatNames = additionalCatIds.map(id => categories.find(c => c.id === id)?.name).filter(Boolean);
-    const newP = { 
-      ...req.body, 
-      id: products.reduce((max, p) => Math.max(max, p.id), 0) + 1, 
-      createdAt: new Date().toISOString(),
-      categoryName: categories.find(c => c.id === req.body.categoryId)?.name || "Uncategorized",
-      additionalCategoryIds: additionalCatIds,
-      additionalCategoryNames: additionalCatNames
-    };
-    products.push(newP);
-    categories = categories.map(c => c.id === req.body.categoryId ? { ...c, productCount: c.productCount + 1 } : c);
-    res.status(201).json(newP);
   }
+  const additionalCatIds = req.body.additionalCategoryIds || [];
+  const additionalCatNames = additionalCatIds.map(id => categories.find(c => c.id === id)?.name).filter(Boolean);
+  const newP = { 
+    ...req.body, 
+    id: products.reduce((max, p) => Math.max(max, p.id), 0) + 1, 
+    createdAt: new Date().toISOString(),
+    categoryName: categories.find(c => c.id === req.body.categoryId)?.name || "Uncategorized",
+    additionalCategoryIds: additionalCatIds,
+    additionalCategoryNames: additionalCatNames
+  };
+  products.push(newP);
+  categories = categories.map(c => c.id === req.body.categoryId ? { ...c, productCount: c.productCount + 1 } : c);
+  res.status(201).json(newP);
 });
 
 app.put('/api/products/:id', async (req, res) => {
@@ -798,35 +784,33 @@ app.put('/api/products/:id', async (req, res) => {
       if (error) throw error;
       return res.json(mapProductFromDb(data));
     } catch (err) {
-      console.error('Database error on product update:', err);
-      return res.status(500).json({ error: err.message });
+      console.warn('⚠️ Database error on product update, falling back to local mock data:', err.message);
     }
+  }
+  const idx = products.findIndex(p => p.id === parseInt(idStr));
+  if (idx !== -1) {
+    const oldCatId = products[idx].categoryId;
+    const newCatId = req.body.categoryId;
+    const catName = categories.find(c => c.id === newCatId)?.name || "Uncategorized";
+    const additionalCatIds = req.body.additionalCategoryIds || [];
+    const additionalCatNames = additionalCatIds.map(id => categories.find(c => c.id === id)?.name).filter(Boolean);
+    products[idx] = { 
+      ...products[idx], 
+      ...req.body, 
+      categoryName: catName,
+      additionalCategoryIds: additionalCatIds,
+      additionalCategoryNames: additionalCatNames
+    };
+    if (oldCatId !== newCatId && newCatId !== undefined) {
+      categories = categories.map(c => {
+        if (c.id === oldCatId) return { ...c, productCount: Math.max(0, c.productCount - 1) };
+        if (c.id === newCatId) return { ...c, productCount: c.productCount + 1 };
+        return c;
+      });
+    }
+    res.json(products[idx]);
   } else {
-    const idx = products.findIndex(p => p.id === parseInt(idStr));
-    if (idx !== -1) {
-      const oldCatId = products[idx].categoryId;
-      const newCatId = req.body.categoryId;
-      const catName = categories.find(c => c.id === newCatId)?.name || "Uncategorized";
-      const additionalCatIds = req.body.additionalCategoryIds || [];
-      const additionalCatNames = additionalCatIds.map(id => categories.find(c => c.id === id)?.name).filter(Boolean);
-      products[idx] = { 
-        ...products[idx], 
-        ...req.body, 
-        categoryName: catName,
-        additionalCategoryIds: additionalCatIds,
-        additionalCategoryNames: additionalCatNames
-      };
-      if (oldCatId !== newCatId && newCatId !== undefined) {
-        categories = categories.map(c => {
-          if (c.id === oldCatId) return { ...c, productCount: Math.max(0, c.productCount - 1) };
-          if (c.id === newCatId) return { ...c, productCount: c.productCount + 1 };
-          return c;
-        });
-      }
-      res.json(products[idx]);
-    } else {
-      res.status(404).json({ error: 'Not found' });
-    }
+    res.status(404).json({ error: 'Not found' });
   }
 });
 
@@ -855,17 +839,15 @@ app.delete('/api/products/:id', async (req, res) => {
 
       return res.sendStatus(204);
     } catch (err) {
-      console.error('Database error on product deletion:', err);
-      return res.status(500).json({ error: err.message });
+      console.warn('⚠️ Database error on product deletion, falling back to local mock data:', err.message);
     }
-  } else {
-    const p = products.find(p => p.id === parseInt(idStr));
-    if (p) {
-      categories = categories.map(c => c.id === p.categoryId ? { ...c, productCount: Math.max(0, c.productCount - 1) } : c);
-    }
-    products = products.filter(p => p.id !== parseInt(idStr));
-    res.sendStatus(204);
   }
+  const p = products.find(p => p.id === parseInt(idStr));
+  if (p) {
+    categories = categories.map(c => c.id === p.categoryId ? { ...c, productCount: Math.max(0, c.productCount - 1) } : c);
+  }
+  products = products.filter(p => p.id !== parseInt(idStr));
+  res.sendStatus(204);
 });
 
 app.get('/api/dashboard/stats', async (req, res) => {
@@ -903,18 +885,16 @@ app.get('/api/dashboard/stats', async (req, res) => {
         recentProducts: (recentProductsRaw || []).map(mapProductFromDb)
       });
     } catch (err) {
-      console.error('Database query error on dashboard stats:', err);
-      return res.status(500).json({ error: err.message });
+      console.warn('⚠️ Database query error on dashboard stats, falling back to local mock data:', err.message);
     }
-  } else {
-    res.json({
-      totalProducts: products.length,
-      totalCategories: categories.length,
-      featuredProducts: products.filter(p => p.featured).length,
-      lowStockProducts: products.filter(p => p.stock < 5).length,
-      recentProducts: products.slice(-5).reverse()
-    });
   }
+  res.json({
+    totalProducts: products.length,
+    totalCategories: categories.length,
+    featuredProducts: products.filter(p => p.featured).length,
+    lowStockProducts: products.filter(p => p.stock < 5).length,
+    recentProducts: products.slice(-5).reverse()
+  });
 });
 
 app.get('/api/dashboard/featured', async (req, res) => {
@@ -929,12 +909,10 @@ app.get('/api/dashboard/featured', async (req, res) => {
       if (error) throw error;
       return res.json(data.map(mapProductFromDb));
     } catch (err) {
-      console.error('Database query error on featured products:', err);
-      return res.status(500).json({ error: err.message });
+      console.warn('⚠️ Database query error on featured products, falling back to local mock data:', err.message);
     }
-  } else {
-    res.json(products.filter(p => p.featured));
   }
+  res.json(products.filter(p => p.featured));
 });
 
 const PORT = 8081;

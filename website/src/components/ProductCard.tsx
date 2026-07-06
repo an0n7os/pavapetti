@@ -144,6 +144,9 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
           <div className="mt-4 md:mt-8 px-1 md:px-2">
             <p className="text-[8px] md:text-[10px] font-bold tracking-[0.2em] md:tracking-[0.4em] uppercase text-primary/70 mb-1 md:mb-2 group-hover:text-primary transition-colors duration-500">
               {product.categoryName || "Pavapetti Heritage Artifacts"}
+              {product.additionalCategoryNames && product.additionalCategoryNames.length > 0 && (
+                <span className="text-muted-foreground/60 font-light lowercase"> &bull; {product.additionalCategoryNames.join(" &bull; ")}</span>
+              )}
             </p>
             
             <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-1 md:gap-4">
