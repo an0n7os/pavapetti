@@ -15,7 +15,9 @@ import ProductDetail from "@/pages/ProductDetail";
 import Dashboard from "@/pages/Dashboard";
 import DashboardProducts from "@/pages/DashboardProducts";
 import DashboardCategories from "@/pages/DashboardCategories";
+import DashboardBackup from "@/pages/DashboardBackup";
 import Wishlist from "@/pages/Wishlist";
+
 import Checkout from "@/pages/Checkout";
 import MobileNav from "@/components/MobileNav";
 import Bidding from "@/pages/Bidding";
@@ -480,6 +482,10 @@ function Router() {
         <Route path="/dashboard/categories">
           <AdminGate><PageWrapper><DashboardCategories /></PageWrapper></AdminGate>
         </Route>
+        <Route path="/dashboard/backup">
+          <AdminGate><PageWrapper><DashboardBackup /></PageWrapper></AdminGate>
+        </Route>
+
 
         <Route path="/wishlist">
           <PageWrapper><Wishlist /></PageWrapper>
