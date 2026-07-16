@@ -6,6 +6,6 @@
     "dev": "concurrently --names \"API,WEB\" --prefix-colors \"cyan,magenta\" \"node mock-api-server/index.mjs\" \"npm run dev --prefix website\""
   },
   "devDependencies": {
-    "concurrently": "^9.1.2"
+    "concurrently": "^9.2.4"
   }
 }
