@@ -28,7 +28,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
       viewport={{ once: true }}
       transition={{ 
         duration: 0.8, 
-        delay: index * 0.1,
+        delay: index < 8 ? (index % 4) * 0.05 : 0,
         ease: [0.16, 1, 0.3, 1]
       }}
       className="group relative"

@@ -33,6 +33,107 @@ if (supabaseUrl && supabaseKey && !supabaseUrl.includes('your-project-id')) {
   console.log('⚠️ Supabase URL/Key not found or using default placeholders. Falling back to In-Memory mock data.');
 }
 
+// --- In-Memory Caching for Supabase ---
+let cachedProducts = null;
+let cachedProductsTime = 0;
+let cachedCategories = null;
+let cachedCategoriesTime = 0;
+const CACHE_DURATION_MS = 60000; // Cache for 60 seconds (1 minute)
+
+function clearCache() {
+  cachedProducts = null;
+  cachedProductsTime = 0;
+  cachedCategories = null;
+  cachedCategoriesTime = 0;
+}
+
+// Timeout helper to race database queries
+async function queryWithTimeout(queryPromise, timeoutMs = 2500) {
+  let timeoutId;
+  const timeoutPromise = new Promise((_, reject) => {
+    timeoutId = setTimeout(() => {
+      reject(new Error('Query timeout'));
+    }, timeoutMs);
+  });
+
+  try {
+    const result = await Promise.race([queryPromise, timeoutPromise]);
+    clearTimeout(timeoutId);
+    return result;
+  } catch (error) {
+    clearTimeout(timeoutId);
+    throw error;
+  }
+}
+
+// Stale-While-Revalidate Categories getter
+async function getCategoriesData() {
+  const now = Date.now();
+  if (cachedCategories && (now - cachedCategoriesTime < CACHE_DURATION_MS)) {
+    return cachedCategories;
+  }
+
+  const query = supabase
+    .from('categories')
+    .select('*')
+    .order('id', { ascending: true })
+    .then(({ data, error }) => {
+      if (error) throw error;
+      const mapped = data.map(mapCategoryFromDb);
+      cachedCategories = mapped;
+      cachedCategoriesTime = Date.now();
+      return mapped;
+    });
+
+  if (cachedCategories) {
+    // If we have stale data, update it in the background and return it immediately
+    query.catch(err => console.warn('⚠️ Background categories fetch failed:', err.message));
+    return cachedCategories;
+  }
+
+  try {
+    return await queryWithTimeout(query, 2500);
+  } catch (err) {
+    console.warn(`⚠️ Categories query timed out or failed (${err.message}). Serving local fallback data, waking up DB in background...`);
+    query.catch(() => {});
+    return categories;
+  }
+}
+
+// Stale-While-Revalidate Products getter
+async function getProductsData() {
+  const now = Date.now();
+  if (cachedProducts && (now - cachedProductsTime < CACHE_DURATION_MS)) {
+    return cachedProducts;
+  }
+
+  const query = supabase
+    .from('products')
+    .select('*')
+    .order('id', { ascending: true })
+    .then(({ data, error }) => {
+      if (error) throw error;
+      const mapped = data.map(mapProductFromDb);
+      cachedProducts = mapped;
+      cachedProductsTime = Date.now();
+      return mapped;
+    });
+
+  if (cachedProducts) {
+    // If we have stale data, update it in the background and return it immediately
+    query.catch(err => console.warn('⚠️ Background products fetch failed:', err.message));
+    return cachedProducts;
+  }
+
+  try {
+    return await queryWithTimeout(query, 2500);
+  } catch (err) {
+    console.warn(`⚠️ Products query timed out or failed (${err.message}). Serving local fallback data, waking up DB in background...`);
+    query.catch(() => {});
+    return products;
+  }
+}
+
 // --- Mappings between Local CamelCase and Supabase snake_case ---
 function mapProductFromDb(p) {
   if (!p) return null;
@@ -515,23 +616,15 @@ app.get('/api/healthz', (req, res) => {
 
 app.get('/api/categories', async (req, res) => {
   if (isSupabaseConfigured) {
-    try {
-      const { data, error } = await supabase
-        .from('categories')
-        .select('*')
-        .order('id', { ascending: true });
-
-      if (error) throw error;
-      return res.json(data.map(mapCategoryFromDb));
-    } catch (err) {
-      console.warn('⚠️ Database query error on categories, falling back to local mock data:', err.message);
-    }
+    const data = await getCategoriesData();
+    return res.json(data);
   }
   return res.json(categories);
 });
 
 app.post('/api/categories', async (req, res) => {
   if (isSupabaseConfigured) {
+    clearCache();
     try {
       const dbCategory = mapCategoryToDb({
         ...req.body,
@@ -562,6 +655,7 @@ app.post('/api/categories', async (req, res) => {
 app.delete('/api/categories/:id', async (req, res) => {
   const idStr = req.params.id;
   if (isSupabaseConfigured) {
+    clearCache();
     try {
       const { error } = await supabase
         .from('categories')
@@ -581,6 +675,7 @@ app.delete('/api/categories/:id', async (req, res) => {
 app.put('/api/categories/:id', async (req, res) => {
   const idStr = req.params.id;
   if (isSupabaseConfigured) {
+    clearCache();
     try {
       const dbCategory = mapCategoryToDb(req.body);
 
@@ -609,39 +704,29 @@ app.put('/api/categories/:id', async (req, res) => {
 app.get('/api/products', async (req, res) => {
   const { category, search, featured, isNewArrival } = req.query;
 
+  let allProducts = [];
   if (isSupabaseConfigured) {
-    try {
-      let query = supabase.from('products').select('*');
-
-      if (category) {
-        query = query.or(`category_name.eq."${category}",additional_category_names.cs.{"${category}"}`);
-      }
-      if (search) {
-        query = query.ilike('name', `%${search}%`);
-      }
-      if (featured === 'true') {
-        query = query.eq('featured', true);
-      }
-      if (isNewArrival === 'true') {
-        query = query.eq('is_new_arrival', true);
-      }
-
-      const { data, error } = await query.order('id', { ascending: true });
-      if (error) throw error;
-
-      return res.json(data.map(mapProductFromDb));
-    } catch (err) {
-      console.warn('⚠️ Database query error on products, falling back to local mock data:', err.message);
-    }
+    allProducts = await getProductsData();
+  } else {
+    allProducts = [...products];
   }
-  let filtered = [...products];
-  if (category) filtered = filtered.filter(p => 
-    p.categoryName === category || 
-    (p.additionalCategoryNames && p.additionalCategoryNames.includes(category))
-  );
-  if (search) filtered = filtered.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
-  if (featured === 'true') filtered = filtered.filter(p => p.featured);
-  if (isNewArrival === 'true') filtered = filtered.filter(p => p.isNewArrival);
+
+  let filtered = [...allProducts];
+  if (category) {
+    filtered = filtered.filter(p => 
+      p.categoryName === category || 
+      (p.additionalCategoryNames && p.additionalCategoryNames.includes(category))
+    );
+  }
+  if (search) {
+    filtered = filtered.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
+  }
+  if (featured === 'true') {
+    filtered = filtered.filter(p => p.featured);
+  }
+  if (isNewArrival === 'true') {
+    filtered = filtered.filter(p => p.isNewArrival);
+  }
   return res.json(filtered);
 });
 
@@ -649,12 +734,18 @@ app.get('/api/products/:id', async (req, res) => {
   const idStr = req.params.id;
 
   if (isSupabaseConfigured) {
+    if (cachedProducts) {
+      const p = cachedProducts.find(p => p.id === parseInt(idStr));
+      if (p) return res.json(p);
+    }
     try {
-      const { data, error } = await supabase
+      const query = supabase
         .from('products')
         .select('*')
         .eq('id', idStr)
         .single();
+
+      const { data, error } = await queryWithTimeout(query, 2500);
 
       if (error) {
         if (error.code === 'PGRST116') {
@@ -673,6 +764,7 @@ app.get('/api/products/:id', async (req, res) => {
 
 app.post('/api/products', async (req, res) => {
   if (isSupabaseConfigured) {
+    clearCache();
     try {
       let catName = "Uncategorized";
       const hasCategory = req.body.categoryId !== undefined && req.body.categoryId !== null && req.body.categoryId !== 0;
@@ -741,6 +833,7 @@ app.put('/api/products/:id', async (req, res) => {
   const idStr = req.params.id;
 
   if (isSupabaseConfigured) {
+    clearCache();
     try {
       let catName = undefined;
       const hasCategory = req.body.categoryId !== undefined && req.body.categoryId !== null && req.body.categoryId !== 0;
@@ -818,6 +911,7 @@ app.delete('/api/products/:id', async (req, res) => {
   const idStr = req.params.id;
 
   if (isSupabaseConfigured) {
+    clearCache();
     try {
       // Get category ID first to decrement count later if wanted
       const { data: prodData } = await supabase
@@ -853,36 +947,21 @@ app.delete('/api/products/:id', async (req, res) => {
 app.get('/api/dashboard/stats', async (req, res) => {
   if (isSupabaseConfigured) {
     try {
-      const { count: totalProducts } = await supabase
-        .from('products')
-        .select('*', { count: 'exact', head: true });
+      const allProds = await getProductsData();
+      const allCats = await getCategoriesData();
 
-      const { count: totalCategories } = await supabase
-        .from('categories')
-        .select('*', { count: 'exact', head: true });
-
-      const { count: featuredProducts } = await supabase
-        .from('products')
-        .select('*', { count: 'exact', head: true })
-        .eq('featured', true);
-
-      const { count: lowStockProducts } = await supabase
-        .from('products')
-        .select('*', { count: 'exact', head: true })
-        .lt('stock', 5);
-
-      const { data: recentProductsRaw } = await supabase
-        .from('products')
-        .select('*')
-        .order('id', { ascending: false })
-        .limit(5);
+      const totalProducts = allProds.length;
+      const totalCategories = allCats.length;
+      const featuredProducts = allProds.filter(p => p.featured).length;
+      const lowStockProducts = allProds.filter(p => p.stock < 5).length;
+      const recentProducts = [...allProds].slice(-5).reverse();
 
       return res.json({
-        totalProducts: totalProducts || 0,
-        totalCategories: totalCategories || 0,
-        featuredProducts: featuredProducts || 0,
-        lowStockProducts: lowStockProducts || 0,
-        recentProducts: (recentProductsRaw || []).map(mapProductFromDb)
+        totalProducts,
+        totalCategories,
+        featuredProducts,
+        lowStockProducts,
+        recentProducts
       });
     } catch (err) {
       console.warn('⚠️ Database query error on dashboard stats, falling back to local mock data:', err.message);
@@ -900,14 +979,8 @@ app.get('/api/dashboard/stats', async (req, res) => {
 app.get('/api/dashboard/featured', async (req, res) => {
   if (isSupabaseConfigured) {
     try {
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .eq('featured', true)
-        .order('id', { ascending: true });
-
-      if (error) throw error;
-      return res.json(data.map(mapProductFromDb));
+      const allProds = await getProductsData();
+      return res.json(allProds.filter(p => p.featured));
     } catch (err) {
       console.warn('⚠️ Database query error on featured products, falling back to local mock data:', err.message);
     }
