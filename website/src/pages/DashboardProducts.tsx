@@ -34,6 +34,7 @@ import {
   useDeleteProduct,
   useListCategories,
   getListProductsQueryKey,
+  getListCategoriesQueryKey,
   getGetDashboardStatsQueryKey,
   type Product,
   type CreateProductBody,
@@ -79,7 +80,12 @@ export default function DashboardProducts() {
   const deleteProduct = useDeleteProduct();
 
   const invalidate = () => {
+    try {
+      localStorage.removeItem("cached-products");
+      localStorage.removeItem("cached-categories");
+    } catch {}
     queryClient.invalidateQueries({ queryKey: getListProductsQueryKey() });
+    queryClient.invalidateQueries({ queryKey: getListCategoriesQueryKey() });
     queryClient.invalidateQueries({ queryKey: getGetDashboardStatsQueryKey() });
   };
 
@@ -528,7 +534,7 @@ export default function DashboardProducts() {
                   </tr>
                 </thead>
                 <tbody>
-                  {(products ?? []).map((product: any) => (
+                  {[...(products ?? [])].reverse().map((product: any) => (
                     <motion.tr
                       key={product.id}
                       initial={{ opacity: 0 }}

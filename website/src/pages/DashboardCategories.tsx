@@ -23,6 +23,7 @@ import {
   useUpdateCategory,
   useDeleteCategory,
   getListCategoriesQueryKey,
+  getListProductsQueryKey,
   getGetDashboardStatsQueryKey,
   type CreateCategoryBody,
   type Category,
@@ -90,7 +91,12 @@ export default function DashboardCategories() {
   };
 
   const invalidate = () => {
+    try {
+      localStorage.removeItem("cached-products");
+      localStorage.removeItem("cached-categories");
+    } catch {}
     queryClient.invalidateQueries({ queryKey: getListCategoriesQueryKey() });
+    queryClient.invalidateQueries({ queryKey: getListProductsQueryKey() });
     queryClient.invalidateQueries({ queryKey: getGetDashboardStatsQueryKey() });
   };
 

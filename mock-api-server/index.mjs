@@ -13,7 +13,8 @@ dotenv.config({ path: path.join(__dirname, '../.env') });
 
 const app = express();
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.url}`);
   next();
@@ -47,6 +48,30 @@ function clearCache() {
   cachedCategoriesTime = 0;
 }
 
+// Recompute product counts from DB and update categories table
+async function recomputeAndSaveCategoryCounts() {
+  try {
+    const { data: prods } = await supabase.from('products').select('category_id, category_name');
+    const { data: cats } = await supabase.from('categories').select('id, name');
+    if (!prods || !cats) return;
+
+    const countById = {};
+    cats.forEach(c => { countById[c.id] = 0; });
+    prods.forEach(p => {
+      if (p.category_id && countById[p.category_id] !== undefined) {
+        countById[p.category_id]++;
+      }
+    });
+
+    for (const [catId, count] of Object.entries(countById)) {
+      await supabase.from('categories').update({ product_count: count }).eq('id', catId);
+    }
+    clearCache();
+  } catch (err) {
+    console.warn('⚠️ recomputeAndSaveCategoryCounts failed:', err.message);
+  }
+}
+
 // Timeout helper to race database queries
 async function queryWithTimeout(queryPromise, timeoutMs = 2500) {
   let timeoutId;
@@ -73,17 +98,67 @@ async function getCategoriesData() {
     return cachedCategories;
   }
 
-  const query = supabase
-    .from('categories')
-    .select('*')
-    .order('id', { ascending: true })
-    .then(({ data, error }) => {
-      if (error) throw error;
-      const mapped = data.map(mapCategoryFromDb);
-      cachedCategories = mapped;
-      cachedCategoriesTime = Date.now();
-      return mapped;
+  const query = (async () => {
+    const { data: catData, error: catError } = await supabase
+      .from('categories')
+      .select('*')
+      .order('id', { ascending: true });
+    if (catError) throw catError;
+
+    const prods = await getProductsData();
+    const mapped = catData.map(c => {
+      const cat = mapCategoryFromDb(c);
+      const catNameLower = (cat.name || '').trim().toLowerCase();
+      const matchingProds = prods.filter(p => {
+        const pCatName = (p.categoryName || '').trim().toLowerCase();
+        if (pCatName === catNameLower) return true;
+        if (p.categoryId === cat.id) return true;
+        if (p.additionalCategoryNames && p.additionalCategoryNames.some(ac => (ac || '').trim().toLowerCase() === catNameLower)) return true;
+        return false;
+      });
+      
+      // Fallback imageUrl to first matching product image if category has no custom image
+      const imageUrl = cat.imageUrl || (matchingProds.length > 0 ? matchingProds[0].imageUrl : null);
+      
+      return { 
+        ...cat, 
+        imageUrl,
+        productCount: matchingProds.length 
+      };
     });
+
+    // Auto-create missing categories in DB if any new categoryName is found in products
+    const existingCatNamesLower = new Set(catData.map(c => (c.name || '').trim().toLowerCase()));
+    const missingCatNames = new Set();
+    prods.forEach(p => {
+      if (p.categoryName && p.categoryName.trim() && p.categoryName.trim() !== 'Uncategorized') {
+        const trimmed = p.categoryName.trim();
+        if (!existingCatNamesLower.has(trimmed.toLowerCase())) {
+          missingCatNames.add(trimmed);
+        }
+      }
+    });
+
+    if (missingCatNames.size > 0) {
+      let maxId = catData.reduce((max, c) => Math.max(max, Number(c.id) || 0), 0);
+      for (const missingName of missingCatNames) {
+        maxId++;
+        const firstProd = prods.find(p => (p.categoryName || '').trim().toLowerCase() === missingName.toLowerCase());
+        const newCatRow = {
+          id: maxId,
+          name: missingName,
+          description: `${missingName} collection`,
+          image_url: firstProd ? firstProd.imageUrl : null,
+          product_count: prods.filter(p => (p.categoryName || '').trim().toLowerCase() === missingName.toLowerCase()).length
+        };
+        supabase.from('categories').insert([newCatRow]).then(() => clearCache()).catch(() => {});
+      }
+    }
+
+    cachedCategories = mapped;
+    cachedCategoriesTime = Date.now();
+    return mapped;
+  })();
 
   if (cachedCategories) {
     // If we have stale data, update it in the background and return it immediately
@@ -92,11 +167,12 @@ async function getCategoriesData() {
   }
 
   try {
-    return await queryWithTimeout(query, 2500);
+    // No cache available - wait up to 8 seconds for real data
+    return await queryWithTimeout(query, 8000);
   } catch (err) {
-    console.warn(`⚠️ Categories query timed out or failed (${err.message}). Serving local fallback data, waking up DB in background...`);
+    console.warn(`⚠️ Categories query timed out or failed (${err.message}). Returning empty until DB wakes up...`);
     query.catch(() => {});
-    return categories;
+    return [];
   }
 }
 
@@ -110,7 +186,7 @@ async function getProductsData() {
   const query = supabase
     .from('products')
     .select('*')
-    .order('id', { ascending: true })
+    .order('id', { ascending: false })
     .then(({ data, error }) => {
       if (error) throw error;
       const mapped = data.map(mapProductFromDb);
@@ -126,11 +202,12 @@ async function getProductsData() {
   }
 
   try {
-    return await queryWithTimeout(query, 2500);
+    // No cache available - wait up to 8 seconds for real data
+    return await queryWithTimeout(query, 8000);
   } catch (err) {
-    console.warn(`⚠️ Products query timed out or failed (${err.message}). Serving local fallback data, waking up DB in background...`);
+    console.warn(`⚠️ Products query timed out or failed (${err.message}). Returning empty until DB wakes up...`);
     query.catch(() => {});
-    return products;
+    return [];
   }
 }
 
@@ -678,6 +755,8 @@ app.put('/api/categories/:id', async (req, res) => {
     clearCache();
     try {
       const dbCategory = mapCategoryToDb(req.body);
+      // Remove product_count from update payload - we manage it ourselves
+      delete dbCategory.product_count;
 
       const { data, error } = await supabase
         .from('categories')
@@ -687,7 +766,15 @@ app.put('/api/categories/:id', async (req, res) => {
         .single();
 
       if (error) throw error;
-      return res.json(mapCategoryFromDb(data));
+
+      // Recompute product counts so the updated category reflects the right count
+      recomputeAndSaveCategoryCounts().catch(() => {});
+
+      // Return with live product count from DB
+      const { data: prods } = await supabase.from('products').select('id').eq('category_id', idStr);
+      const result = mapCategoryFromDb(data);
+      result.productCount = prods ? prods.length : result.productCount;
+      return res.json(result);
     } catch (err) {
       console.warn('⚠️ Database error on category update, falling back to local mock data:', err.message);
     }
@@ -713,10 +800,13 @@ app.get('/api/products', async (req, res) => {
 
   let filtered = [...allProducts];
   if (category) {
-    filtered = filtered.filter(p => 
-      p.categoryName === category || 
-      (p.additionalCategoryNames && p.additionalCategoryNames.includes(category))
-    );
+    const targetCat = String(category).trim().toLowerCase();
+    filtered = filtered.filter(p => {
+      const pCatName = (p.categoryName || '').trim().toLowerCase();
+      if (pCatName === targetCat) return true;
+      if (p.additionalCategoryNames && p.additionalCategoryNames.some(ac => (ac || '').trim().toLowerCase() === targetCat)) return true;
+      return false;
+    });
   }
   if (search) {
     filtered = filtered.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
@@ -804,10 +894,8 @@ app.post('/api/products', async (req, res) => {
 
       if (error) throw error;
 
-      // Increment category count
-      if (hasCategory) {
-        await supabase.rpc('increment_category_count', { row_id: req.body.categoryId });
-      }
+      // Recompute all category product counts from DB (most reliable)
+      recomputeAndSaveCategoryCounts().catch(() => {});
 
       return res.status(201).json(mapProductFromDb(data));
     } catch (err) {
@@ -875,6 +963,10 @@ app.put('/api/products/:id', async (req, res) => {
         .single();
 
       if (error) throw error;
+
+      // Recompute all category product counts from DB
+      recomputeAndSaveCategoryCounts().catch(() => {});
+
       return res.json(mapProductFromDb(data));
     } catch (err) {
       console.warn('⚠️ Database error on product update, falling back to local mock data:', err.message);
@@ -927,9 +1019,8 @@ app.delete('/api/products/:id', async (req, res) => {
 
       if (error) throw error;
 
-      if (prodData?.category_id) {
-        await supabase.rpc('decrement_category_count', { row_id: prodData.category_id });
-      }
+      // Recompute all category product counts from DB
+      recomputeAndSaveCategoryCounts().catch(() => {});
 
       return res.sendStatus(204);
     } catch (err) {
@@ -954,7 +1045,7 @@ app.get('/api/dashboard/stats', async (req, res) => {
       const totalCategories = allCats.length;
       const featuredProducts = allProds.filter(p => p.featured).length;
       const lowStockProducts = allProds.filter(p => p.stock < 5).length;
-      const recentProducts = [...allProds].slice(-5).reverse();
+      const recentProducts = allProds.slice(0, 5);
 
       return res.json({
         totalProducts,
