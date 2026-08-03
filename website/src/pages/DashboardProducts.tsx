@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Pencil, Trash2, X, Check, Package, Upload, Star, Eye, EyeOff, Sparkles } from "lucide-react";
+import { Plus, Pencil, Trash2, X, Check, Package, Upload, Star, Eye, EyeOff, Sparkles, Search } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -73,6 +73,8 @@ export default function DashboardProducts() {
   const [discountPercent, setDiscountPercent] = useState<number>(0);
   const [uploadingMain, setUploadingMain] = useState(false);
   const [uploadingExtra, setUploadingExtra] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>("all");
 
   const { data: products, isLoading } = useListProducts(undefined, {
     query: { queryKey: getListProductsQueryKey() },
@@ -81,6 +83,23 @@ export default function DashboardProducts() {
   const createProduct = useCreateProduct();
   const updateProduct = useUpdateProduct();
   const deleteProduct = useDeleteProduct();
+
+  const filteredProducts = (products ?? []).filter((product: any) => {
+    const query = searchQuery.trim().toLowerCase();
+    const matchesSearch =
+      !query ||
+      (product.name && product.name.toLowerCase().includes(query)) ||
+      (product.categoryName && product.categoryName.toLowerCase().includes(query)) ||
+      (product.material && product.material.toLowerCase().includes(query)) ||
+      (product.description && product.description.toLowerCase().includes(query));
+
+    const matchesCategory =
+      selectedCategoryFilter === "all" ||
+      String(product.categoryId) === selectedCategoryFilter ||
+      ((product as any).additionalCategoryIds || []).map(String).includes(selectedCategoryFilter);
+
+    return matchesSearch && matchesCategory;
+  });
 
   const invalidate = () => {
     try {
@@ -214,18 +233,63 @@ export default function DashboardProducts() {
 
   return (
     <DashboardLayout title="Products Archive" subtitle="Manage your complete product catalog">
-      {/* Header row */}
-      <div className="flex items-center justify-between mb-8">
+      {/* Header row / Toolbar */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-          <p className="text-sm text-muted-foreground">{(products ?? []).length} products total</p>
+          <p className="text-sm font-medium text-muted-foreground">
+            {searchQuery || selectedCategoryFilter !== "all"
+              ? `Showing ${filteredProducts.length} of ${(products ?? []).length} products`
+              : `${(products ?? []).length} products total`}
+          </p>
         </div>
-        <Button
-          onClick={openAdd}
-          className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl px-6 py-3 h-auto text-sm font-semibold shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/25 transition-all"
-          data-testid="button-add-product"
-        >
-          <Plus size={18} /> Add Product
-        </Button>
+
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Search Bar */}
+          <div className="relative flex-1 sm:w-72 min-w-[220px]">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground/60" size={16} />
+            <Input
+              type="text"
+              placeholder="Search products by name, category..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 pr-9 bg-white border border-primary/10 rounded-2xl h-11 text-sm shadow-sm focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all placeholder:text-muted-foreground/40"
+              data-testid="input-search-products"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-1 transition-colors"
+                title="Clear search"
+              >
+                <X size={14} />
+              </button>
+            )}
+          </div>
+
+          {/* Category Filter */}
+          <Select value={selectedCategoryFilter} onValueChange={setSelectedCategoryFilter}>
+            <SelectTrigger className="w-[170px] bg-white border border-primary/10 rounded-2xl h-11 text-sm shadow-sm shrink-0" data-testid="select-category-filter">
+              <SelectValue placeholder="All Categories" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Categories</SelectItem>
+              {(categories ?? []).map((cat: any) => (
+                <SelectItem key={cat.id} value={String(cat.id)}>
+                  {cat.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Button
+            onClick={openAdd}
+            className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl px-6 py-3 h-11 text-sm font-semibold shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/25 transition-all shrink-0"
+            data-testid="button-add-product"
+          >
+            <Plus size={18} /> Add Product
+          </Button>
+        </div>
       </div>
 
       {/* Add/Edit Form */}
@@ -544,6 +608,24 @@ export default function DashboardProducts() {
                 <Plus size={16} /> Add Product
               </Button>
             </div>
+          ) : filteredProducts.length === 0 ? (
+            <div className="text-center py-20 text-muted-foreground">
+              <Search size={44} className="mx-auto mb-3 opacity-30 text-primary" />
+              <p className="font-serif text-xl mb-1 text-foreground">No matching products found</p>
+              <p className="text-sm mb-5 text-muted-foreground">
+                No products match "{searchQuery}"{selectedCategoryFilter !== "all" ? ` in selected category` : ""}.
+              </p>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setSearchQuery("");
+                  setSelectedCategoryFilter("all");
+                }}
+                className="gap-2 rounded-2xl border-primary/20 hover:bg-primary/5 text-xs font-semibold px-5 py-2.5 h-auto"
+              >
+                Clear Search & Filters
+              </Button>
+            </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -558,7 +640,7 @@ export default function DashboardProducts() {
                   </tr>
                 </thead>
                 <tbody>
-                  {[...(products ?? [])].reverse().map((product: any, idx: number) => (
+                  {[...filteredProducts].reverse().map((product: any, idx: number) => (
                     <motion.tr
                       key={product.id}
                       initial={{ opacity: 0, y: 6 }}
