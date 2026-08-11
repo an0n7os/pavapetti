@@ -16,11 +16,13 @@ import Dashboard from "@/pages/Dashboard";
 import DashboardProducts from "@/pages/DashboardProducts";
 import DashboardCategories from "@/pages/DashboardCategories";
 import DashboardBackup from "@/pages/DashboardBackup";
+import DashboardArtForms from "@/pages/DashboardArtForms";
 import Wishlist from "@/pages/Wishlist";
 
 import Checkout from "@/pages/Checkout";
 import MobileNav from "@/components/MobileNav";
 import Bidding from "@/pages/Bidding";
+import ArtForms from "@/pages/ArtForms";
 import { useState, useEffect } from "react";
 import PavapettiLogo from "./components/PavapettiLogo";
 
@@ -482,6 +484,9 @@ function Router() {
         <Route path="/dashboard/categories">
           <AdminGate><PageWrapper><DashboardCategories /></PageWrapper></AdminGate>
         </Route>
+        <Route path="/dashboard/art-forms">
+          <AdminGate><PageWrapper><DashboardArtForms /></PageWrapper></AdminGate>
+        </Route>
         <Route path="/dashboard/backup">
           <AdminGate><PageWrapper><DashboardBackup /></PageWrapper></AdminGate>
         </Route>
@@ -492,6 +497,9 @@ function Router() {
         </Route>
         <Route path="/bidding">
           <PageWrapper><Bidding /></PageWrapper>
+        </Route>
+        <Route path="/art-forms">
+          <PageWrapper><ArtForms /></PageWrapper>
         </Route>
         <Route>
           <PageWrapper><NotFound /></PageWrapper>

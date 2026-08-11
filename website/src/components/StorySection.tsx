@@ -77,10 +77,10 @@ export default function StorySection() {
               className="space-y-6 text-muted-foreground font-light leading-relaxed text-lg max-w-lg"
             >
               <p>
-                Every artifact within the Pavapetti Heritage Artifacts archives is more than a possession—it is a vessel for Kerala's ancient spirit. From the primordial resonance of hand-cast bell metal to the rhythmic precision of loom-woven heirlooms, we safeguard the <span className="italic text-primary/80 font-medium">Samskaram</span> of a thousand-year-old civilization.
+                Every item at Pavapetti Heritage Artifacts is carefully handcrafted by skilled artisans across Kerala. From authentic brass lamps and Nilavilakku to wooden caskets, wall decor, and cultural art pieces, we bring traditional Kerala craftsmanship directly to your home.
               </p>
               <p>
-                Our curators seek the sacred workshops tucked away in the emerald valleys of the Malabar Coast, handpicking pieces that represent the zenith of <span className="italic text-primary/80 font-medium">Parampara</span>. We do not merely offer objects; we curate the bridge between the timeless wisdom of the past and the soul of the modern home.
+                We partner directly with local master craftspeople, selecting high-quality products that preserve Kerala's rich artistic traditions while fitting beautifully into modern homes.
               </p>
             </motion.div>
 

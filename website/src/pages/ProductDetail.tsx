@@ -438,7 +438,7 @@ export default function ProductDetail() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.4 }}
-                className="text-muted-foreground/80 font-serif font-light leading-relaxed text-sm mb-6 border-l border-[#c5a880]/20 pl-4 italic"
+                className="text-foreground/90 font-sans font-normal leading-relaxed text-sm sm:text-base mb-6 border-l-2 border-primary/30 pl-4"
               >
                 {product.description}
               </motion.p>

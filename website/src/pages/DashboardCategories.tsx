@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Grid3X3, X, Check, Trash2, Upload, Pencil } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -46,6 +46,20 @@ export default function DashboardCategories() {
   const [editCategory, setEditCategory] = useState<Category | null>(null);
   const [passcode, setPasscode] = useState("");
   const [uploadingImg, setUploadingImg] = useState(false);
+
+  // Lock background window scroll when any modal is open
+  const isModalOpen = showForm || editCategory !== null || deleteId !== null;
+
+  useEffect(() => {
+    if (isModalOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isModalOpen]);
 
   const { data: categories, isLoading } = useListCategories({
     query: { queryKey: getListCategoriesQueryKey() },

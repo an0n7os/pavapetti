@@ -16,46 +16,48 @@ import {
 } from "@workspace/api-client-react";
 
 const MARQUEE_ITEMS = [
-  "Tharavadu Royal Heirlooms", 
-  "Authentic Aranmula Kannadi", 
-  "Teakwood Nettoor Petti", 
-  "Hand-cast Nilavilakku", 
-  "Sacred Temple Art", 
-  "Bespoke Kathakali Vesham", 
-  "Ancient Malabar Murals", 
-  "Fine Kasavu Weaves", 
-  "Vedic Craftsmanship", 
-  "Timeless Legacies"
+  "Wall Decor",
+  "Statues & Idols",
+  "Hanging Decor",
+  "Keychains",
+  "Lamps & Pooja Decor",
+  "Jewellery & Spiritual Accessories",
+  "Leather Category",
+  "Car Statues",
+  "Money Boxes",
+  "Key Holders",
+  "Miniatures & Mini Chenda",
+  "Magnets"
 ];
 
 const HERO_SLIDES = [
   {
     src: "/hero-dance-v2.webp",
     label: "Kathakali Vesham",
-    tag: "Divine Dramaturgy",
-    headline: ["Echoes", "of the", "Sacred"],
-    sub: "Kathakali masks and dance artifacts — preserving the primordial rhythms and sacred colors of Kerala's soul.",
+    tag: "Traditional Performing Art",
+    headline: ["Authentic", "Kathakali", "Handicrafts"],
+    sub: "Handcrafted Kathakali masks, wall decor, and collectibles crafted by master Kerala artisans.",
+  },
+  {
+    src: "/art-forms/tholpavakoothu.png",
+    label: "Tholpavakoothu",
+    tag: "Traditional Shadow Puppetry",
+    headline: ["Authentic", "Tholpavakoothu", "Puppetry"],
+    sub: "Traditional leather shadow puppetry art forms and handcrafted puppets from master Kerala puppeteers.",
   },
   {
     src: "/hero-mural-v2.webp",
-    label: "Sacred Mural Art",
-    tag: "Temple Sanctum Art",
-    headline: ["Whispers", "of the", "Sanctum"],
-    sub: "Ancient Kerala mural paintings — handcrafted using natural pigments, breathing life into stories of a thousand years.",
-  },
-  {
-    src: "/hero-box-v2.webp",
-    label: "Nettoor Petti",
-    tag: "Ancestral Caskets",
-    headline: ["Legacy", "of the", "Ancestors"],
-    sub: "The legendary jewellery caskets of Kerala — handcrafted rosewood boxes, each a silent witness to a royal past.",
+    label: "Kerala Mural Art",
+    tag: "Traditional Wall Art",
+    headline: ["Handmade", "Kerala Mural", "Paintings"],
+    sub: "Handpainted traditional Kerala murals made with rich natural colors for home and sacred spaces.",
   },
   {
     src: "/hero-brass-v2.webp",
-    label: "Sacred Brass Lamps",
-    tag: "Eternal Light",
-    headline: ["Glow", "of the", "Parampara"],
-    sub: "Hand-cast Nilavilakku and brass lamps — carrying the warmth of ancient devotion across generations.",
+    label: "Brass Lamps & Pooja Decor",
+    tag: "Brassware Collection",
+    headline: ["Hand-Cast", "Nilavilakku &", "Pooja Items"],
+    sub: "Traditional brass lamps, Nilavilakku, and pooja decor items for home ceremonies and gifting.",
   },
 ];
 
@@ -75,7 +77,17 @@ const TESTIMONIALS = [
 ];
 
 function MarqueeBand() {
-  const items = [...MARQUEE_ITEMS, ...MARQUEE_ITEMS, ...MARQUEE_ITEMS];
+  const { data: categories } = useListCategories();
+
+  const categoryNames = React.useMemo(() => {
+    if (Array.isArray(categories) && categories.length > 0) {
+      return categories.map((c: any) => c.name);
+    }
+    return MARQUEE_ITEMS;
+  }, [categories]);
+
+  const items = [...categoryNames, ...categoryNames, ...categoryNames];
+
   return (
     <div className="overflow-hidden bg-secondary py-3 select-none w-full">
       <div className="flex whitespace-nowrap" style={{ animation: "marquee 32s linear infinite" }}>
@@ -368,9 +380,9 @@ export default function Home() {
               viewport={{ once: true }}
               transition={{ duration: 1 }}
             >
-              <span className="text-primary text-[10px] font-black tracking-[0.5em] uppercase mb-6 block">Our Essence</span>
+              <span className="text-primary text-[10px] font-black tracking-[0.5em] uppercase mb-6 block">Our Craft & Heritage</span>
               <h2 className="font-serif text-5xl font-light leading-tight text-foreground">
-                Curators of the <span className="italic">Malabar Legacy</span>
+                Authentic <span className="italic">Kerala Crafts</span>
               </h2>
             </motion.div>
             <motion.div
@@ -381,10 +393,10 @@ export default function Home() {
               className="space-y-6"
             >
               <p className="text-xl text-muted-foreground font-light leading-relaxed">
-                Pavapetti Heritage Artifacts is an editorial boutique dedicated to the preservation of Kerala's sacred artistic traditions. We serve as a direct bridge between master artisans and global collectors.
+                Pavapetti Heritage Artifacts brings authentic handcrafted Kerala products, traditional brassware, wall decor, and art form bookings directly from master artisans to your home.
               </p>
               <p className="text-sm text-muted-foreground/60 uppercase tracking-widest font-bold">
-                Authentic Handcrafts • Sacred Artifacts • Timeless Mural Art
+                Authentic Handcrafts • Brass & Pooja Decor • Performing Arts
               </p>
             </motion.div>
           </div>
@@ -395,10 +407,10 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
             {[
-              { icon: <ShieldCheck className="text-primary" size={32} />, title: "Authentic Heritage", desc: "100% Original Kerala Artifacts" },
-              { icon: <Sparkles className="text-primary" size={32} />, title: "Handcrafted", desc: "Made by Master Artisans" },
-              { icon: <Globe className="text-primary" size={32} />, title: "Global Shipping", desc: "Securely delivered worldwide" },
-              { icon: <Heart className="text-primary" size={32} />, title: "Eco-Friendly", desc: "Sustainably sourced materials" }
+              { icon: <ShieldCheck className="text-primary" size={32} />, title: "Authentic Heritage", desc: "100% Original Kerala Handcrafts" },
+              { icon: <Sparkles className="text-primary" size={32} />, title: "Handcrafted Quality", desc: "Made by Master Artisans" },
+              { icon: <Globe className="text-primary" size={32} />, title: "Global Shipping", desc: "Delivered safely worldwide" },
+              { icon: <Heart className="text-primary" size={32} />, title: "Sustainably Sourced", desc: "Natural & traditional materials" }
             ].map((item, i) => (
               <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }} className="flex flex-col items-center text-center space-y-4">
                 <div className="w-16 h-16 rounded-3xl bg-primary/5 flex items-center justify-center mb-2">{item.icon}</div>
@@ -415,10 +427,10 @@ export default function Home() {
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-12 md:mb-16">
           <div>
             <p className="text-primary text-[10px] tracking-[0.5em] uppercase font-black mb-3">Curated for you</p>
-            <h2 className="font-serif text-4xl md:text-5xl font-light text-foreground">Featured <span className="italic text-primary">Masterpieces</span></h2>
+            <h2 className="font-serif text-4xl md:text-5xl font-light text-foreground">Featured <span className="italic text-primary">Products</span></h2>
           </div>
           <Link href="/products?featured=true" className="group flex items-center gap-3 text-[10px] md:text-[11px] font-black tracking-[0.3em] md:tracking-[0.4em] uppercase text-foreground/40 hover:text-primary transition-all duration-500 self-start sm:self-auto">
-            Explore All Artifacts
+            Explore All Products
             <div className="w-8 md:w-12 h-px bg-foreground/10 group-hover:bg-primary group-hover:w-20 transition-all duration-500" />
           </Link>
         </div>
@@ -431,8 +443,8 @@ export default function Home() {
           </div>
         ) : (Array.isArray(featured) ? featured : []).length === 0 ? (
           <div className="text-center py-20 bg-secondary/30 rounded-[3rem] border border-dashed border-primary/10">
-            <p className="font-serif text-2xl text-muted-foreground mb-2 italic">Awaiting Curation</p>
-            <p className="text-xs uppercase tracking-widest opacity-40">Artifacts are being selected for the gallery</p>
+            <p className="font-serif text-2xl text-muted-foreground mb-2 italic">Awaiting Products</p>
+            <p className="text-xs uppercase tracking-widest opacity-40">Products are being selected for display</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-8">
@@ -445,11 +457,11 @@ export default function Home() {
 
       <section className="py-16 md:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <p className="text-primary text-[10px] tracking-[0.5em] uppercase font-bold mb-4">Curated Collections</p>
-          <h2 className="font-serif text-5xl font-light text-foreground">Curated <span className="italic">Parampara</span></h2>
+          <p className="text-primary text-[10px] tracking-[0.5em] uppercase font-bold mb-4">Explore By Category</p>
+          <h2 className="font-serif text-5xl font-light text-foreground">Featured <span className="italic">Categories</span></h2>
         </div>
         {catLoading ? <div className="grid grid-cols-2 md:grid-cols-4 gap-8">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="aspect-[3/4] bg-muted animate-pulse" />)}</div> : (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-10">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-10 items-stretch">
             {(Array.isArray(categories) ? categories : []).slice(0, 4).map((cat: any, i: number) => {
               const ROMAN_NUMERALS = ["I", "II", "III", "IV"];
               return (
@@ -459,10 +471,10 @@ export default function Home() {
                   whileInView={{ opacity: 1, y: 0, scale: 1 }} 
                   viewport={{ once: true, margin: "-100px" }} 
                   transition={{ delay: i * 0.15, duration: 1, ease: [0.16, 1, 0.3, 1] }} 
-                  className="group relative"
+                  className="group relative flex flex-col h-full"
                 >
-                  <Link href={`/products?category=${encodeURIComponent(cat.name)}`}>
-                    <div className="relative aspect-[4/5] overflow-hidden bg-white mb-6 shadow-[0_20px_50px_rgba(0,0,0,0.06)] rounded-[2.5rem] border border-primary/5 group-hover:border-primary/15 transition-all duration-750">
+                  <Link href={`/products?category=${encodeURIComponent(cat.name)}`} className="flex flex-col h-full">
+                    <div className="relative aspect-[4/5] overflow-hidden bg-white mb-5 shadow-[0_20px_50px_rgba(0,0,0,0.06)] rounded-[2.5rem] border border-primary/5 group-hover:border-primary/15 transition-all duration-750 shrink-0">
                       <img 
                         src={CATEGORY_OVERRIDE[cat.name] || cat.imageUrl} 
                         alt={cat.name} 
@@ -474,15 +486,13 @@ export default function Home() {
                       </div>
                       <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-all duration-500" />
                     </div>
-                    <div className="text-center space-y-2">
-                      <h3 className="font-serif text-2xl font-light text-foreground group-hover:text-primary transition-colors duration-500">
+                    <div className="text-center flex-1 flex flex-col justify-start px-2">
+                      <h3 className="font-serif text-xl sm:text-2xl font-light text-foreground group-hover:text-primary transition-colors duration-500 min-h-[3.5rem] flex items-center justify-center leading-tight">
                         {cat.name}
                       </h3>
-                      {cat.description && (
-                        <p className="text-[10px] text-muted-foreground/75 font-medium leading-relaxed tracking-wider uppercase max-w-[200px] mx-auto opacity-70 group-hover:opacity-100 transition-opacity duration-500">
-                          {cat.description.split(",")[0]}
-                        </p>
-                      )}
+                      <p className="text-xs text-muted-foreground/75 font-light leading-relaxed max-w-[220px] mx-auto line-clamp-2 min-h-[2.5rem] flex items-center justify-center mt-1">
+                        {cat.description || "Authentic Kerala handcrafted collection"}
+                      </p>
                     </div>
                   </Link>
                 </motion.div>
@@ -500,65 +510,83 @@ export default function Home() {
 
 
 
-      {/* ── Heritage Gallery — Ultra Premium Grid ── */}
-      <section className="py-20 md:py-32 bg-white w-full overflow-hidden">
-        <div className="max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16 w-full">
-          <div className="flex flex-col items-center text-center mb-20">
-            <motion.span 
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-primary text-[10px] font-black tracking-[0.5em] uppercase mb-4"
-            >
-              The Curated Gallery
-            </motion.span>
-            <motion.h2 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="font-serif text-5xl md:text-7xl font-light text-foreground"
-            >
-              Captured <span className="italic">Heritage</span>
-            </motion.h2>
+
+
+      {/* ── Kerala Performing Arts Spotlight & WhatsApp Booking Banner ── */}
+      <section className="py-20 md:py-28 bg-[#0a0a09] text-white relative overflow-hidden border-t border-b border-white/10">
+        <div className="max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16 w-full relative z-10">
+          <div className="flex flex-col md:flex-row items-end justify-between gap-6 mb-16">
+            <div className="space-y-3">
+              <span className="text-primary text-[10px] font-black tracking-[0.5em] uppercase block">
+                Traditional Performing Arts &amp; Booking · കലാസന്ധ്യ
+              </span>
+              <h2 className="font-serif text-4xl md:text-6xl font-light text-[#f8f5ee]">
+                Experience Kerala’s <span className="italic text-primary font-medium">Sacred Stage</span>
+              </h2>
+              <p className="text-white/60 text-sm md:text-base font-serif italic max-w-2xl">
+                Book authentic traditional troupes for Kathakali, Tholpavakoothu, Mohiniyattam, Ottamthullal, Mizhavu Melam, Bharatanatyam, Chakyar Koothu, and Kuchipudi recitals directly via WhatsApp.
+              </p>
+            </div>
+            <Link href="/art-forms">
+              <button className="px-8 py-4 rounded-2xl bg-primary text-white font-bold text-xs uppercase tracking-[0.2em] hover:bg-primary/90 transition-all hover:scale-105 shadow-xl shadow-primary/20 shrink-0">
+                Explore All Art Forms
+              </button>
+            </Link>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 w-full">
-            {/* Main Featured Piece */}
-            <motion.div 
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="col-span-2 lg:col-span-2 lg:row-span-2 relative group overflow-hidden rounded-[2rem] md:rounded-[2.5rem] shadow-2xl aspect-[4/3] md:aspect-[4/5] lg:aspect-auto border border-primary/5 hover:border-primary/20 transition-all duration-700"
-            >
-              <img src="/netipattam.webp" alt="Netipattam" className="w-full h-full object-cover transition-transform duration-[2500ms] ease-out group-hover:scale-105" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent transition-opacity duration-700 group-hover:from-black/75" />
-              <div className="absolute bottom-6 left-6 md:bottom-10 md:left-10 text-white z-10">
-                <span className="text-[8px] md:text-[10px] font-black tracking-[0.3em] md:tracking-[0.4em] uppercase text-primary/90 mb-2 block">The Golden Ornament</span>
-                <h4 className="font-serif text-2xl md:text-4xl font-light tracking-tight text-[#FFF8E7]">Netipattam</h4>
-              </div>
-            </motion.div>
-
-            {/* Smaller Gallery Pieces */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { img: "/aranmula-mirror.webp", title: "Aranmula Kannadi", tag: "The Metal Mirror" },
-              { img: "/elephant_head.webp", title: "Temple Artifacts", tag: "Sacred Decor" },
-              { img: "/kasavu-textile.webp", title: "Heirloom Kasavu", tag: "Traditional Weaves" },
-              { img: "/hero-box-v2.webp", title: "Nettoor Petti", tag: "Royal Caskets" }
-            ].map((item, i) => (
-              <motion.div 
-                key={i}
+              {
+                title: "Tholpavakoothu",
+                malayalam: "തോൽപാവകൂത്ത്",
+                tag: "Shadow Puppetry",
+                desc: "Ancient 2000-year-old temple shadow puppetry lit by coconut oil lamps.",
+                img: "https://images.unsplash.com/photo-1578925518470-4def7a0f08bb?q=80&w=800&auto=format&fit=crop"
+              },
+              {
+                title: "Kathakali",
+                malayalam: "കഥകളി",
+                tag: "Classical Dance Drama",
+                desc: "World-famous dance-drama with grand face makeup, mudras & Chenda drums.",
+                img: "https://images.unsplash.com/photo-1609137144813-7d9921338f24?q=80&w=800&auto=format&fit=crop"
+              },
+              {
+                title: "Mohiniyattam",
+                malayalam: "മോഹിനിയാട്ടം",
+                tag: "Dance of Enchantress",
+                desc: "Graceful classical solo dance in traditional white and gold Kerala Kasavu silk.",
+                img: "https://images.unsplash.com/photo-1547153760-18fc86324498?q=80&w=800&auto=format&fit=crop"
+              }
+            ].map((art, i) => (
+              <motion.div
+                key={art.title}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="relative group overflow-hidden rounded-[1.5rem] md:rounded-[2rem] shadow-lg hover:shadow-xl aspect-[4/5] border border-primary/5 hover:border-primary/20 transition-all duration-700 bg-[#f9f7f4]"
+                className="group relative rounded-[2rem] overflow-hidden bg-[#161513] border border-white/10 hover:border-primary/40 transition-all duration-500 flex flex-col justify-between"
               >
-                <img src={item.img} alt={item.title} className="w-full h-full object-cover transition-transform duration-[2500ms] ease-out group-hover:scale-105" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent opacity-90 group-hover:opacity-100 transition-opacity duration-700" />
-                <div className="absolute bottom-4 left-4 md:bottom-8 md:left-8 text-white z-10 translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
-                  <p className="text-[8px] md:text-[9px] font-black tracking-[0.2em] md:tracking-[0.3em] uppercase text-primary/90 mb-1 md:mb-2">{item.tag}</p>
-                  <h4 className="font-serif text-sm md:text-xl font-light tracking-tight text-[#FFF8E7] leading-tight">{item.title}</h4>
+                <div className="aspect-[16/10] overflow-hidden relative">
+                  <img src={art.img} alt={art.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-85 group-hover:opacity-100" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#161513] via-transparent to-transparent" />
+                  <span className="absolute top-4 left-4 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md text-primary text-[10px] font-black uppercase tracking-wider border border-white/10">
+                    {art.tag}
+                  </span>
+                </div>
+                <div className="p-6 space-y-4">
+                  <div>
+                    <h3 className="font-serif text-2xl text-white font-medium">
+                      {art.title} <span className="text-primary font-sans text-sm block md:inline">({art.malayalam})</span>
+                    </h3>
+                    <p className="text-xs text-white/60 font-serif italic mt-2">
+                      "{art.desc}"
+                    </p>
+                  </div>
+                  <Link href="/art-forms" className="block pt-2">
+                    <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary group-hover:text-white transition-colors flex items-center gap-2">
+                      Book Performers <ArrowRight size={14} />
+                    </span>
+                  </Link>
                 </div>
               </motion.div>
             ))}
@@ -654,8 +682,8 @@ export default function Home() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent opacity-80" />
                 
                 <div className="absolute bottom-8 left-8 text-white z-10">
-                  <span className="text-[8px] font-black tracking-[0.5em] uppercase text-primary mb-2 block">The Archives Sanctum</span>
-                  <p className="font-serif text-lg italic text-[#FFF8E7]">"Wisdom is preserved in silence."</p>
+                  <span className="text-[8px] font-black tracking-[0.5em] uppercase text-primary mb-2 block">Handcrafted In Kerala</span>
+                  <p className="font-serif text-lg italic text-[#FFF8E7]">"Authentic Quality & Direct Support"</p>
                 </div>
               </div>
             </motion.div>
@@ -663,23 +691,23 @@ export default function Home() {
             {/* Narrative Column */}
             <motion.div
               initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
               className="lg:col-span-7 space-y-10 text-left"
             >
               <div className="space-y-4">
-                <span className="text-primary text-[10px] font-black tracking-[0.6em] uppercase block">Private Curatorial Advisory</span>
+                <span className="text-primary text-[10px] font-black tracking-[0.6em] uppercase block">Need Help Choosing?</span>
                 <h3 className="font-serif text-4xl md:text-6xl font-light text-[#FFF8E7] leading-tight">
-                  Request Curatorial <br />
-                  <span className="italic text-primary">Assistance</span>
+                  Direct WhatsApp <br />
+                  <span className="italic text-primary">Support &amp; Assistance</span>
                 </h3>
                 {/* Gold scroll-drawn divider */}
                 <div className="h-[1px] w-24 bg-gradient-to-r from-primary to-transparent mt-6" />
               </div>
               
               <p className="text-white/60 text-base md:text-lg font-light leading-relaxed max-w-xl">
-                Our master curators are available to guide you through the sacred geometries, provenance, and material lineages of our ancient collections. Connect directly via WhatsApp to receive dedicated, private consultation.
+                Have questions about our handcrafted products, brassware sizes, custom items, or bulk orders? Connect directly with our team on WhatsApp for instant guidance and friendly support.
               </p>
               
               <div className="pt-4">
@@ -691,7 +719,7 @@ export default function Home() {
                     className="inline-flex items-center gap-4 bg-white text-[#0a0a0a] font-black px-10 py-5 rounded-full text-[11px] tracking-[0.3em] uppercase shadow-2xl hover:bg-primary hover:text-white hover:shadow-primary/20 transition-all duration-500 outline-none"
                   >
                     <MessageCircle size={16} className="text-primary group-hover:text-white" />
-                    Speak with a Curator
+                    Chat on WhatsApp
                   </a>
                 </Magnetic>
               </div>

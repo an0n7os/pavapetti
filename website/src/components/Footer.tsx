@@ -90,10 +90,10 @@ export default function Footer() {
             <ul className="space-y-4 text-[11px] font-black tracking-[0.25em] uppercase text-white/40">
               {[
                 { href: "/products", label: "All Artifacts" },
+                { href: "/art-forms", label: "Art Forms & Bookings" },
                 { href: "/products?featured=true", label: "Featured Collection" },
                 { href: "/products?category=Pooja Category", label: "Ritual" },
                 { href: "/products?category=Elephant Heritage", label: "Heritage" },
-                { href: "/products?category=Miniatures %26 Mini Chenda", label: "Miniatures" },
               ].map(({ href, label }) => (
                 <li key={href}>
                   <Link href={href} className="hover:text-primary hover:opacity-100 transition-all flex items-center gap-3 group">

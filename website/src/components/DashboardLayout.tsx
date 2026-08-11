@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { LayoutDashboard, Package, Grid3X3, Home, ChevronRight, Database } from "lucide-react";
+import { LayoutDashboard, Package, Grid3X3, Home, ChevronRight, Database, Sparkles } from "lucide-react";
 import PavapettiLogo from "./PavapettiLogo";
 
 interface DashboardLayoutProps {
@@ -12,6 +12,7 @@ const navItems = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
   { href: "/dashboard/products", label: "Products Archive", icon: Package },
   { href: "/dashboard/categories", label: "Categories", icon: Grid3X3 },
+  { href: "/dashboard/art-forms", label: "Art Forms", icon: Sparkles },
   { href: "/dashboard/backup", label: "Backup & Restore", icon: Database },
 ];
 

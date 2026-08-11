@@ -12,50 +12,21 @@ import Magnetic from "@/components/Magnetic";
 import { useListProducts, useListCategories, getListProductsQueryKey, getListCategoriesQueryKey } from "@workspace/api-client-react";
 
 export default function Products() {
-  const [currentSearchStr, setCurrentSearchStr] = useState(
-    () => typeof window !== "undefined" ? window.location.search : ""
-  );
+  const [location, setLocation] = useLocation();
 
-  useEffect(() => {
-    const handleUrlChange = () => {
-      setCurrentSearchStr(window.location.search);
-    };
-
-    window.addEventListener("popstate", handleUrlChange);
-
-    const originalPushState = history.pushState;
-    const originalReplaceState = history.replaceState;
-
-    history.pushState = function (...args) {
-      originalPushState.apply(this, args);
-      handleUrlChange();
-    };
-
-    history.replaceState = function (...args) {
-      originalReplaceState.apply(this, args);
-      handleUrlChange();
-    };
-
-    return () => {
-      window.removeEventListener("popstate", handleUrlChange);
-      history.pushState = originalPushState;
-      history.replaceState = originalReplaceState;
-    };
-  }, []);
-
-  const searchParams = new URLSearchParams(currentSearchStr);
+  const searchParams = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
   const initialCategory = searchParams.get("category") ?? "";
   const initialSearch = searchParams.get("search") ?? "";
   const initialFeatured = searchParams.get("featured") === "true" ? true : undefined;
 
   const [search, setSearch] = useState(initialSearch);
   const [activeCategory, setActiveCategory] = useState(initialCategory);
-  const [featuredOnly, setFeaturedOnly] = useState(initialFeatured);
+  const [featuredOnly, setFeaturedOnly] = useState<boolean | undefined>(initialFeatured);
   const [inputValue, setInputValue] = useState(initialSearch);
 
-  // Sync state with URL search parameters on location or search query changes
+  // Sync state when URL location changes
   useEffect(() => {
-    const params = new URLSearchParams(currentSearchStr);
+    const params = new URLSearchParams(window.location.search);
     const category = params.get("category") ?? "";
     const searchVal = params.get("search") ?? "";
     const featured = params.get("featured") === "true" ? true : undefined;
@@ -64,9 +35,9 @@ export default function Products() {
     setSearch(searchVal);
     setInputValue(searchVal);
     setFeaturedOnly(featured);
-  }, [currentSearchStr]);
+  }, [location]);
 
-  // Sync state changes back to the browser URL for deep-linking & smooth browser navigation
+  // Sync state changes back to the browser URL
   useEffect(() => {
     const params = new URLSearchParams();
     if (activeCategory) params.set("category", activeCategory);
@@ -77,11 +48,9 @@ export default function Products() {
     const currentSearch = window.location.search.replace(/^\?/, "");
     if (newSearch !== currentSearch) {
       const newUrl = window.location.pathname + (newSearch ? `?${newSearch}` : "");
-      window.history.replaceState(null, "", newUrl);
+      setLocation(newUrl);
     }
-  }, [activeCategory, search, featuredOnly]);
-
-
+  }, [activeCategory, search, featuredOnly, setLocation]);
 
   const { data: categories, isSuccess: isCategoriesSuccess } = useListCategories({
     query: {
@@ -95,11 +64,13 @@ export default function Products() {
       }
     }
   });
+
   const params = {
     ...(activeCategory ? { category: activeCategory } : {}),
     ...(search ? { search } : {}),
     ...(featuredOnly ? { featured: featuredOnly } : {}),
   };
+
   const { data: products, isLoading, isSuccess } = useListProducts(
     Object.keys(params).length > 0 ? params : undefined,
     {
@@ -148,6 +119,7 @@ export default function Products() {
     setInputValue("");
     setActiveCategory("");
     setFeaturedOnly(undefined);
+    setLocation(window.location.pathname);
   };
 
   const hasFilters = search || activeCategory || featuredOnly;

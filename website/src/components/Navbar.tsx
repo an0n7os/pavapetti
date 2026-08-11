@@ -42,15 +42,17 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Lock body scroll when menu is open
+  // Lock body scroll when mobile menu or categories modal is open
   useEffect(() => {
-    if (menuOpen) {
+    if (menuOpen || catOpen) {
       document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = "unset";
+      document.body.style.overflow = "";
     }
-    return () => { document.body.style.overflow = "unset"; };
-  }, [menuOpen]);
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [menuOpen, catOpen]);
 
   useEffect(() => {
     if (searchOpen) searchRef.current?.focus();
@@ -62,6 +64,7 @@ export default function Navbar() {
   const NAV_LINKS = [
     { href: "/", label: "Home" },
     { href: "/products", label: "Shop" },
+    { href: "/art-forms", label: "Art Forms" },
     { href: "/bidding", label: "Auctions" },
   ];
 
@@ -126,13 +129,14 @@ export default function Navbar() {
                 {/* Immersive Category Overlay */}
                 <AnimatePresence>
                   {catOpen && (
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[95vw] max-w-5xl z-[100] pointer-events-auto">
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[95vw] max-w-5xl z-[100] pointer-events-auto" data-lenis-prevent>
                       <motion.div 
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 10 }}
                         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                        className="bg-white border border-border/50 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.18)] rounded-[2.5rem] overflow-y-auto max-h-[85vh] p-8 md:p-10"
+                        className="bg-white border border-border/50 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.18)] rounded-[2.5rem] overflow-y-auto max-h-[85vh] p-8 md:p-10 overscroll-contain"
+                        data-lenis-prevent
                       >
                         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
                           {(categories ?? []).map((cat: any, i: number) => (
@@ -160,7 +164,7 @@ export default function Navbar() {
                                     {cat.name}
                                   </span>
                                   {cat.description && (
-                                    <p className="text-[9px] text-muted-foreground/70 line-clamp-2 mt-1 leading-relaxed max-w-[130px] mx-auto group-hover:text-muted-foreground transition-colors font-medium">
+                                    <p className="text-[10px] text-muted-foreground font-normal line-clamp-2 mt-1 leading-relaxed max-w-[140px] mx-auto">
                                       {cat.description}
                                     </p>
                                   )}
@@ -172,8 +176,8 @@ export default function Navbar() {
                         
                         <div className="mt-10 pt-8 border-t border-border/40 flex items-center justify-between">
                           <div className="max-w-md">
-                            <p className="text-[11px] text-muted-foreground/80 italic font-serif leading-relaxed">
-                              Pavapetti Heritage Artifacts is an editorial boutique dedicated to the preservation of Kerala's sacred artistic traditions. We serve as a direct bridge between master artisans and global collectors.
+                            <p className="text-xs text-muted-foreground font-normal leading-relaxed">
+                              Pavapetti Heritage Artifacts offers authentic Kerala handcrafts, traditional brassware, wall decor, and performing art bookings directly from master artisans.
                             </p>
                           </div>
                           <Link href="/products" className="text-[10px] font-bold tracking-[0.25em] uppercase text-primary hover:text-primary/80 transition-colors border-b border-primary/20 pb-0.5 hover:border-primary">
