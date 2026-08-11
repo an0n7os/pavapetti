@@ -478,7 +478,7 @@ export default function Home() {
                       <img 
                         src={CATEGORY_OVERRIDE[cat.name] || cat.imageUrl} 
                         alt={cat.name} 
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[2000ms] ease-out" 
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 ease-out" 
                       />
                       {/* Floating Royal Roman Badge */}
                       <div className="absolute top-6 right-6 w-8 h-8 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center border border-white/40 shadow-sm transition-transform duration-500 group-hover:scale-110">
@@ -523,7 +523,7 @@ export default function Home() {
               <h2 className="font-serif text-4xl md:text-6xl font-light text-[#f8f5ee]">
                 Experience Kerala’s <span className="italic text-primary font-medium">Sacred Stage</span>
               </h2>
-              <p className="text-white/60 text-sm md:text-base font-serif italic max-w-2xl">
+              <p className="text-white/80 text-sm md:text-base font-sans font-normal leading-relaxed max-w-2xl">
                 Book authentic traditional troupes for Kathakali, Tholpavakoothu, Mohiniyattam, Ottamthullal, Mizhavu Melam, Bharatanatyam, Chakyar Koothu, and Kuchipudi recitals directly via WhatsApp.
               </p>
             </div>
@@ -578,8 +578,8 @@ export default function Home() {
                     <h3 className="font-serif text-2xl text-white font-medium">
                       {art.title} <span className="text-primary font-sans text-sm block md:inline">({art.malayalam})</span>
                     </h3>
-                    <p className="text-xs text-white/60 font-serif italic mt-2">
-                      "{art.desc}"
+                    <p className="text-xs text-white/75 font-sans font-normal mt-2 leading-relaxed">
+                      {art.desc}
                     </p>
                   </div>
                   <Link href="/art-forms" className="block pt-2">
@@ -677,7 +677,7 @@ export default function Home() {
                 <img 
                   src="/hero-brass-v2.webp" 
                   alt="Curatorial Sanctum" 
-                  className="w-full h-full object-cover transition-transform duration-[4000ms] ease-out group-hover:scale-110 brightness-[0.8]"
+                  className="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-110 brightness-[0.8]"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent opacity-80" />
                 

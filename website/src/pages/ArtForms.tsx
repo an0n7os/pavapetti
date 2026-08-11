@@ -39,7 +39,7 @@ export default function ArtForms() {
   }, [isAnyModalOpen]);
 
   const categories = useMemo(() => {
-    return ["All", "Classical Dance", "Solo Performance", "Percussion & Music", "Traditional Theater & Puppetry"];
+    return ["All", "Classical Dance", "Solo Performance", "Percussion & Music", "Theater & Puppetry"];
   }, []);
 
   const filteredArtForms = useMemo(() => {
@@ -80,64 +80,117 @@ export default function ArtForms() {
       <Navbar />
 
       {/* ── HERO BANNER ── */}
-      <section className="relative bg-[#090908] text-white pt-20 pb-24 md:pt-28 md:pb-32 overflow-hidden">
-        {/* Subtle Ambient Glows */}
+      <section className="relative bg-[#0c0b0a] text-white pt-16 pb-20 md:pt-24 md:pb-28 overflow-hidden border-b border-amber-500/10">
+        {/* Ambient Rich Gold Glows */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute -top-24 left-1/4 w-96 h-96 rounded-full bg-primary/20 blur-[120px]" />
-          <div className="absolute bottom-0 right-10 w-80 h-80 rounded-full bg-amber-600/10 blur-[100px]" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.03)_0%,transparent_70%)]" />
+          <div className="absolute -top-32 left-1/3 w-[500px] h-[500px] rounded-full bg-amber-500/15 blur-[140px]" />
+          <div className="absolute bottom-0 right-0 w-[400px] h-[400px] rounded-full bg-primary/20 blur-[120px]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(184,134,11,0.08)_0%,transparent_75%)]" />
         </div>
 
         <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-10">
-          <div className="max-w-3xl space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+            
+            {/* Left Content Column */}
+            <div className="lg:col-span-7 space-y-6">
+              <motion.div 
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-amber-500/15 border border-amber-500/35 text-amber-300 shadow-md shadow-amber-500/10"
+              >
+                <Sparkles size={14} className="text-amber-400 animate-pulse shrink-0" />
+                <span className="tracking-[0.2em] uppercase font-black text-[10px] text-amber-300">KERALA HERITAGE PERFORMING ARTS</span>
+                <span className="text-amber-400/60 font-bold">•</span>
+                <span className="font-semibold font-sans tracking-normal text-xs text-amber-200">കലാസാംസ്കാരിക സന്ധ്യ</span>
+              </motion.div>
+
+              <motion.h1 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="font-serif text-4xl sm:text-5xl lg:text-6xl font-light leading-[1.12] text-[#fefdfa]"
+              >
+                Book Authentic <br />
+                <span className="font-medium italic text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-500">
+                  Traditional Performing Arts
+                </span>
+              </motion.h1>
+
+              <motion.p 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="text-base md:text-lg text-white/90 font-sans font-normal leading-relaxed max-w-xl"
+              >
+                From the ancient temple shadow puppets of <span className="text-amber-400 font-medium">Tholpavakoothu</span> to the expressive mudras of <span className="text-amber-400 font-medium">Kathakali</span> and graceful motions of <span className="text-amber-400 font-medium">Mohiniyattam</span> — invite master troupes directly to your stage, cultural events, and temple festivals.
+              </motion.p>
+
+              {/* Quick stats counter grid */}
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="pt-6 grid grid-cols-3 gap-4 border-t border-white/10"
+              >
+                <div className="bg-white/5 border border-white/10 rounded-2xl p-4 backdrop-blur-md">
+                  <p className="text-2xl sm:text-3xl font-serif text-amber-400 font-bold leading-none">9+</p>
+                  <p className="text-[10px] uppercase font-black tracking-wider text-white/70 mt-1.5">Master Arts</p>
+                </div>
+                <div className="bg-white/5 border border-white/10 rounded-2xl p-4 backdrop-blur-md">
+                  <p className="text-2xl sm:text-3xl font-serif text-amber-400 font-bold leading-none">100%</p>
+                  <p className="text-[10px] uppercase font-black tracking-wider text-white/70 mt-1.5">Authentic Lineage</p>
+                </div>
+                <div className="bg-white/5 border border-white/10 rounded-2xl p-4 backdrop-blur-md">
+                  <p className="text-2xl sm:text-3xl font-serif text-amber-400 font-bold leading-none">Direct</p>
+                  <p className="text-[10px] uppercase font-black tracking-wider text-white/70 mt-1.5">WhatsApp Booking</p>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Right Visual Showcase Card */}
             <motion.div 
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/25 text-primary text-[10px] font-black tracking-[0.3em] uppercase"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.25, duration: 0.8 }}
+              className="lg:col-span-5 relative"
             >
-              <Sparkles size={13} className="text-primary animate-pulse" />
-              Kerala Heritage Performing Arts · കലാസാംസ്കാരിക സന്ധ്യ
+              <div className="relative rounded-[2.5rem] overflow-hidden border border-amber-500/30 bg-[#161513] shadow-2xl group">
+                <div className="aspect-[4/3] sm:aspect-[16/11] overflow-hidden relative">
+                  <img 
+                    src="/art-forms/tholpavakoothu.png" 
+                    alt="Kerala Performing Arts Showcase" 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 opacity-90" 
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#161513] via-black/30 to-transparent" />
+                  
+                  {/* Floating Badge */}
+                  <div className="absolute top-4 left-4 px-3.5 py-1.5 rounded-full bg-black/70 backdrop-blur-md border border-amber-500/30 text-amber-300 text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+                    Live Performer Booking
+                  </div>
+                </div>
+
+                <div className="p-6 space-y-3">
+                  <h3 className="font-serif text-2xl text-white font-medium flex items-center justify-between">
+                    <span>Tholpavakoothu</span>
+                    <span className="text-xs font-sans text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20 font-bold">തോൽപാവകൂത്ത്</span>
+                  </h3>
+                  <p className="text-xs text-white/75 leading-relaxed font-sans">
+                    Ancient 2,000-year-old temple shadow puppetry performed by traditional master artists.
+                  </p>
+                  <a
+                    href="https://wa.me/919400827290?text=Hello%2C%20I%20am%20interested%20in%20booking%20a%20traditional%20Kerala%20Performing%20Art%20troupe."
+                    target="_blank"
+                    rel="noreferrer"
+                    className="w-full mt-2 flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20bd5a] text-white py-3 rounded-xl font-bold text-xs uppercase tracking-wider shadow-lg shadow-green-500/20 transition-all hover:scale-[1.02]"
+                  >
+                    <MessageCircle size={16} />
+                    Quick WhatsApp Booking
+                  </a>
+                </div>
+              </div>
             </motion.div>
 
-            <motion.h1 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="font-serif text-4xl sm:text-5xl lg:text-6xl font-normal leading-[1.15] text-[#f8f5ee]"
-            >
-              Book Authentic <br />
-              <span className="italic text-primary font-medium">Traditional Performing Arts</span>
-            </motion.h1>
-
-            <motion.p 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="text-base md:text-lg text-white/70 font-serif italic font-light leading-relaxed max-w-2xl"
-            >
-              From the sacred shadow puppets of <span className="text-primary font-normal">Tholpavakoothu</span> to the dramatic gestures of <span className="text-primary font-normal">Kathakali</span> and the rhythmic grace of <span className="text-primary font-normal">Mohiniyattam</span> — invite master performers directly to your stage, cultural events, and celebrations.
-            </motion.p>
-
-            {/* Quick stats counter */}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="pt-6 grid grid-cols-2 sm:grid-cols-3 gap-6 border-t border-white/10"
-            >
-              <div>
-                <p className="text-2xl font-serif text-primary font-bold">9+ Legend Arts</p>
-                <p className="text-[10px] uppercase font-bold tracking-widest text-white/50">Traditional Masterworks</p>
-              </div>
-              <div>
-                <p className="text-2xl font-serif text-primary font-bold">100% Authentic</p>
-                <p className="text-[10px] uppercase font-bold tracking-widest text-white/50">Kalamandalam Lineage</p>
-              </div>
-              <div>
-                <p className="text-2xl font-serif text-primary font-bold">Instant WhatsApp</p>
-                <p className="text-[10px] uppercase font-bold tracking-widest text-white/50">Direct Artist Booking</p>
-              </div>
-            </motion.div>
           </div>
         </div>
       </section>
@@ -224,15 +277,15 @@ export default function ArtForms() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                   
-                  {/* Category Badge */}
-                  <span className="absolute top-4 left-4 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-white text-[10px] font-black uppercase tracking-wider">
-                    {art.category}
-                  </span>
-
-                  {/* Malayalam Title Badge */}
-                  <span className="absolute top-4 right-4 px-3 py-1 rounded-full bg-primary/90 text-white text-xs font-bold tracking-tight shadow-md">
-                    {art.malayalamName}
-                  </span>
+                  {/* Badges Overlay Container - Prevents Overlap */}
+                  <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2 z-10 pointer-events-none">
+                    <span className="px-3 py-1 rounded-full bg-black/70 backdrop-blur-md border border-white/20 text-white text-[10px] font-black uppercase tracking-wider truncate max-w-[55%] shrink-0">
+                      {art.category}
+                    </span>
+                    <span className="px-3 py-1 rounded-full bg-primary/95 text-white text-xs font-bold shadow-md truncate max-w-[42%] shrink-0">
+                      {art.malayalamName}
+                    </span>
+                  </div>
 
                   {/* Name overlay */}
                   <div className="absolute bottom-4 left-4 right-4">
@@ -355,23 +408,7 @@ export default function ArtForms() {
                   </div>
                 )}
 
-                {/* Specs */}
-                {(activeDetailArt.troopSize || activeDetailArt.duration) && (
-                  <div className="grid grid-cols-2 gap-4">
-                    {activeDetailArt.troopSize && (
-                      <div className="bg-[#fcfbfa] border border-border/60 p-4 rounded-2xl space-y-1">
-                        <p className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Troupe Size</p>
-                        <p className="text-xs font-bold text-foreground">{activeDetailArt.troopSize}</p>
-                      </div>
-                    )}
-                    {activeDetailArt.duration && (
-                      <div className="bg-[#fcfbfa] border border-border/60 p-4 rounded-2xl space-y-1">
-                        <p className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Standard Duration</p>
-                        <p className="text-xs font-bold text-foreground">{activeDetailArt.duration}</p>
-                      </div>
-                    )}
-                  </div>
-                )}
+
 
                 {/* Highlights */}
                 {activeDetailArt.highlights && activeDetailArt.highlights.length > 0 && (

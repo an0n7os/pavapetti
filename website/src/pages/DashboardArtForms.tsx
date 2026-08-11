@@ -50,7 +50,7 @@ export default function DashboardArtForms() {
     linkUrl: ""
   });
 
-  const categories = ["All", "Classical Dance", "Solo Performance", "Percussion & Music", "Traditional Theater & Puppetry"];
+  const categories = ["All", "Classical Dance", "Solo Performance", "Percussion & Music", "Theater & Puppetry"];
 
   const filteredArtForms = artForms.filter(art => {
     const matchesCat = categoryFilter === "All" || art.category === categoryFilter;
@@ -345,7 +345,7 @@ export default function DashboardArtForms() {
                       <option value="Classical Dance">Classical Dance</option>
                       <option value="Solo Performance">Solo Performance</option>
                       <option value="Percussion & Music">Percussion &amp; Music</option>
-                      <option value="Traditional Theater & Puppetry">Traditional Theater &amp; Puppetry</option>
+                      <option value="Theater & Puppetry">Theater &amp; Puppetry</option>
                     </select>
                   </div>
 

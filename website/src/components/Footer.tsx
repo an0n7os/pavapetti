@@ -154,7 +154,7 @@ export default function Footer() {
                 width="100%" 
                 height="100%" 
                 style={{ border: 0 }} 
-                className="w-full h-full border-0 filter invert-[0.9] hue-rotate-[180deg] brightness-[0.85] contrast-[1.2] saturate-[0.6] transition-all duration-[1000ms] group-hover:invert-0 group-hover:hue-rotate-0 group-hover:brightness-100 group-hover:contrast-100 group-hover:saturate-100"
+                className="w-full h-full border-0 filter invert-[0.9] hue-rotate-[180deg] brightness-[0.85] contrast-[1.2] saturate-[0.6] transition-all duration-1000 group-hover:invert-0 group-hover:hue-rotate-0 group-hover:brightness-100 group-hover:contrast-100 group-hover:saturate-100"
                 allowFullScreen={true} 
                 loading="lazy" 
                 referrerPolicy="no-referrer-when-downgrade"

@@ -4,7 +4,7 @@ export interface ArtForm {
   id: string;
   name: string;
   malayalamName: string;
-  category: "Classical Dance" | "Solo Performance" | "Percussion & Music" | "Traditional Theater & Puppetry";
+  category: "Classical Dance" | "Solo Performance" | "Percussion & Music" | "Theater & Puppetry";
   shortDesc: string;
   fullDesc: string;
   history: string;
@@ -23,7 +23,7 @@ export const INITIAL_ART_FORMS: ArtForm[] = [
     id: "tholpavakoothu",
     name: "Tholpavakoothu",
     malayalamName: "തോൽപാവകൂത്ത്",
-    category: "Traditional Theater & Puppetry",
+    category: "Theater & Puppetry",
     shortDesc: "Ancient shadow puppetry of Kerala performed with leather puppets lit by oil lamps behind a white screen.",
     fullDesc: "Tholpavakoothu is a sacred, ancient shadow puppetry form native to the Bhadrakali temples of Malabar (Palakkad, Thrissur, Malappuram). Intricately carved deerskin leather puppets cast dramatic shadows onto a illuminated white cloth (Koothumadam), bringing ancient epics to life with chanted poetic verses and traditional percussion.",
     history: "Dating back over 2,000 years, Tholpavakoothu was traditionally performed for 7 to 21 nights in temple sanctums as an offering to Goddess Bhadrakali.",
@@ -143,7 +143,7 @@ export const INITIAL_ART_FORMS: ArtForm[] = [
     id: "chakyarkoothu",
     name: "Chakyar Koothu",
     malayalamName: "ചാക്യാർ കൂത്ത്",
-    category: "Traditional Theater & Puppetry",
+    category: "Theater & Puppetry",
     shortDesc: "Satirical solo monologue storytelling by Chakyar artists inside traditional temple theaters with Mizhavu accompaniment.",
     fullDesc: "Chakyar Koothu is an ancient solo theatrical monologue where a single Chakyar performer wearing colorful makeup and a unique winged headpiece narrates stories from epics like Ramayana and Mahabharata. Combining Sanskrit verses, Malayalam commentary, spontaneous wit, and facial mime, the performer humorously critiques societal flaws and engages directly with audience members.",
     history: "Dating back over 1,000 years to the ancient Chera kingdom, Chakyar Koothu was exclusively performed inside temple theaters called Koothambalams.",

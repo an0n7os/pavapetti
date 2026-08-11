@@ -211,27 +211,24 @@ export default function Products() {
             </div>
           </div>
 
-          {/* Category Navigation — Horizontal Luxury Pills with dissolving edge gradients */}
+          {/* Category Navigation — Horizontal Pills */}
           <div className="relative w-full border-b border-primary/5 pb-4">
-            {/* Left Edge Dissolve */}
-            <div className="absolute left-0 top-0 bottom-4 w-12 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none opacity-40 md:opacity-100" />
-            
-            <div className="flex items-center gap-3 overflow-x-auto no-scrollbar scroll-smooth w-full px-6 md:px-0">
+            <div className="flex items-center gap-3 overflow-x-auto no-scrollbar scroll-smooth w-full px-1 py-1">
               <button
                 onClick={() => setActiveCategory("")}
-                className={`text-[9px] md:text-[10px] font-black tracking-[0.25em] uppercase whitespace-nowrap transition-all px-5 md:px-6 py-2.5 md:py-3 rounded-full ${
+                className={`text-[10px] md:text-[11px] font-black tracking-[0.2em] uppercase whitespace-nowrap transition-all px-5 md:px-6 py-2.5 md:py-3 rounded-full ${
                   activeCategory === "" 
                     ? "bg-secondary text-secondary-foreground shadow-lg shadow-secondary/15" 
                     : "bg-[#f9f7f4] text-muted-foreground/60 hover:text-primary border border-primary/5 hover:border-primary/15"
                 }`}
               >
-                All Archive
+                All Products
               </button>
               {(Array.isArray(categories) ? categories : []).map((cat: any) => (
                 <button
                   key={cat.id}
                   onClick={() => setActiveCategory(cat.name)}
-                  className={`text-[9px] md:text-[10px] font-black tracking-[0.25em] uppercase whitespace-nowrap transition-all px-5 md:px-6 py-2.5 md:py-3 rounded-full ${
+                  className={`text-[10px] md:text-[11px] font-black tracking-[0.2em] uppercase whitespace-nowrap transition-all px-5 md:px-6 py-2.5 md:py-3 rounded-full ${
                     activeCategory === cat.name 
                       ? "bg-secondary text-secondary-foreground shadow-lg shadow-secondary/15" 
                       : "bg-[#f9f7f4] text-muted-foreground/60 hover:text-primary border border-primary/5 hover:border-primary/15"
@@ -241,9 +238,6 @@ export default function Products() {
                 </button>
               ))}
             </div>
-
-            {/* Right Edge Dissolve */}
-            <div className="absolute right-0 top-0 bottom-4 w-16 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
           </div>
         </div>
 

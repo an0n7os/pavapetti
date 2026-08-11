@@ -62,7 +62,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
                 e.currentTarget.style.opacity = "1";
               }}
               style={{ opacity: 0 }}
-              className="h-full w-full object-cover transition-all duration-[1.5s] ease-[0.16, 1, 0.3, 1] group-hover:scale-110"
+              className="h-full w-full object-cover transition-all duration-700 ease-out group-hover:scale-110"
             />
 
             {/* Hover Overlay — Darkens slightly to make buttons pop */}
