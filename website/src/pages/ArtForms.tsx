@@ -179,7 +179,7 @@ export default function ArtForms() {
                     Ancient 2,000-year-old temple shadow puppetry performed by traditional master artists.
                   </p>
                   <a
-                    href="https://wa.me/919400827290?text=Hello%2C%20I%20am%20interested%20in%20booking%20a%20traditional%20Kerala%20Performing%20Art%20troupe."
+                    href={`https://wa.me/${WHATSAPP_PHONE}?text=Hello%2C%20I%20am%20interested%20in%20booking%20a%20traditional%20Kerala%20Performing%20Art%20troupe.`}
                     target="_blank"
                     rel="noreferrer"
                     className="w-full mt-2 flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20bd5a] text-white py-3 rounded-xl font-bold text-xs uppercase tracking-wider shadow-lg shadow-green-500/20 transition-all hover:scale-[1.02]"

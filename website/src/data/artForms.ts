@@ -288,7 +288,7 @@ export function useArtForms() {
   };
 }
 
-export const WHATSAPP_PHONE = "919292016901";
+export const WHATSAPP_PHONE = "91965816900";
 
 export function generateArtBookingWhatsAppUrl(artForm: ArtForm, customDetails?: {
   name?: string;
