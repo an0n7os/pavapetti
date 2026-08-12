@@ -87,13 +87,34 @@ export default function Footer() {
           {/* Quick links Column */}
           <div className="lg:col-span-1">
             <h4 className="font-serif text-lg font-light mb-8 text-primary tracking-widest uppercase">The Archive</h4>
-            <ul className="space-y-4 text-[11px] font-black tracking-[0.25em] uppercase text-white/40">
+            <ul className="space-y-3.5 text-[11px] font-black tracking-[0.25em] uppercase text-white/40">
               {[
                 { href: "/products", label: "All Artifacts" },
-                { href: "/art-forms", label: "Art Forms & Bookings" },
-                { href: "/products?featured=true", label: "Featured Collection" },
+                { href: "/art-forms", label: "Art Forms" },
+                { href: "/products?featured=true", label: "Featured" },
                 { href: "/products?category=Pooja Category", label: "Ritual" },
-                { href: "/products?category=Elephant Heritage", label: "Heritage" },
+                { href: "/contact", label: "Contact Us" },
+              ].map(({ href, label }) => (
+                <li key={href}>
+                  <Link href={href} className="hover:text-primary hover:opacity-100 transition-all flex items-center gap-3 group">
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary scale-0 group-hover:scale-100 transition-all duration-300" />
+                    {label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Governance & Policies Column */}
+          <div className="lg:col-span-1">
+            <h4 className="font-serif text-lg font-light mb-8 text-primary tracking-widest uppercase">Governance</h4>
+            <ul className="space-y-3.5 text-[11px] font-black tracking-[0.25em] uppercase text-white/40">
+              {[
+                { href: "/terms", label: "Terms & Conditions" },
+                { href: "/privacy", label: "Privacy Policy" },
+                { href: "/shipping-returns", label: "Shipping & Returns" },
+                { href: "/faq", label: "Heritage FAQ" },
+                { href: "/contact", label: "Gallery Contact" },
               ].map(({ href, label }) => (
                 <li key={href}>
                   <Link href={href} className="hover:text-primary hover:opacity-100 transition-all flex items-center gap-3 group">
@@ -111,7 +132,7 @@ export default function Footer() {
             {!subscribed ? (
               <form onSubmit={handleSubscribe} className="space-y-4">
                 <p className="text-[11px] font-serif text-white/50 leading-relaxed italic">
-                  Subscribe to receive whispers of new collections, private galleries &amp; historical memoirs of Malabar.
+                  Subscribe to receive whispers of new collections &amp; historical memoirs of Malabar.
                 </p>
                 <div className="relative group border-b border-white/20 focus-within:border-primary transition-colors duration-500 pb-2">
                   <input 
@@ -145,36 +166,22 @@ export default function Footer() {
             )}
           </div>
 
-          {/* Map Column — Premium Dark Blending Overlay */}
-          <div className="md:col-span-2 lg:col-span-1">
-            <h4 className="font-serif text-lg font-light mb-8 text-primary tracking-widest uppercase">Our Gallery</h4>
-            <div className="relative group rounded-[2.5rem] overflow-hidden transition-all duration-1000 h-56 border border-white/5 shadow-2xl">
-              <iframe 
-                src="https://maps.google.com/maps?q=Vallathol%20Museum%20Cheruthuruthy%20Thrissur&t=&z=15&ie=UTF8&iwloc=&output=embed" 
-                width="100%" 
-                height="100%" 
-                style={{ border: 0 }} 
-                className="w-full h-full border-0 filter invert-[0.9] hue-rotate-[180deg] brightness-[0.85] contrast-[1.2] saturate-[0.6] transition-all duration-1000 group-hover:invert-0 group-hover:hue-rotate-0 group-hover:brightness-100 group-hover:contrast-100 group-hover:saturate-100"
-                allowFullScreen={true} 
-                loading="lazy" 
-                referrerPolicy="no-referrer-when-downgrade"
-              />
-              {/* Premium Dark blending overlay that dissolves on hover */}
-              <div className="absolute inset-0 bg-[#0a0a0a]/35 group-hover:bg-transparent transition-all duration-700 pointer-events-none" />
-              <div className="absolute inset-0 pointer-events-none border border-white/5 rounded-[2.5rem]" />
-            </div>
-            <p className="mt-5 text-[9px] text-primary/80 font-black tracking-[0.4em] uppercase text-center">
-              Visit the Archive • Cheruthuruthy
-            </p>
-          </div>
         </div>
 
         {/* Bottom tag strip */}
         <div className="border-t border-white/5 mt-20 pt-10 flex flex-col md:flex-row items-center justify-between gap-6 text-[10px] text-white/30 tracking-[0.2em] uppercase font-bold">
           <span>© {new Date().getFullYear()} Pavapetti Heritage Artifacts®</span>
-          <span className="flex items-center gap-2">
-            Preserving Kerala's Artistic Legacy <span className="text-primary text-base">✦</span> Made with Devotion
-          </span>
+          <div className="flex flex-wrap items-center gap-4 text-white/40">
+            <Link href="/terms" className="hover:text-primary transition-colors">Terms</Link>
+            <span>•</span>
+            <Link href="/privacy" className="hover:text-primary transition-colors">Privacy</Link>
+            <span>•</span>
+            <Link href="/shipping-returns" className="hover:text-primary transition-colors">Shipping</Link>
+            <span>•</span>
+            <Link href="/faq" className="hover:text-primary transition-colors">FAQ</Link>
+            <span>•</span>
+            <Link href="/contact" className="hover:text-primary transition-colors">Contact</Link>
+          </div>
           <span className="flex items-center gap-1.5">
             Crafted by <a href="https://brandliftonline.in" target="_blank" rel="noreferrer" className="text-primary/60 hover:text-primary transition-colors duration-300 font-black tracking-[0.25em]">Brandlift</a>
           </span>

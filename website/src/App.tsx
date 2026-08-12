@@ -23,6 +23,11 @@ import Checkout from "@/pages/Checkout";
 import MobileNav from "@/components/MobileNav";
 import Bidding from "@/pages/Bidding";
 import ArtForms from "@/pages/ArtForms";
+import Terms from "@/pages/Terms";
+import Privacy from "@/pages/Privacy";
+import ShippingReturns from "@/pages/ShippingReturns";
+import FAQ from "@/pages/FAQ";
+import Contact from "@/pages/Contact";
 import { useState, useEffect } from "react";
 import PavapettiLogo from "./components/PavapettiLogo";
 
@@ -500,6 +505,21 @@ function Router() {
         </Route>
         <Route path="/art-forms">
           <PageWrapper><ArtForms /></PageWrapper>
+        </Route>
+        <Route path="/terms">
+          <PageWrapper><Terms /></PageWrapper>
+        </Route>
+        <Route path="/privacy">
+          <PageWrapper><Privacy /></PageWrapper>
+        </Route>
+        <Route path="/shipping-returns">
+          <PageWrapper><ShippingReturns /></PageWrapper>
+        </Route>
+        <Route path="/faq">
+          <PageWrapper><FAQ /></PageWrapper>
+        </Route>
+        <Route path="/contact">
+          <PageWrapper><Contact /></PageWrapper>
         </Route>
         <Route>
           <PageWrapper><NotFound /></PageWrapper>
