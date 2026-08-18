@@ -59,6 +59,20 @@ const HERO_SLIDES = [
     headline: ["Hand-Cast", "Nilavilakku &", "Pooja Items"],
     sub: "Traditional brass lamps, Nilavilakku, and pooja decor items for home ceremonies and gifting.",
   },
+  {
+    src: "/hero-image-1.jpg",
+    label: "Heritage Figurines",
+    tag: "Sacred Art & Craft",
+    headline: ["Divine", "Illuminated", "Heritage"],
+    sub: "Exquisite traditional figurines and masks, beautifully illuminated to bring divine energy to your space.",
+  },
+  {
+    src: "/hero-image-2.jpg",
+    label: "Shadow Puppetry",
+    tag: "Tholpavakoothu",
+    headline: ["Ancient", "Shadow", "Puppetry"],
+    sub: "Experience the magic of traditional Tholpavakoothu shadow puppetry, telling epic tales through light and leather.",
+  },
 ];
 
 const CATEGORY_OVERRIDE: Record<string, string> = {
