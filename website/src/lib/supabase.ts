@@ -1,9 +1,12 @@
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string | undefined;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase =
+  supabaseUrl && supabaseAnonKey
+    ? createClient(supabaseUrl, supabaseAnonKey)
+    : null;
 
 /**
  * Uploads an image File to Supabase Storage (products bucket) and returns the public URL.
@@ -28,6 +31,9 @@ export async function uploadImageToStorage(
 
   // 2. Upload to Supabase Storage
   try {
+    if (!supabase) {
+      throw new Error("Supabase client not configured");
+    }
     const { error } = await supabase.storage
       .from("products")
       .upload(filename, blob, { contentType: blob.type, upsert: false });
