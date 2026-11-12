@@ -555,21 +555,21 @@ export default function Home() {
                 malayalam: "തോൽപാവകൂത്ത്",
                 tag: "Shadow Puppetry",
                 desc: "Ancient 2000-year-old temple shadow puppetry lit by coconut oil lamps.",
-                img: "https://images.unsplash.com/photo-1578925518470-4def7a0f08bb?q=80&w=800&auto=format&fit=crop"
+                img: "/art-forms/tholpavakoothu.png"
               },
               {
                 title: "Kathakali",
                 malayalam: "കഥകളി",
                 tag: "Classical Dance Drama",
                 desc: "World-famous dance-drama with grand face makeup, mudras & Chenda drums.",
-                img: "https://images.unsplash.com/photo-1609137144813-7d9921338f24?q=80&w=800&auto=format&fit=crop"
+                img: "/hero-dance-v2.webp"
               },
               {
                 title: "Mohiniyattam",
                 malayalam: "മോഹിനിയാട്ടം",
                 tag: "Dance of Enchantress",
                 desc: "Graceful classical solo dance in traditional white and gold Kerala Kasavu silk.",
-                img: "https://images.unsplash.com/photo-1547153760-18fc86324498?q=80&w=800&auto=format&fit=crop"
+                img: "/art-forms/mohiniyattam.png"
               }
             ].map((art, i) => (
               <motion.div
