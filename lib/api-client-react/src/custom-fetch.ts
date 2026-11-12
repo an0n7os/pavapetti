@@ -1,3 +1,5 @@
+import { CATALOG_DATA } from "./catalog-data";
+
 export type CustomFetchOptions = RequestInit & {
   responseType?: "json" | "text" | "blob" | "auto";
 };
@@ -556,6 +558,37 @@ FALLBACK_PRODUCTS = FALLBACK_PRODUCTS.map(p => ({
   additionalCategoryIds: p.additionalCategoryIds || [],
   additionalCategoryNames: p.additionalCategoryNames || []
 }));
+
+// Merge compressed catalog products & categories into static fallback
+{
+  const existingCatByName = new Map(FALLBACK_CATEGORIES.map(c => [c.name.trim().toLowerCase(), c]));
+  let nextCatId = FALLBACK_CATEGORIES.reduce((max, c) => Math.max(max, c.id), 0) + 1;
+  for (const cat of CATALOG_DATA.categories) {
+    const key = cat.name.trim().toLowerCase();
+    if (!existingCatByName.has(key)) {
+      const newCat = { ...cat, id: nextCatId++ };
+      FALLBACK_CATEGORIES.push(newCat);
+      existingCatByName.set(key, newCat);
+    }
+  }
+
+  const existingProdNames = new Set(FALLBACK_PRODUCTS.map(p => p.name.trim().toLowerCase()));
+  let nextProdId = FALLBACK_PRODUCTS.reduce((max, p) => Math.max(max, p.id), 0) + 1;
+  for (const prod of CATALOG_DATA.products) {
+    const pKey = prod.name.trim().toLowerCase();
+    if (!existingProdNames.has(pKey)) {
+      const catObj = existingCatByName.get(prod.categoryName.trim().toLowerCase());
+      FALLBACK_PRODUCTS.push({
+        ...prod,
+        id: nextProdId++,
+        categoryId: catObj ? catObj.id : 1,
+        additionalCategoryIds: [],
+        additionalCategoryNames: []
+      } as any);
+      existingProdNames.add(pKey);
+    }
+  }
+}
 
 async function handleFetchError(res: Response, prefix: string): Promise<never> {
   let errMsg = res.statusText;

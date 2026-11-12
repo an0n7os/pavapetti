@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
+import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -91,6 +92,24 @@ async function queryWithTimeout(queryPromise, timeoutMs = 2500) {
   }
 }
 
+function getFallbackCategories() {
+  return categories.map(c => {
+    const catNameLower = (c.name || '').trim().toLowerCase();
+    const matching = products.filter(p => {
+      const pCatName = (p.categoryName || '').trim().toLowerCase();
+      if (pCatName === catNameLower) return true;
+      if (p.categoryId === c.id) return true;
+      if (p.additionalCategoryNames && p.additionalCategoryNames.some(ac => (ac || '').trim().toLowerCase() === catNameLower)) return true;
+      return false;
+    });
+    return {
+      ...c,
+      imageUrl: c.imageUrl || (matching.length > 0 ? matching[0].imageUrl : null),
+      productCount: matching.length
+    };
+  });
+}
+
 // Stale-While-Revalidate Categories getter
 async function getCategoriesData() {
   const now = Date.now();
@@ -170,9 +189,9 @@ async function getCategoriesData() {
     // No cache available - wait up to 8 seconds for real data
     return await queryWithTimeout(query, 8000);
   } catch (err) {
-    console.warn(`⚠️ Categories query timed out or failed (${err.message}). Returning empty until DB wakes up...`);
+    console.warn(`⚠️ Categories query timed out or failed (${err.message}). Falling back to local mock categories.`);
     query.catch(() => {});
-    return [];
+    return getFallbackCategories();
   }
 }
 
@@ -205,9 +224,9 @@ async function getProductsData() {
     // No cache available - wait up to 8 seconds for real data
     return await queryWithTimeout(query, 8000);
   } catch (err) {
-    console.warn(`⚠️ Products query timed out or failed (${err.message}). Returning empty until DB wakes up...`);
+    console.warn(`⚠️ Products query timed out or failed (${err.message}). Falling back to local mock products.`);
     query.catch(() => {});
-    return [];
+    return [...products];
   }
 }
 
@@ -685,6 +704,46 @@ products = products.map(p => ({
   additionalCategoryIds: p.additionalCategoryIds || [],
   additionalCategoryNames: p.additionalCategoryNames || []
 }));
+
+// Merge compressed catalog products & categories from catalog-data.json
+try {
+  const catalogJsonPath = path.join(__dirname, 'catalog-data.json');
+  if (fs.existsSync(catalogJsonPath)) {
+    const catalogData = JSON.parse(fs.readFileSync(catalogJsonPath, 'utf8'));
+    const existingCatByName = new Map(categories.map(c => [c.name.trim().toLowerCase(), c]));
+    let nextCatId = categories.reduce((max, c) => Math.max(max, c.id), 0) + 1;
+
+    for (const cat of (catalogData.categories || [])) {
+      const key = (cat.name || '').trim().toLowerCase();
+      if (key && !existingCatByName.has(key)) {
+        const newCat = { ...cat, id: nextCatId++ };
+        categories.push(newCat);
+        existingCatByName.set(key, newCat);
+      }
+    }
+
+    const existingProdNames = new Set(products.map(p => p.name.trim().toLowerCase()));
+    let nextProdId = products.reduce((max, p) => Math.max(max, p.id), 0) + 1;
+
+    for (const prod of (catalogData.products || [])) {
+      const pKey = (prod.name || '').trim().toLowerCase();
+      if (pKey && !existingProdNames.has(pKey)) {
+        const catObj = existingCatByName.get((prod.categoryName || '').trim().toLowerCase());
+        products.push({
+          ...prod,
+          id: nextProdId++,
+          categoryId: catObj ? catObj.id : 1,
+          additionalCategoryIds: [],
+          additionalCategoryNames: []
+        });
+        existingProdNames.add(pKey);
+      }
+    }
+    console.log(`📦 Loaded ${products.length} total products across ${categories.length} categories (including catalog-data.json).`);
+  }
+} catch (err) {
+  console.warn('⚠️ Failed to load catalog-data.json:', err.message);
+}
 
 // --- Endpoints ---
 app.get('/api/healthz', (req, res) => {

@@ -56,6 +56,8 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
             <motion.img
               src={product.imageUrl}
               alt={product.name}
+              loading="lazy"
+              decoding="async"
               onLoad={(e) => (e.currentTarget.style.opacity = "1")}
               onError={(e) => {
                 e.currentTarget.src = "https://images.unsplash.com/photo-1582234372483-42174d568bc5?auto=format&fit=crop&q=80&w=800"; // Fallback: Kerala boat/culture
