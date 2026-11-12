@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Pencil, Trash2, X, Check, Package, Upload, Star, Eye, EyeOff, Sparkles, Search } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
