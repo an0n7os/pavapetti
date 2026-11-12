@@ -88,7 +88,11 @@ export default function ProductDetail() {
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [lightboxZoom, setLightboxZoom] = useState(false);
 
-  const images = product ? [product.imageUrl, ...(product.images || [])].filter((img, i, self) => self.indexOf(img) === i) : [];
+  const images = product
+    ? [product.imageUrl, ...(product.images || [])]
+        .filter((img): img is string => Boolean(img && img.trim()))
+        .filter((img, i, self) => self.indexOf(img) === i)
+    : [];
 
   function handleNextImage() {
     if (images.length <= 1) return;
@@ -298,7 +302,7 @@ export default function ProductDetail() {
               {/* Main Image Slider — Horizontal on Mobile with Premium Archival Borders */}
               <div className="md:hidden -mx-4">
                 <div className="flex overflow-x-auto scroll-snap-x mandatory scrollbar-hide gap-5 px-6 pb-4">
-                  {[product.imageUrl, ...(product.images || [])].filter((img, i, self) => self.indexOf(img) === i).map((img, idx) => (
+                  {images.map((img, idx) => (
                     <div key={idx} className="flex-shrink-0 w-[82vw] scroll-snap-align-start p-4 rounded-[3rem] border border-[#c5a880]/20 bg-gradient-to-br from-[#FAF8F5] via-[#FAF8F5]/95 to-[#F3EFE9] shadow-xl relative">
                       {/* Thin inner gold border for premium aesthetic */}
                       <div className="absolute inset-1.5 rounded-[2.5rem] border border-[#c5a880]/30 pointer-events-none" />
@@ -313,7 +317,7 @@ export default function ProductDetail() {
                 </div>
                 {/* Scroll Indicator */}
                 <div className="flex justify-center gap-1.5 mt-4">
-                  {[product.imageUrl, ...(product.images || [])].filter((img, i, self) => self.indexOf(img) === i).map((_, i) => (
+                  {images.map((_, i) => (
                     <div key={i} className="w-1.5 h-1.5 rounded-full bg-primary/20" />
                   ))}
                 </div>
@@ -356,9 +360,9 @@ export default function ProductDetail() {
 
 
               {/* Thumbnails — Desktop Only */}
-              {product.images && product.images.length > 1 && (
+              {images.length > 1 && (
                 <div className="hidden md:flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
-                  {product.images.map((img: string, idx: number) => (
+                  {images.map((img: string, idx: number) => (
                     <button
                       key={idx}
                       onClick={() => setSelectedImage(img)}

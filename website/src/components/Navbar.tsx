@@ -394,7 +394,7 @@ export default function Navbar() {
                   className="group flex items-end gap-4"
                 >
                   <span className={`text-primary text-[10px] font-black tracking-widest mb-2 transition-all ${isActive("/wishlist") ? "opacity-100" : "opacity-60"}`}>
-                    03
+                    05
                   </span>
                   <span className={`text-5xl font-serif font-light transition-colors italic relative ${
                     isActive("/wishlist") ? "text-primary" : "text-white/90 group-hover:text-primary"

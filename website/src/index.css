@@ -27,8 +27,12 @@
     --radius: 0.5rem;
   }
   
+  html, body {
+    @apply overflow-x-hidden;
+  }
+
   body {
-    @apply bg-background text-foreground font-sans antialiased selection:bg-primary selection:text-white overflow-x-hidden;
+    @apply bg-background text-foreground font-sans antialiased selection:bg-primary selection:text-white;
   }
 }
 

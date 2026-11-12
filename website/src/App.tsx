@@ -503,6 +503,9 @@ function Router() {
         <Route path="/bidding">
           <PageWrapper><Bidding /></PageWrapper>
         </Route>
+        <Route path="/auctions">
+          <PageWrapper><Bidding /></PageWrapper>
+        </Route>
         <Route path="/art-forms">
           <PageWrapper><ArtForms /></PageWrapper>
         </Route>
@@ -536,7 +539,7 @@ function App() {
         <TooltipProvider>
           <WishlistProvider>
             <CartProvider>
-              <div className="relative font-sans antialiased">
+              <div className="relative font-sans antialiased overflow-x-hidden">
                 {/* Ultra Premium Overlays */}
                 <div className="noise-overlay" />
                 
