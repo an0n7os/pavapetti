@@ -44,7 +44,6 @@ const queryClient = new QueryClient({
 function PageWrapper({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
 
-
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location]);
@@ -52,10 +51,11 @@ function PageWrapper({ children }: { children: React.ReactNode }) {
   return (
     <motion.div
       key={location}
-      initial={{ opacity: 0, y: 10, scale: 0.99 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: -10, scale: 1.01 }}
-      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.3 }}
+      className="w-full"
     >
       {children}
     </motion.div>
@@ -538,7 +538,7 @@ function App() {
         <TooltipProvider>
           <WishlistProvider>
             <CartProvider>
-              <div className="relative font-sans antialiased overflow-x-hidden">
+              <div className="relative font-sans antialiased">
                 {/* Ultra Premium Overlays */}
                 <div className="noise-overlay" />
                 

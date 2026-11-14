@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { motion, AnimatePresence, useScroll } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingBag, Search, Menu, X, Phone, Mail, Instagram, Facebook, Youtube, Heart } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useCart } from "@/context/CartContext";
@@ -7,15 +7,18 @@ import { useWishlist } from "@/context/WishlistContext";
 import { useListCategories } from "@workspace/api-client-react";
 import PavapettiLogo from "./PavapettiLogo";
 import Magnetic from "./Magnetic";
+import { useAccessibleDialog } from "@/hooks/use-accessible-dialog";
 
 export default function Navbar() {
   const [location, setLocation] = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const mobileMenuRef = useAccessibleDialog<HTMLDivElement>(menuOpen, () => setMenuOpen(false));
   const [catOpen, setCatOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchVal, setSearchVal] = useState("");
-  const searchRef = useRef<HTMLInputElement>(null);
+  const desktopSearchRef = useRef<HTMLInputElement>(null);
+  const mobileSearchRef = useRef<HTMLInputElement>(null);
   const { count, openCart } = useCart();
   const { count: wishlistCount } = useWishlist();
   const { data: categories } = useListCategories();
@@ -44,7 +47,7 @@ export default function Navbar() {
 
   // Lock body scroll when mobile menu or categories modal is open
   useEffect(() => {
-    if (menuOpen || catOpen) {
+    if (menuOpen) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "";
@@ -52,10 +55,12 @@ export default function Navbar() {
     return () => {
       document.body.style.overflow = "";
     };
-  }, [menuOpen, catOpen]);
+  }, [menuOpen]);
 
   useEffect(() => {
-    if (searchOpen) searchRef.current?.focus();
+    if (!searchOpen) return;
+    const isMobile = window.matchMedia("(max-width: 767px)").matches;
+    (isMobile ? mobileSearchRef.current : desktopSearchRef.current)?.focus();
   }, [searchOpen]);
 
   const isActive = (path: string) => location === path;
@@ -70,24 +75,24 @@ export default function Navbar() {
 
   return (
     <>
-      <header className={`sticky top-0 z-50 transition-shadow duration-500 w-full ${scrolled ? "shadow-md" : ""}`}>
-
-
-      {/* ── Main navbar ── */}
-      <nav className={`relative transition-[background-color,border-color,box-shadow] duration-500 border-b h-16 flex items-center ${
+      <header className={`sticky top-0 z-50 w-full transition-all duration-300 ${
         scrolled 
-          ? "bg-white/95 backdrop-blur-md border-border/40 shadow-sm" 
-          : "bg-white border-transparent"
+          ? "bg-white/95 backdrop-blur-md shadow-md border-b border-border/40" 
+          : "bg-white border-b border-transparent"
       }`}>
-        <div className="max-w-7xl mx-auto px-6 lg:px-12 w-full">
+        {/* ── Main navbar ── */}
+        <nav className="relative h-16 flex items-center">
+          <div className="max-w-7xl mx-auto px-6 lg:px-12 w-full">
           <div className="flex items-center justify-between h-16 gap-8">
             {/* Logo with Secret Dashboard Trigger */}
-            <div 
+            <button
+              type="button"
               onClick={handleLogoClick}
-              className="cursor-pointer"
+              aria-label="Pavapetti home; double click for administrator sign in"
+              className="cursor-pointer bg-transparent border-0 p-0"
             >
               <PavapettiLogo size={36} />
-            </div>
+            </button>
 
 
             {/* Desktop Nav */}
@@ -119,7 +124,7 @@ export default function Navbar() {
                 onMouseEnter={() => setCatOpen(true)} 
                 onMouseLeave={() => setCatOpen(false)}
               >
-                <button className={`px-4 py-2 text-[13px] font-bold tracking-wide rounded-lg transition-all flex items-center gap-1 ${catOpen ? "text-primary" : "text-foreground hover:text-primary"}`}>
+                <button aria-haspopup="true" aria-expanded={catOpen} className={`px-4 py-2 text-[13px] font-bold tracking-wide rounded-lg transition-all flex items-center gap-1 ${catOpen ? "text-primary" : "text-foreground hover:text-primary"}`}>
                   Collections
                   <svg width="10" height="10" viewBox="0 0 12 12" className={`transition-transform duration-300 ${catOpen ? "rotate-180" : ""}`}>
                     <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" />
@@ -202,9 +207,10 @@ export default function Navbar() {
                   className="overflow-hidden flex items-center"
                 >
                   <input
-                    ref={searchRef}
+                    ref={desktopSearchRef}
                     type="text"
-                    placeholder="Search artifacts..."
+                    aria-label="Search products"
+                    placeholder="Search artifacts…"
                     value={searchVal}
                     onChange={(e) => setSearchVal(e.target.value)}
                     onKeyDown={(e) => {
@@ -220,6 +226,8 @@ export default function Navbar() {
                 </motion.div>
                 <Magnetic>
                   <button
+                    type="button"
+                    aria-label={searchOpen ? "Close product search" : "Search products"}
                     onClick={() => {
                       if (searchOpen && searchVal.trim()) {
                         setLocation(`/products?search=${encodeURIComponent(searchVal.trim())}`);
@@ -238,6 +246,8 @@ export default function Navbar() {
               {/* Search Toggle Button - Mobile only */}
               <div className="md:hidden flex items-center">
                 <button
+                  type="button"
+                  aria-label={searchOpen ? "Close product search" : "Search products"}
                   onClick={() => setSearchOpen(!searchOpen)}
                   className="p-2.5 hover:text-primary hover:bg-primary/8 rounded-xl transition-all text-muted-foreground"
                 >
@@ -248,15 +258,13 @@ export default function Navbar() {
               {/* Wishlist - Visible on both desktop & mobile */}
               <div className="flex items-center">
                 <Magnetic>
-                  <Link href="/wishlist">
-                    <button className="relative p-2.5 hover:text-primary hover:bg-primary/8 rounded-xl transition-all text-muted-foreground">
-                      <Heart size={18} />
-                      {wishlistCount > 0 && (
-                        <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-[9px] font-black min-w-[14px] min-h-[14px] rounded-full flex items-center justify-center shadow-sm">
-                          {wishlistCount}
-                        </span>
-                      )}
-                    </button>
+                  <Link href="/wishlist" aria-label={`Wishlist${wishlistCount ? `, ${wishlistCount} items` : ""}`} className="relative p-2.5 hover:text-primary hover:bg-primary/8 rounded-xl transition-all text-muted-foreground">
+                    <Heart size={18} aria-hidden="true" />
+                    {wishlistCount > 0 && (
+                      <span aria-hidden="true" className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-[9px] font-black min-w-[14px] min-h-[14px] rounded-full flex items-center justify-center shadow-sm">
+                        {wishlistCount}
+                      </span>
+                    )}
                   </Link>
                 </Magnetic>
               </div>
@@ -264,6 +272,8 @@ export default function Navbar() {
               {/* Cart */}
               <Magnetic>
                 <button
+                  type="button"
+                  aria-label={`Open cart${count ? `, ${count} items` : ""}`}
                   onClick={openCart}
                   className="relative p-2.5 hover:text-primary hover:bg-primary/8 rounded-xl transition-all text-muted-foreground"
                   data-testid="button-cart"
@@ -279,6 +289,8 @@ export default function Navbar() {
 
               {/* Cinematic Menu Trigger */}
               <button
+                type="button"
+                aria-label="Open navigation menu"
                 className="md:hidden p-2.5 hover:text-primary hover:bg-primary/8 rounded-xl transition-all text-muted-foreground"
                 onClick={() => setMenuOpen(true)}
               >
@@ -302,9 +314,10 @@ export default function Navbar() {
             <div className="relative flex-1">
               <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground/60" />
               <input
-                ref={searchRef}
+                ref={mobileSearchRef}
                 type="text"
-                placeholder="Search artifacts..."
+                aria-label="Search products"
+                placeholder="Search artifacts…"
                 value={searchVal}
                 onChange={(e) => setSearchVal(e.target.value)}
                 onKeyDown={(e) => {
@@ -333,6 +346,11 @@ export default function Navbar() {
       <AnimatePresence>
         {menuOpen && (
           <motion.div
+            ref={mobileMenuRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Mobile navigation"
+            tabIndex={-1}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -344,7 +362,9 @@ export default function Navbar() {
 
             <div className="relative z-10 flex justify-between items-center mb-16">
               <PavapettiLogo size={32} variant="dark" />
-              <button 
+              <button
+                type="button"
+                aria-label="Close navigation menu"
                 onClick={() => setMenuOpen(false)}
                 className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center text-white/80 hover:text-white transition-colors bg-white/5 backdrop-blur-md"
               >
