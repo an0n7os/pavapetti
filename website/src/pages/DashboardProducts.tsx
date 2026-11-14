@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -60,8 +60,9 @@ const emptyForm: CreateProductBody = {
   weight: "",
 };
 
-const inputCls = "bg-white border border-primary/10 hover:border-primary/25 rounded-xl py-2.5 px-4 text-sm tracking-wide focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all shadow-sm outline-none placeholder:text-muted-foreground/35 h-auto";
-const labelCls = "text-[10px] font-black tracking-[0.22em] uppercase text-primary/75";
+// Compact modern inputs & labels
+const inputCls = "bg-white border border-stone-200 hover:border-stone-300 focus:border-primary/50 focus:ring-2 focus:ring-primary/10 rounded-lg h-9 px-3 text-xs transition-all shadow-none outline-none placeholder:text-muted-foreground/40";
+const labelCls = "text-[11px] font-semibold text-stone-700 tracking-tight flex items-center justify-between";
 
 export default function DashboardProducts() {
   const queryClient = useQueryClient();
@@ -76,8 +77,8 @@ export default function DashboardProducts() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>("all");
 
-  // Lock background window scroll when any modal is open
-  const isModalOpen = showForm || editProduct !== null || deleteId !== null;
+  // Lock background scroll when modal is open
+  const isModalOpen = showForm || deleteId !== null;
 
   useEffect(() => {
     if (isModalOpen) {
@@ -134,7 +135,6 @@ export default function DashboardProducts() {
     });
     setDiscountPercent(0);
     setShowForm(true);
-    setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 50);
   };
 
   const openEdit = (product: Product) => {
@@ -169,7 +169,6 @@ export default function DashboardProducts() {
       weight: product.weight || "",
     });
     setShowForm(true);
-    setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 50);
   };
 
   const handlePriceChange = (newPrice: number) => {
@@ -246,7 +245,7 @@ export default function DashboardProducts() {
     if (isMain) setUploadingMain(true); else setUploadingExtra(true);
     try {
       const publicUrl = await uploadImageToStorage(file);
-      if (isMain) { setForm(prev => ({ ...prev, imageUrl: publicUrl })); toast({ title: "✅ Image uploaded to CDN" }); }
+      if (isMain) { setForm(prev => ({ ...prev, imageUrl: publicUrl })); toast({ title: "✅ Main image uploaded" }); }
       else { setForm(prev => ({ ...prev, images: [...(prev.images || []), publicUrl] })); toast({ title: "✅ Extra image uploaded" }); }
     } catch (err: any) {
       toast({ title: "Image upload failed", description: err?.message, variant: "destructive" });
@@ -270,43 +269,46 @@ export default function DashboardProducts() {
 
   return (
     <DashboardLayout title="Products Archive" subtitle="Manage your complete product catalog">
-      {/* Header row / Toolbar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-        <div>
-          <p className="text-sm font-medium text-muted-foreground">
-            {searchQuery || selectedCategoryFilter !== "all"
-              ? `Showing ${filteredProducts.length} of ${(products ?? []).length} products`
-              : `${(products ?? []).length} products total`}
-          </p>
+      {/* ── Toolbar: Compact, responsive search & filter bar ── */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+        <div className="flex items-center gap-2">
+          <Badge variant="secondary" className="font-mono text-xs px-2.5 py-0.5 bg-stone-100 text-stone-700 border-stone-200">
+            {filteredProducts.length} {filteredProducts.length === 1 ? "Product" : "Products"}
+          </Badge>
+          {filteredProducts.length !== (products ?? []).length && (
+            <span className="text-[11px] text-muted-foreground">
+              (Filtered from {(products ?? []).length})
+            </span>
+          )}
         </div>
 
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
           {/* Search Bar */}
-          <div className="relative flex-1 sm:w-72 min-w-[220px]">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground/60" size={16} />
+          <div className="relative flex-1 sm:w-64 min-w-[180px]">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground/50" size={14} />
             <Input
               type="text"
-              placeholder="Search products by name, category..."
+              placeholder="Search products..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 pr-9 bg-white border border-primary/10 rounded-2xl h-11 text-sm shadow-sm focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all placeholder:text-muted-foreground/40"
+              className="pl-8 pr-7 bg-white border-stone-200 rounded-lg h-9 text-xs focus:border-primary/50 focus:ring-1 focus:ring-primary/20 placeholder:text-muted-foreground/40"
               data-testid="input-search-products"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-1 transition-colors"
-                title="Clear search"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                title="Clear"
               >
-                <X size={14} />
+                <X size={12} />
               </button>
             )}
           </div>
 
           {/* Category Filter */}
           <Select value={selectedCategoryFilter} onValueChange={setSelectedCategoryFilter}>
-            <SelectTrigger className="w-[170px] bg-white border border-primary/10 rounded-2xl h-11 text-sm shadow-sm shrink-0" data-testid="select-category-filter">
+            <SelectTrigger className="w-[140px] sm:w-[160px] bg-white border-stone-200 rounded-lg h-9 text-xs shrink-0" data-testid="select-category-filter">
               <SelectValue placeholder="All Categories" />
             </SelectTrigger>
             <SelectContent>
@@ -321,488 +323,666 @@ export default function DashboardProducts() {
 
           <Button
             onClick={openAdd}
-            className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl px-6 py-3 h-11 text-sm font-semibold shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/25 transition-all shrink-0"
+            className="gap-1.5 bg-primary text-primary-foreground hover:bg-primary/95 rounded-lg px-3.5 h-9 text-xs font-semibold shadow-sm shrink-0"
             data-testid="button-add-product"
           >
-            <Plus size={18} /> Add Product
+            <Plus size={15} /> Add Product
           </Button>
         </div>
       </div>
 
-      {/* Add/Edit Form */}
+      {/* ── Add / Edit Modal: Minimal, Compact & Fast ── */}
       <AnimatePresence>
         {showForm && (
-          <motion.div
-            initial={{ opacity: 0, y: -16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -16 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-            className="mb-8"
-          >
-            <Card className="border border-primary/10 rounded-[2rem] bg-[#fdfbf7] shadow-2xl shadow-primary/8 overflow-hidden">
-              {/* Form Header */}
-              <CardHeader className="pb-4 pt-6 px-8 border-b border-primary/5 flex-row items-center justify-between bg-gradient-to-r from-[#faf7f2] to-[#fdfbf7]">
-                <div>
-                  <span className="text-[9px] tracking-[0.4em] text-primary/70 uppercase font-black block mb-1">
-                    {editProduct ? "✏️ Editing Record" : "➕ New Entry"}
-                  </span>
-                  <CardTitle className="font-serif text-2xl font-light text-foreground">
-                    {editProduct ? "Modify Product Details" : "Add New Product"}
-                  </CardTitle>
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/60 backdrop-blur-sm overflow-y-auto">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96, y: 8 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96, y: 8 }}
+              transition={{ duration: 0.18, ease: "easeOut" }}
+              className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-stone-200 overflow-hidden my-auto max-h-[92vh] flex flex-col"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Modal Header */}
+              <div className="px-5 py-3 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-7 h-7 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold text-xs">
+                    {editProduct ? <Pencil size={13} /> : <Plus size={14} />}
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-sm text-stone-900 leading-tight">
+                      {editProduct ? "Modify Product Details" : "Add New Product"}
+                    </h3>
+                    <p className="text-[11px] text-muted-foreground">
+                      {editProduct ? `Editing ID: #${editProduct.id} — ${editProduct.name}` : "Fill in the details to add an artifact to your catalog"}
+                    </p>
+                  </div>
                 </div>
                 <Button
-                  size="sm" variant="ghost"
-                  className="rounded-full hover:bg-primary/8 text-muted-foreground hover:text-foreground p-2 h-auto"
+                  size="sm"
+                  variant="ghost"
+                  className="rounded-lg h-8 w-8 p-0 text-muted-foreground hover:text-stone-900 hover:bg-stone-200/50"
                   onClick={() => setShowForm(false)}
                   data-testid="button-close-form"
                 >
-                  <X size={18} />
+                  <X size={16} />
                 </Button>
-              </CardHeader>
+              </div>
 
-              <CardContent className="p-7">
-                <form onSubmit={handleSubmit}>
-
-                  {/* ── Section 1: Basic Info ── */}
-                  <div className="mb-4">
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-primary text-[10px] font-black">1</div>
-                      <span className="text-[10px] font-black tracking-[0.3em] uppercase text-primary/70">Basic Information</span>
-                      <div className="flex-1 h-px bg-primary/8" />
+              {/* Modal Scrollable Body */}
+              <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
+                
+                {/* 1. Basic Info */}
+                <div className="space-y-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div className="sm:col-span-2 space-y-1">
+                      <Label htmlFor="name" className={labelCls}>
+                        <span>Product Name *</span>
+                      </Label>
+                      <Input
+                        id="name"
+                        className={inputCls}
+                        placeholder="e.g. Kathakali Headgear Wall Hanging"
+                        value={form.name}
+                        onChange={(e) => setForm({ ...form, name: e.target.value })}
+                        required
+                        data-testid="input-product-name"
+                      />
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      <div className="space-y-1.5 md:col-span-2">
-                        <Label htmlFor="name" className={labelCls}>Product Name *</Label>
-                        <Input id="name" className={inputCls} placeholder="e.g. Nataraja Dancing Shiva Copper Statue" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required data-testid="input-product-name" />
-                      </div>
 
-                      <div className="space-y-1.5">
-                        <Label htmlFor="category" className={labelCls}>Primary Category *</Label>
-                        <Select value={form.categoryId ? String(form.categoryId) : ""} onValueChange={(v) => setForm({ ...form, categoryId: parseInt(v, 10) })}>
-                          <SelectTrigger className={`${inputCls} flex`} data-testid="select-category">
-                            <SelectValue placeholder="Select a category" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {(categories ?? []).map((cat: any) => (
-                              <SelectItem key={cat.id} value={String(cat.id)}>{cat.name}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <div className="space-y-1.5">
-                        <Label className={labelCls}>Also Show In</Label>
-                        <div className="bg-white border border-primary/10 rounded-xl p-2.5 max-h-[7.5rem] overflow-y-auto shadow-sm space-y-1">
-                          {(categories ?? []).filter((cat: any) => cat.id !== form.categoryId).map((cat: any) => {
-                            const checked = (form.additionalCategoryIds || []).includes(cat.id);
-                            return (
-                              <label key={cat.id} className="flex items-center gap-2 cursor-pointer group">
-                                <div
-                                  className={`w-3.5 h-3.5 rounded border-2 flex items-center justify-center transition-all duration-200 shrink-0 ${checked ? "bg-primary border-primary" : "border-primary/20 bg-white group-hover:border-primary/50"}`}
-                                  onClick={() => {
-                                    const curr = form.additionalCategoryIds || [];
-                                    setForm({ ...form, additionalCategoryIds: checked ? curr.filter(id => id !== cat.id) : [...curr, cat.id] });
-                                  }}
-                                >
-                                  {checked && <Check size={8} className="text-white" strokeWidth={3} />}
-                                </div>
-                                <span className={`text-xs transition-colors ${checked ? "text-primary font-medium" : "text-muted-foreground group-hover:text-foreground"}`}>{cat.name}</span>
-                              </label>
-                            );
-                          })}
-                          {(categories ?? []).length <= 1 && (
-                            <p className="text-xs text-muted-foreground/50 italic py-1">No other categories available</p>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="space-y-1.5 md:col-span-2">
-                        <Label htmlFor="description" className={labelCls}>Product Description</Label>
-                        <Textarea
-                          id="description"
-                          placeholder="Describe the product — heritage, materials, craftsmanship..."
-                          value={form.description}
-                          onChange={(e) => setForm({ ...form, description: e.target.value })}
-                          rows={3}
-                          className="bg-white border border-primary/10 hover:border-primary/25 rounded-xl py-2.5 px-4 text-sm focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all shadow-sm outline-none resize-none placeholder:text-muted-foreground/35"
-                          data-testid="input-description"
-                        />
-                      </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="category" className={labelCls}>
+                        <span>Primary Category *</span>
+                      </Label>
+                      <Select
+                        value={form.categoryId ? String(form.categoryId) : ""}
+                        onValueChange={(v) => setForm({ ...form, categoryId: parseInt(v, 10) })}
+                      >
+                        <SelectTrigger className={inputCls} data-testid="select-category">
+                          <SelectValue placeholder="Select Category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {(categories ?? []).map((cat: any) => (
+                            <SelectItem key={cat.id} value={String(cat.id)} className="text-xs">
+                              {cat.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
 
-                  {/* ── Section 2: Pricing & Stock ── */}
-                  <div className="mb-4">
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-primary text-[10px] font-black">2</div>
-                      <span className="text-[10px] font-black tracking-[0.3em] uppercase text-primary/70">Pricing & Inventory</span>
-                      <div className="flex-1 h-px bg-primary/8" />
+                  {/* Also Show In - Compact Pill Tags */}
+                  {(categories ?? []).length > 1 && (
+                    <div className="space-y-1.5 pt-1">
+                      <Label className="text-[10px] font-semibold text-stone-500 uppercase tracking-wider block">
+                        Also Show In Additional Categories (Optional)
+                      </Label>
+                      <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-1 bg-stone-50/60 rounded-lg border border-stone-100">
+                        {(categories ?? [])
+                          .filter((cat: any) => cat.id !== form.categoryId)
+                          .map((cat: any) => {
+                            const isChecked = (form.additionalCategoryIds || []).includes(cat.id);
+                            return (
+                              <button
+                                key={cat.id}
+                                type="button"
+                                onClick={() => {
+                                  const curr = form.additionalCategoryIds || [];
+                                  setForm({
+                                    ...form,
+                                    additionalCategoryIds: isChecked
+                                      ? curr.filter((id) => id !== cat.id)
+                                      : [...curr, cat.id],
+                                  });
+                                }}
+                                className={`text-[11px] px-2.5 py-1 rounded-md border font-medium transition-all flex items-center gap-1 ${
+                                  isChecked
+                                    ? "bg-primary text-white border-primary shadow-xs"
+                                    : "bg-white text-stone-600 border-stone-200 hover:border-stone-400 hover:bg-stone-50"
+                                }`}
+                              >
+                                {isChecked && <Check size={11} strokeWidth={3} />}
+                                {cat.name}
+                              </button>
+                            );
+                          })}
+                      </div>
                     </div>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                      <div className="space-y-1.5">
-                        <Label htmlFor="mrp" className={labelCls}>MRP (₹)</Label>
-                        <Input id="mrp" type="number" min="0" step="0.01" placeholder="0" className={inputCls} value={form.mrp !== undefined && form.mrp !== null ? form.mrp : ""} onChange={(e) => handleMrpChange(parseFloat(e.target.value) || 0)} data-testid="input-mrp" />
-                      </div>
-                      <div className="space-y-1.5">
-                        <Label htmlFor="discount" className={labelCls}>Discount %</Label>
-                        <Input id="discount" type="number" min="0" max="100" placeholder="0" className={inputCls} value={discountPercent !== undefined && discountPercent !== null ? discountPercent : ""} onChange={(e) => handleDiscountChange(parseFloat(e.target.value) || 0)} data-testid="input-discount" />
-                      </div>
-                      <div className="space-y-1.5">
-                        <Label htmlFor="price" className={labelCls}>Sale Price (₹) *</Label>
-                        <Input id="price" type="number" min="0" step="0.01" placeholder="0" className={`${inputCls} font-semibold text-primary`} value={form.price !== undefined && form.price !== null ? form.price : ""} onChange={(e) => handlePriceChange(parseFloat(e.target.value) || 0)} required data-testid="input-price" />
-                      </div>
-                      <div className="space-y-1.5">
-                        <Label htmlFor="stock" className={labelCls}>Stock Qty</Label>
-                        <Input id="stock" type="number" min="0" placeholder="0" className={inputCls} value={form.stock !== undefined && form.stock !== null ? form.stock : ""} onChange={(e) => setForm({ ...form, stock: parseInt(e.target.value, 10) || 0 })} data-testid="input-stock" />
-                      </div>
+                  )}
+
+                  {/* Description */}
+                  <div className="space-y-1">
+                    <Label htmlFor="description" className={labelCls}>
+                      <span>Description</span>
+                    </Label>
+                    <Textarea
+                      id="description"
+                      placeholder="Brief details regarding heritage, craftsmanship and significance..."
+                      value={form.description}
+                      onChange={(e) => setForm({ ...form, description: e.target.value })}
+                      rows={2}
+                      className="bg-white border border-stone-200 hover:border-stone-300 focus:border-primary/50 focus:ring-1 focus:ring-primary/20 rounded-lg p-2.5 text-xs outline-none resize-none placeholder:text-muted-foreground/40"
+                      data-testid="input-description"
+                    />
+                  </div>
+                </div>
+
+                {/* 2. Pricing & Inventory - Sleek 4 Col Grid */}
+                <div className="p-3 bg-stone-50/70 rounded-xl border border-stone-100 space-y-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                    <div className="space-y-1">
+                      <Label htmlFor="mrp" className={labelCls}>MRP (₹)</Label>
+                      <Input
+                        id="mrp"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        placeholder="0"
+                        className={inputCls}
+                        value={form.mrp !== undefined && form.mrp !== null ? form.mrp : ""}
+                        onChange={(e) => handleMrpChange(parseFloat(e.target.value) || 0)}
+                        data-testid="input-mrp"
+                      />
                     </div>
-                    {form.mrp > 0 && form.price > 0 && (
-                      <div className="mt-3 flex items-center gap-3 px-4 py-2.5 bg-gradient-to-r from-primary/5 to-amber-50/60 rounded-xl border border-primary/8">
-                        <span className="text-xs text-muted-foreground">Preview:</span>
-                        <span className="font-bold text-primary">₹{Number(form.price).toLocaleString("en-IN")}</span>
-                        <span className="text-sm line-through text-muted-foreground">₹{Number(form.mrp).toLocaleString("en-IN")}</span>
-                        {discountPercent > 0 && (
-                          <span className="text-xs font-black text-amber-700 bg-amber-100 px-2.5 py-0.5 rounded-full">{discountPercent}% OFF</span>
-                        )}
+                    <div className="space-y-1">
+                      <Label htmlFor="discount" className={labelCls}>Discount %</Label>
+                      <Input
+                        id="discount"
+                        type="number"
+                        min="0"
+                        max="100"
+                        placeholder="0"
+                        className={inputCls}
+                        value={discountPercent !== undefined && discountPercent !== null ? discountPercent : ""}
+                        onChange={(e) => handleDiscountChange(parseFloat(e.target.value) || 0)}
+                        data-testid="input-discount"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="price" className={labelCls}>Sale Price (₹) *</Label>
+                      <Input
+                        id="price"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        placeholder="0"
+                        className={`${inputCls} font-bold text-primary`}
+                        value={form.price !== undefined && form.price !== null ? form.price : ""}
+                        onChange={(e) => handlePriceChange(parseFloat(e.target.value) || 0)}
+                        required
+                        data-testid="input-price"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="stock" className={labelCls}>Stock</Label>
+                      <Input
+                        id="stock"
+                        type="number"
+                        min="0"
+                        placeholder="0"
+                        className={inputCls}
+                        value={form.stock !== undefined && form.stock !== null ? form.stock : ""}
+                        onChange={(e) => setForm({ ...form, stock: parseInt(e.target.value, 10) || 0 })}
+                        data-testid="input-stock"
+                      />
+                    </div>
+                  </div>
+
+                  {form.mrp > 0 && form.price > 0 && (
+                    <div className="flex items-center gap-2 pt-1 text-[11px]">
+                      <span className="text-muted-foreground">Live Customer Price:</span>
+                      <span className="font-bold text-primary">₹{Number(form.price).toLocaleString("en-IN")}</span>
+                      <span className="line-through text-muted-foreground/70">₹{Number(form.mrp).toLocaleString("en-IN")}</span>
+                      {discountPercent > 0 && (
+                        <span className="font-bold text-amber-700 bg-amber-100 px-1.5 py-0.2 rounded text-[10px]">
+                          {discountPercent}% OFF
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* 3. Specifications */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                  <div className="space-y-1">
+                    <Label htmlFor="material" className={labelCls}>Material</Label>
+                    <Input
+                      id="material"
+                      placeholder="e.g. Teak Wood, Brass"
+                      className={inputCls}
+                      value={form.material || ""}
+                      onChange={(e) => setForm({ ...form, material: e.target.value })}
+                      data-testid="input-material"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="size" className={labelCls}>Size / Dimensions</Label>
+                    <Input
+                      id="size"
+                      placeholder="e.g. 12 x 8 inches"
+                      className={inputCls}
+                      value={form.size || ""}
+                      onChange={(e) => setForm({ ...form, size: e.target.value })}
+                      data-testid="input-size"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="weight" className={labelCls}>Weight</Label>
+                    <Input
+                      id="weight"
+                      placeholder="e.g. 850 grams"
+                      className={inputCls}
+                      value={form.weight || ""}
+                      onChange={(e) => setForm({ ...form, weight: e.target.value })}
+                      data-testid="input-weight"
+                    />
+                  </div>
+                </div>
+
+                {/* 4. Images - Compact Side-by-Side Strip */}
+                <div className="p-3 bg-stone-50/70 rounded-xl border border-stone-100 space-y-2">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                    <div className="space-y-0.5">
+                      <Label className="text-xs font-semibold text-stone-800">Product Images</Label>
+                      <p className="text-[10px] text-muted-foreground">Upload main showcase picture and gallery shots</p>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <input type="file" id="main-image-input" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, true)} />
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        disabled={uploadingMain}
+                        onClick={() => document.getElementById("main-image-input")?.click()}
+                        className="h-7 px-2.5 rounded-md text-[11px] gap-1.5 border-stone-300 hover:bg-white"
+                      >
+                        {uploadingMain ? <span className="animate-spin text-xs">⌛</span> : <Upload size={12} />}
+                        {uploadingMain ? "Uploading..." : form.imageUrl ? "Change Main" : "Upload Main"}
+                      </Button>
+
+                      <input type="file" id="gallery-image-input" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, false)} />
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        disabled={uploadingExtra}
+                        onClick={() => document.getElementById("gallery-image-input")?.click()}
+                        className="h-7 px-2.5 rounded-md text-[11px] gap-1.5 border-stone-300 hover:bg-white"
+                      >
+                        {uploadingExtra ? <span className="animate-spin text-xs">⌛</span> : <Plus size={12} />}
+                        Add Gallery Image
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Image Thumbnails Strip */}
+                  <div className="flex items-center gap-2 overflow-x-auto py-1">
+                    {form.imageUrl && (
+                      <div className="relative group w-14 h-14 rounded-lg overflow-hidden border-2 border-primary/40 shrink-0 shadow-xs">
+                        <img src={form.imageUrl} alt="Main" className="w-full h-full object-cover" />
+                        <span className="absolute bottom-0 inset-x-0 bg-primary/90 text-[8px] font-bold text-white text-center py-0.5 uppercase tracking-wider">
+                          Main
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setForm({ ...form, imageUrl: "" })}
+                          className="absolute top-1 right-1 w-4 h-4 bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                          title="Remove main image"
+                        >
+                          <X size={10} />
+                        </button>
+                      </div>
+                    )}
+
+                    {(form.images || [])
+                      .filter((img) => img && !img.startsWith("data:") && img !== form.imageUrl)
+                      .map((img, idx) => (
+                        <div key={idx} className="relative group w-14 h-14 rounded-lg overflow-hidden border border-stone-200 shrink-0 shadow-xs">
+                          <img src={img} alt={`Gallery ${idx}`} className="w-full h-full object-cover" />
+                          <button
+                            type="button"
+                            onClick={() => setForm({ ...form, images: form.images?.filter((_, i) => i !== idx) })}
+                            className="absolute top-1 right-1 w-4 h-4 bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                            title="Remove image"
+                          >
+                            <X size={10} />
+                          </button>
+                        </div>
+                      ))}
+
+                    {!form.imageUrl && (form.images || []).length === 0 && (
+                      <div className="h-14 w-full flex items-center justify-center border border-dashed border-stone-300 rounded-lg text-[11px] text-muted-foreground/60 italic">
+                        No image uploaded yet
                       </div>
                     )}
                   </div>
+                </div>
 
-                  {/* ── Section 3: Product Specs ── */}
-                  <div className="mb-4">
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-primary text-[10px] font-black">3</div>
-                      <span className="text-[10px] font-black tracking-[0.3em] uppercase text-primary/70">Specifications</span>
-                      <div className="flex-1 h-px bg-primary/8" />
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                      <div className="space-y-1.5">
-                        <Label htmlFor="material" className={labelCls}>Material</Label>
-                        <Input id="material" placeholder="e.g. Pure Teak Wood & Brass" className={inputCls} value={form.material || ""} onChange={(e) => setForm({ ...form, material: e.target.value })} data-testid="input-material" />
-                      </div>
-                      <div className="space-y-1.5">
-                        <Label htmlFor="size" className={labelCls}>Dimensions / Size</Label>
-                        <Input id="size" placeholder="e.g. 14 x 10 inches" className={inputCls} value={form.size || ""} onChange={(e) => setForm({ ...form, size: e.target.value })} data-testid="input-size" />
-                      </div>
-                      <div className="space-y-1.5">
-                        <Label htmlFor="weight" className={labelCls}>Net Weight</Label>
-                        <Input id="weight" placeholder="e.g. 1.2 kg" className={inputCls} value={form.weight || ""} onChange={(e) => setForm({ ...form, weight: e.target.value })} data-testid="input-weight" />
-                      </div>
-                    </div>
-                  </div>
+                {/* 5. Status & Flags - Minimal 3-Button Toggle Row */}
+                <div className="grid grid-cols-3 gap-2">
+                  {/* Featured */}
+                  <button
+                    type="button"
+                    onClick={() => setForm({ ...form, featured: !form.featured })}
+                    className={`h-9 px-3 rounded-lg border text-xs font-medium transition-all flex items-center justify-center gap-1.5 ${
+                      form.featured
+                        ? "bg-amber-50 text-amber-800 border-amber-300 shadow-xs font-semibold"
+                        : "bg-white text-stone-600 border-stone-200 hover:bg-stone-50"
+                    }`}
+                  >
+                    <Star size={13} className={form.featured ? "text-amber-500 fill-amber-500" : "text-stone-400"} />
+                    <span>Featured</span>
+                  </button>
 
-                  {/* ── Section 4: Images ── */}
-                  <div className="mb-4">
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-primary text-[10px] font-black">4</div>
-                      <span className="text-[10px] font-black tracking-[0.3em] uppercase text-primary/70">Product Images</span>
-                      <div className="flex-1 h-px bg-primary/8" />
-                    </div>
+                  {/* Visible */}
+                  <button
+                    type="button"
+                    onClick={() => setForm({ ...form, isVisible: !form.isVisible })}
+                    className={`h-9 px-3 rounded-lg border text-xs font-medium transition-all flex items-center justify-center gap-1.5 ${
+                      form.isVisible
+                        ? "bg-green-50 text-green-800 border-green-300 shadow-xs font-semibold"
+                        : "bg-white text-stone-400 border-stone-200 hover:bg-stone-50"
+                    }`}
+                  >
+                    {form.isVisible ? <Eye size={13} className="text-green-600" /> : <EyeOff size={13} className="text-stone-400" />}
+                    <span>{form.isVisible ? "Visible" : "Hidden"}</span>
+                  </button>
 
-                    {/* Main Image row */}
-                    <div className="flex gap-3 items-center mb-3">
-                      <div className="flex-1">
-                        <Label className={`${labelCls} mb-1.5 block`}>Main Image</Label>
-                        <input type="file" id="image-upload" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, true)} />
-                        <button
-                          type="button" disabled={uploadingMain}
-                          className="w-full border border-dashed border-primary/25 bg-white/70 hover:bg-white hover:border-primary/40 rounded-xl px-4 py-2.5 flex flex-row h-auto items-center gap-2.5 cursor-pointer transition-all group disabled:opacity-60 text-left"
-                          onClick={() => document.getElementById("image-upload")?.click()}
-                        >
-                          {uploadingMain
-                            ? <svg className="animate-spin text-primary shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" strokeOpacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round"/></svg>
-                            : <Upload size={14} className="text-primary/50 group-hover:text-primary transition-colors shrink-0" />
-                          }
-                          <span className="text-sm text-muted-foreground group-hover:text-primary/80 transition-colors">
-                            {uploadingMain ? "Uploading…" : "Click to upload — PNG, JPG, WEBP"}
-                          </span>
-                        </button>
-                      </div>
-                      {form.imageUrl && (
-                        <div className="relative group w-16 h-16 rounded-xl overflow-hidden border-2 border-primary/15 shadow-md shrink-0">
-                          <img src={form.imageUrl} alt="Main" className="w-full h-full object-cover" />
-                          <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <button type="button" onClick={() => setForm({ ...form, imageUrl: "" })} className="bg-red-500 text-white p-1 rounded-full">
-                              <X size={9} />
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
+                  {/* New Arrival */}
+                  <button
+                    type="button"
+                    onClick={() => setForm({ ...form, isNewArrival: !form.isNewArrival })}
+                    className={`h-9 px-3 rounded-lg border text-xs font-medium transition-all flex items-center justify-center gap-1.5 ${
+                      form.isNewArrival
+                        ? "bg-primary/10 text-primary border-primary/30 shadow-xs font-semibold"
+                        : "bg-white text-stone-600 border-stone-200 hover:bg-stone-50"
+                    }`}
+                  >
+                    <Sparkles size={13} className={form.isNewArrival ? "text-primary fill-primary" : "text-stone-400"} />
+                    <span>New Arrival</span>
+                  </button>
+                </div>
 
-                    {/* Gallery row */}
-                    <div>
-                      <Label className={`${labelCls} mb-1.5 block`}>Gallery Images</Label>
-                      <div className="flex flex-wrap gap-2">
-                        {(form.images || []).filter(img => img && !img.startsWith('data:')).map((img, idx) => (
-                          <div key={idx} className="relative group w-16 h-16 rounded-xl overflow-hidden border-2 border-primary/10 shadow-sm transition-all hover:scale-[1.05]">
-                            <img src={img} alt={`Gallery ${idx}`} className="w-full h-full object-cover" />
-                            <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                              <button type="button" onClick={() => setForm({ ...form, images: form.images?.filter((_, i) => i !== idx) })} className="bg-red-500 text-white p-1 rounded-full">
-                                <X size={9} />
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                        <label className="flex flex-col items-center justify-center w-16 h-16 rounded-xl border-2 border-dashed border-primary/20 bg-white/80 hover:border-primary/40 cursor-pointer transition-all group">
-                          <input type="file" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, false)} />
-                          <Plus size={16} className="text-primary/50 group-hover:text-primary transition-colors" />
-                          <span className="text-[8px] font-black tracking-widest uppercase text-muted-foreground/60 mt-0.5">Add</span>
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* ── Section 5: Settings ── */}
-                  <div className="mb-4">
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-primary text-[10px] font-black">5</div>
-                      <span className="text-[10px] font-black tracking-[0.3em] uppercase text-primary/70">Visibility & Status</span>
-                      <div className="flex-1 h-px bg-primary/8" />
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                      {/* Featured */}
-                      <div className={`flex items-center gap-3 px-4 py-3.5 rounded-xl border-2 transition-all cursor-pointer ${form.featured ? "border-primary/30 bg-primary/5" : "border-primary/10 bg-white hover:border-primary/20"}`}
-                        onClick={() => setForm({ ...form, featured: !form.featured })}>
-                        <Switch id="featured" checked={form.featured} onCheckedChange={(v) => setForm({ ...form, featured: v })} data-testid="switch-featured" onClick={(e) => e.stopPropagation()} />
-                        <div>
-                          <div className="flex items-center gap-1.5">
-                            <Star size={13} className={form.featured ? "text-primary fill-primary" : "text-muted-foreground"} />
-                            <Label htmlFor="featured" className="cursor-pointer text-sm font-semibold">Featured</Label>
-                          </div>
-                          <p className="text-[11px] text-muted-foreground">Show on homepage</p>
-                        </div>
-                      </div>
-                      {/* Visible */}
-                      <div className={`flex items-center gap-3 px-4 py-3.5 rounded-xl border-2 transition-all cursor-pointer ${form.isVisible ? "border-green-300/50 bg-green-50/50" : "border-primary/10 bg-white hover:border-primary/20"}`}
-                        onClick={() => setForm({ ...form, isVisible: !form.isVisible })}>
-                        <Switch id="isVisible" checked={form.isVisible} onCheckedChange={(v) => setForm({ ...form, isVisible: v })} data-testid="switch-visible" onClick={(e) => e.stopPropagation()} />
-                        <div>
-                          <div className="flex items-center gap-1.5">
-                            {form.isVisible ? <Eye size={13} className="text-green-600" /> : <EyeOff size={13} className="text-muted-foreground" />}
-                            <Label htmlFor="isVisible" className="cursor-pointer text-sm font-semibold">Visible</Label>
-                          </div>
-                          <p className="text-[11px] text-muted-foreground">Show in store</p>
-                        </div>
-                      </div>
-                      {/* New Arrival */}
-                      <div className={`flex items-center gap-3 px-4 py-3.5 rounded-xl border-2 transition-all cursor-pointer ${form.isNewArrival ? "border-amber-300/50 bg-amber-50/50" : "border-primary/10 bg-white hover:border-primary/20"}`}
-                        onClick={() => setForm({ ...form, isNewArrival: !form.isNewArrival })}>
-                        <Switch id="isNewArrival" checked={form.isNewArrival} onCheckedChange={(v) => setForm({ ...form, isNewArrival: v })} data-testid="switch-new-arrival" onClick={(e) => e.stopPropagation()} />
-                        <div>
-                          <div className="flex items-center gap-1.5">
-                            <Sparkles size={13} className={form.isNewArrival ? "text-amber-600" : "text-muted-foreground"} />
-                            <Label htmlFor="isNewArrival" className="cursor-pointer text-sm font-semibold">New Arrival</Label>
-                          </div>
-                          <p className="text-[11px] text-muted-foreground">Show "New" badge</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* ── Form Actions ── */}
-                  <div className="flex gap-4 justify-end pt-4 border-t border-primary/8">
-                    <Button type="button" variant="outline" className="rounded-2xl border border-primary/15 text-sm font-semibold px-8 py-3 h-auto bg-white hover:bg-[#faf7f2] transition-all" onClick={() => setShowForm(false)}>
+                {/* Modal Footer */}
+                <div className="pt-3 border-t border-stone-100 flex items-center justify-between">
+                  <span className="text-[11px] text-muted-foreground hidden sm:inline">
+                    Changes sync immediately to Supabase
+                  </span>
+                  <div className="flex items-center gap-2 ml-auto">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="h-9 px-4 text-xs font-medium rounded-lg border-stone-200 hover:bg-stone-100"
+                      onClick={() => setShowForm(false)}
+                    >
                       Cancel
                     </Button>
-                    <Button type="submit" disabled={isPending} className="bg-primary text-primary-foreground hover:bg-primary/95 shadow-xl shadow-primary/20 rounded-2xl text-sm font-semibold px-10 py-3 h-auto transition-all hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50" data-testid="button-submit-product">
+                    <Button
+                      type="submit"
+                      disabled={isPending}
+                      className="h-9 px-5 text-xs font-semibold rounded-lg bg-primary text-white hover:bg-primary/90 shadow-sm"
+                      data-testid="button-submit-product"
+                    >
                       {isPending ? (
-                        <span className="flex items-center gap-2"><svg className="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" strokeOpacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round"/></svg> Saving…</span>
+                        <span className="flex items-center gap-1.5">
+                          <svg className="animate-spin" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10" strokeOpacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round"/></svg>
+                          Saving...
+                        </span>
                       ) : (
-                        <span className="flex items-center gap-2"><Check size={16} /> {editProduct ? "Save Changes" : "Add Product"}</span>
+                        <span className="flex items-center gap-1.5">
+                          <Check size={14} /> {editProduct ? "Save Changes" : "Create Product"}
+                        </span>
                       )}
                     </Button>
                   </div>
-                </form>
-              </CardContent>
-            </Card>
-          </motion.div>
+                </div>
+              </form>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
 
-      {/* ── Products Table ── */}
-      <Card className="border border-border/60 rounded-3xl overflow-hidden shadow-sm">
+      {/* ── Products Archive: Sleek, compact & fast table / list ── */}
+      <Card className="border border-stone-200 rounded-xl overflow-hidden shadow-xs bg-white">
         <CardContent className="p-0">
           {isLoading ? (
-            <div className="p-8 space-y-4">
+            <div className="p-6 space-y-3">
               {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="flex items-center gap-5">
-                  <div className="w-16 h-16 bg-muted rounded-2xl animate-pulse shrink-0" />
-                  <div className="flex-1 space-y-2">
-                    <div className="h-4 bg-muted rounded animate-pulse w-2/3" />
-                    <div className="h-3 bg-muted rounded animate-pulse w-1/3" />
+                <div key={i} className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-stone-100 rounded-lg animate-pulse shrink-0" />
+                  <div className="flex-1 space-y-1.5">
+                    <div className="h-3.5 bg-stone-100 rounded animate-pulse w-1/3" />
+                    <div className="h-2.5 bg-stone-100 rounded animate-pulse w-1/5" />
                   </div>
-                  <div className="w-24 h-8 bg-muted rounded-xl animate-pulse" />
+                  <div className="w-16 h-7 bg-stone-100 rounded-md animate-pulse" />
                 </div>
               ))}
             </div>
           ) : (products ?? []).length === 0 ? (
-            <div className="text-center py-24 text-muted-foreground">
-              <Package size={52} className="mx-auto mb-4 opacity-30" />
-              <p className="font-serif text-xl mb-2">No products yet</p>
-              <p className="text-sm mb-6">Add your first product to get started</p>
-              <Button onClick={openAdd} className="gap-2 bg-primary text-primary-foreground rounded-2xl px-6 py-3 h-auto">
-                <Plus size={16} /> Add Product
+            <div className="text-center py-16 text-muted-foreground">
+              <Package size={40} className="mx-auto mb-2 opacity-30" />
+              <p className="font-semibold text-stone-800 text-sm mb-1">No products yet</p>
+              <p className="text-xs mb-4">Add your first product to get started</p>
+              <Button onClick={openAdd} size="sm" className="gap-1.5 bg-primary text-white rounded-lg text-xs">
+                <Plus size={14} /> Add Product
               </Button>
             </div>
           ) : filteredProducts.length === 0 ? (
-            <div className="text-center py-20 text-muted-foreground">
-              <Search size={44} className="mx-auto mb-3 opacity-30 text-primary" />
-              <p className="font-serif text-xl mb-1 text-foreground">No matching products found</p>
-              <p className="text-sm mb-5 text-muted-foreground">
-                No products match "{searchQuery}"{selectedCategoryFilter !== "all" ? ` in selected category` : ""}.
+            <div className="text-center py-14 text-muted-foreground">
+              <Search size={32} className="mx-auto mb-2 opacity-30 text-primary" />
+              <p className="font-semibold text-stone-800 text-sm mb-0.5">No matching products</p>
+              <p className="text-xs mb-3 text-muted-foreground">
+                No items match "{searchQuery}"
               </p>
               <Button
                 variant="outline"
+                size="sm"
                 onClick={() => {
                   setSearchQuery("");
                   setSelectedCategoryFilter("all");
                 }}
-                className="gap-2 rounded-2xl border-primary/20 hover:bg-primary/5 text-xs font-semibold px-5 py-2.5 h-auto"
+                className="rounded-lg text-xs"
               >
-                Clear Search & Filters
+                Clear Search
               </Button>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-border bg-muted/20">
-                    <th className="text-left px-6 py-4 font-semibold text-muted-foreground text-xs uppercase tracking-widest">Product</th>
-                    <th className="text-left px-6 py-4 font-semibold text-muted-foreground text-xs uppercase tracking-widest hidden lg:table-cell">Category</th>
-                    <th className="text-left px-6 py-4 font-semibold text-muted-foreground text-xs uppercase tracking-widest">Price</th>
-                    <th className="text-center px-6 py-4 font-semibold text-muted-foreground text-xs uppercase tracking-widest hidden md:table-cell">Stock</th>
-                    <th className="text-left px-6 py-4 font-semibold text-muted-foreground text-xs uppercase tracking-widest hidden sm:table-cell">Status</th>
-                    <th className="text-right px-6 py-4 font-semibold text-muted-foreground text-xs uppercase tracking-widest">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[...filteredProducts].reverse().map((product: any, idx: number) => (
-                    <motion.tr
-                      key={product.id}
-                      initial={{ opacity: 0, y: 6 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: Math.min(idx * 0.02, 0.3) }}
-                      className="border-b border-border/50 last:border-0 hover:bg-primary/[0.02] transition-colors group"
-                      data-testid={`row-product-${product.id}`}
-                    >
-                      {/* Product cell */}
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-4">
-                          <div className="relative shrink-0">
+            <>
+              {/* Desktop Table View (sm+) */}
+              <div className="hidden sm:block overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-stone-200 bg-stone-50/80 text-[11px] font-semibold text-stone-500 uppercase tracking-wider">
+                      <th className="py-2.5 px-3.5">Product</th>
+                      <th className="py-2.5 px-3 hidden md:table-cell">Category</th>
+                      <th className="py-2.5 px-3">Price</th>
+                      <th className="py-2.5 px-3 text-center hidden lg:table-cell">Stock</th>
+                      <th className="py-2.5 px-3 hidden sm:table-cell">Status</th>
+                      <th className="py-2.5 px-3.5 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-stone-100">
+                    {[...filteredProducts].reverse().map((product: any) => (
+                      <tr
+                        key={product.id}
+                        className="hover:bg-stone-50/60 transition-colors group text-xs"
+                        data-testid={`row-product-${product.id}`}
+                      >
+                        {/* Product info */}
+                        <td className="py-2 px-3.5">
+                          <div className="flex items-center gap-3">
                             <img
                               src={product.imageUrl}
                               alt={product.name}
-                              className="w-16 h-16 rounded-2xl object-cover border border-border/60 shadow-sm group-hover:shadow-md transition-shadow"
+                              className="w-10 h-10 rounded-lg object-cover border border-stone-200 shrink-0 bg-stone-50"
                             />
-                            {product.isNewArrival && (
-                              <div className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-amber-400 rounded-full flex items-center justify-center shadow">
-                                <Sparkles size={10} className="text-white" />
+                            <div className="min-w-0 max-w-xs md:max-w-md">
+                              <p className="font-semibold text-stone-900 truncate leading-snug">
+                                {product.name}
+                              </p>
+                              <div className="flex items-center gap-2 mt-0.5">
+                                <span className="text-[11px] text-muted-foreground md:hidden truncate">
+                                  {product.categoryName}
+                                </span>
+                                {product.material && (
+                                  <span className="text-[11px] text-stone-400 hidden sm:inline truncate">
+                                    • {product.material}
+                                  </span>
+                                )}
                               </div>
-                            )}
-                          </div>
-                          <div className="min-w-0">
-                            <p className="font-semibold text-foreground text-base leading-snug line-clamp-1">{product.name}</p>
-                            <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1 lg:hidden">{product.categoryName}</p>
-                            {product.material && (
-                              <p className="text-[11px] text-muted-foreground/60 mt-0.5 hidden sm:block">{product.material}</p>
-                            )}
-                          </div>
-                        </div>
-                      </td>
-
-                      {/* Category cell */}
-                      <td className="px-6 py-4 hidden lg:table-cell">
-                        <div className="flex flex-wrap gap-1.5 items-center">
-                          <span className="text-sm text-foreground/80">{product.categoryName ?? "—"}</span>
-                          {(product.additionalCategoryNames || []).map((name: string) => (
-                            <span key={name} className="text-[9px] font-black tracking-widest uppercase bg-primary/8 text-primary/70 border border-primary/15 px-2 py-0.5 rounded-full">{name}</span>
-                          ))}
-                        </div>
-                      </td>
-
-                      {/* Price cell */}
-                      <td className="px-6 py-4">
-                        <div>
-                          <span className="font-bold text-primary text-base">₹{product.price.toLocaleString("en-IN")}</span>
-                          {product.mrp && product.mrp > product.price ? (
-                            <div className="flex items-center gap-1.5 mt-0.5">
-                              <span className="text-xs text-muted-foreground line-through">₹{product.mrp.toLocaleString("en-IN")}</span>
-                              <span className="text-[9px] font-black text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-full">
-                                {Math.round(((product.mrp - product.price) / product.mrp) * 100)}% OFF
-                              </span>
                             </div>
+                          </div>
+                        </td>
+
+                        {/* Category */}
+                        <td className="py-2 px-3 hidden md:table-cell text-stone-600">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="font-medium text-stone-700">{product.categoryName ?? "—"}</span>
+                            {(product.additionalCategoryNames || []).map((name: string) => (
+                              <span key={name} className="text-[10px] bg-stone-100 text-stone-600 px-1.5 py-0.2 rounded">
+                                {name}
+                              </span>
+                            ))}
+                          </div>
+                        </td>
+
+                        {/* Price */}
+                        <td className="py-2 px-3 whitespace-nowrap">
+                          <span className="font-bold text-stone-900">₹{Number(product.price).toLocaleString("en-IN")}</span>
+                          {product.mrp && product.mrp > product.price ? (
+                            <span className="text-[11px] text-muted-foreground line-through ml-1.5">
+                              ₹{Number(product.mrp).toLocaleString("en-IN")}
+                            </span>
                           ) : null}
-                        </div>
-                      </td>
+                        </td>
 
-                      {/* Stock cell */}
-                      <td className="px-6 py-4 text-center hidden md:table-cell">
-                        <span className={`text-base font-bold ${product.stock <= 3 ? "text-red-500" : product.stock <= 10 ? "text-amber-600" : "text-foreground"}`}>
-                          {product.stock}
-                        </span>
-                        {product.stock <= 3 && <p className="text-[9px] text-red-400 font-semibold mt-0.5">Low stock</p>}
-                      </td>
+                        {/* Stock */}
+                        <td className="py-2 px-3 text-center hidden lg:table-cell">
+                          <span className={`font-mono text-xs font-semibold ${product.stock <= 3 ? "text-red-600" : "text-stone-700"}`}>
+                            {product.stock}
+                          </span>
+                        </td>
 
-                      {/* Status cell */}
-                      <td className="px-6 py-4 hidden sm:table-cell">
-                        <div className="flex flex-col gap-1.5">
-                          {product.featured && <Badge className="bg-primary/10 text-primary text-[10px] font-semibold w-fit gap-1"><Star size={9} className="fill-primary" />Featured</Badge>}
-                          {product.isNewArrival && <Badge className="bg-amber-100 text-amber-700 text-[10px] font-semibold w-fit gap-1"><Sparkles size={9} />New</Badge>}
-                          {!product.isVisible
-                            ? <Badge variant="outline" className="text-[10px] opacity-50 w-fit"><EyeOff size={9} className="mr-1" />Hidden</Badge>
-                            : <Badge className="bg-green-50 text-green-700 text-[10px] font-semibold w-fit gap-1"><Eye size={9} />Active</Badge>
-                          }
-                        </div>
-                      </td>
+                        {/* Status */}
+                        <td className="py-2 px-3 hidden sm:table-cell">
+                          <div className="flex items-center gap-1.5">
+                            {product.featured && (
+                              <span className="text-[10px] font-medium bg-amber-50 text-amber-800 border border-amber-200 px-1.5 py-0.5 rounded flex items-center gap-1">
+                                <Star size={9} className="fill-amber-500 text-amber-500" /> Featured
+                              </span>
+                            )}
+                            {!product.isVisible ? (
+                              <span className="text-[10px] font-medium bg-stone-100 text-stone-500 px-1.5 py-0.5 rounded">
+                                Hidden
+                              </span>
+                            ) : (
+                              <span className="text-[10px] font-medium bg-green-50 text-green-700 border border-green-200 px-1.5 py-0.5 rounded">
+                                Active
+                              </span>
+                            )}
+                          </div>
+                        </td>
 
-                      {/* Actions cell */}
-                      <td className="px-6 py-4 text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <Button
-                            size="sm" variant="ghost"
-                            onClick={() => openEdit(product)}
-                            className="h-9 w-9 p-0 rounded-xl text-muted-foreground hover:text-foreground hover:bg-primary/8 transition-all"
-                            data-testid={`button-edit-${product.id}`}
-                          >
-                            <Pencil size={16} />
-                          </Button>
-                          <Button
-                            size="sm" variant="ghost"
-                            onClick={() => setDeleteId(product.id)}
-                            className="h-9 w-9 p-0 rounded-xl text-red-400 hover:text-red-600 hover:bg-red-50 transition-all"
-                            data-testid={`button-delete-${product.id}`}
-                          >
-                            <Trash2 size={16} />
-                          </Button>
+                        {/* Actions */}
+                        <td className="py-2 px-3.5 text-right whitespace-nowrap">
+                          <div className="flex items-center justify-end gap-1">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => openEdit(product)}
+                              className="h-7 w-7 p-0 rounded-md text-stone-500 hover:text-stone-900 hover:bg-stone-100"
+                              title="Edit product"
+                              data-testid={`button-edit-${product.id}`}
+                            >
+                              <Pencil size={13} />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => setDeleteId(product.id)}
+                              className="h-7 w-7 p-0 rounded-md text-stone-400 hover:text-red-600 hover:bg-red-50"
+                              title="Delete product"
+                              data-testid={`button-delete-${product.id}`}
+                            >
+                              <Trash2 size={13} />
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile Card View (< sm screens) */}
+              <div className="sm:hidden divide-y divide-stone-100">
+                {[...filteredProducts].reverse().map((product: any) => (
+                  <div
+                    key={product.id}
+                    className="p-3 flex items-center justify-between gap-3 hover:bg-stone-50/70 transition-colors"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <img
+                        src={product.imageUrl}
+                        alt={product.name}
+                        className="w-12 h-12 rounded-lg object-cover border border-stone-200 shrink-0 bg-stone-50"
+                      />
+                      <div className="min-w-0">
+                        <p className="font-semibold text-xs text-stone-900 truncate">{product.name}</p>
+                        <p className="text-[11px] text-muted-foreground truncate">{product.categoryName}</p>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <span className="font-bold text-xs text-primary">₹{Number(product.price).toLocaleString("en-IN")}</span>
+                          <span className="text-[10px] text-stone-500 font-mono">Stock: {product.stock}</span>
                         </div>
-                      </td>
-                    </motion.tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-1 shrink-0">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => openEdit(product)}
+                        className="h-8 w-8 p-0 rounded-lg text-stone-600 hover:bg-stone-100"
+                      >
+                        <Pencil size={14} />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setDeleteId(product.id)}
+                        className="h-8 w-8 p-0 rounded-lg text-red-500 hover:bg-red-50"
+                      >
+                        <Trash2 size={14} />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
           )}
         </CardContent>
       </Card>
 
-      {/* Delete confirmation */}
+      {/* Delete confirmation dialog */}
       <AlertDialog open={deleteId !== null} onOpenChange={(open) => !open && setDeleteId(null)}>
-        <AlertDialogContent className="rounded-3xl">
+        <AlertDialogContent className="rounded-2xl max-w-md">
           <AlertDialogHeader>
-            <AlertDialogTitle className="font-serif text-xl">Delete Product?</AlertDialogTitle>
-            <AlertDialogDescription className="text-sm leading-relaxed">
-              This action cannot be undone. The product will be permanently removed from your store and all categories.
+            <AlertDialogTitle className="text-base font-semibold text-stone-900">Delete Product?</AlertDialogTitle>
+            <AlertDialogDescription className="text-xs text-muted-foreground">
+              Are you sure you want to permanently delete this product? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-2">
-            <AlertDialogCancel className="rounded-2xl">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="rounded-lg h-9 text-xs">Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
-              className="bg-red-600 hover:bg-red-700 text-white rounded-2xl px-6"
+              className="bg-red-600 hover:bg-red-700 text-white rounded-lg h-9 text-xs px-4"
               data-testid="button-confirm-delete"
             >
-              Delete Product
+              Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
