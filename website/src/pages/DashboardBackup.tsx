@@ -4,6 +4,7 @@ import { Database, Download, Upload, CheckCircle2, AlertCircle, RefreshCw, FileJ
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import DashboardLayout from "@/components/DashboardLayout";
+import { customFetch } from "@workspace/api-client-react";
 
 export default function DashboardBackup() {
   const [loading, setLoading] = useState(false);
@@ -20,14 +21,10 @@ export default function DashboardBackup() {
     setStatusText("Preparing your database backup...");
     try {
       // 1. Fetch Categories
-      const catRes = await fetch("/api/categories");
-      if (!catRes.ok) throw new Error("Failed to fetch categories");
-      const categories = await catRes.json();
+      const categories = await customFetch<any[]>("/api/categories");
 
       // 2. Fetch Products
-      const prodRes = await fetch("/api/products");
-      if (!prodRes.ok) throw new Error("Failed to fetch products");
-      const products = await prodRes.json();
+      const products = await customFetch<any[]>("/api/products");
 
       // 3. Create Backup Payload
       const backupData = {
@@ -97,23 +94,21 @@ export default function DashboardBackup() {
       // 1. Clear database first if overwrite mode
       if (importMode === "overwrite") {
         setStatusText("Clearing existing products from database...");
-        const prodRes = await fetch("/api/products");
-        const existingProds = await prodRes.json();
+        const existingProds = await customFetch<any[]>("/api/products");
         let deletedProdCount = 0;
         for (const p of existingProds) {
           deletedProdCount++;
           setStatusText(`Deleting existing product ${deletedProdCount}/${existingProds.length}...`);
-          await fetch(`/api/products/${p.id}`, { method: "DELETE" });
+          await customFetch(`/api/products/${p.id}`, { method: "DELETE" });
         }
 
         setStatusText("Clearing existing categories from database...");
-        const catRes = await fetch("/api/categories");
-        const existingCats = await catRes.json();
+        const existingCats = await customFetch<any[]>("/api/categories");
         let deletedCatCount = 0;
         for (const c of existingCats) {
           deletedCatCount++;
           setStatusText(`Deleting existing category ${deletedCatCount}/${existingCats.length}...`);
-          await fetch(`/api/categories/${c.id}`, { method: "DELETE" });
+          await customFetch(`/api/categories/${c.id}`, { method: "DELETE" });
         }
       }
 
@@ -125,21 +120,22 @@ export default function DashboardBackup() {
         importedCats++;
         setStatusText(`Importing category ${importedCats}/${backup.categories.length}: ${cat.name}...`);
         
-        const res = await fetch("/api/categories", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: cat.name,
-            description: cat.description,
-            imageUrl: cat.imageUrl,
-          }),
-        });
+        try {
+          const newCat = await customFetch<any>("/api/categories", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name: cat.name,
+              description: cat.description,
+              imageUrl: cat.imageUrl,
+            }),
+          });
 
-        if (res.ok) {
-          const newCat = await res.json();
-          catMap[cat.id] = newCat.id; // Map original ID to newly generated database ID
-        } else {
-          console.error(`Failed to import category: ${cat.name}`);
+          if (newCat && newCat.id) {
+            catMap[cat.id] = newCat.id; // Map original ID to newly generated database ID
+          }
+        } catch (err) {
+          console.error(`Failed to import category: ${cat.name}`, err);
         }
       }
 
@@ -155,25 +151,29 @@ export default function DashboardBackup() {
           .map((oldId: number) => catMap[oldId])
           .filter(Boolean);
 
-        await fetch("/api/products", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: prod.name,
-            description: prod.description,
-            price: prod.price,
-            mrp: prod.mrp,
-            imageUrl: prod.imageUrl,
-            categoryId: mappedCatId,
-            stock: prod.stock || 0,
-            material: prod.material,
-            size: prod.size,
-            featured: prod.featured || false,
-            isVisible: prod.isVisible ?? true,
-            isNewArrival: prod.isNewArrival || false,
-            additionalCategoryIds: mappedAdditionalCatIds,
-          }),
-        });
+        try {
+          await customFetch("/api/products", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name: prod.name,
+              description: prod.description,
+              price: prod.price,
+              mrp: prod.mrp,
+              imageUrl: prod.imageUrl,
+              categoryId: mappedCatId,
+              stock: prod.stock || 0,
+              material: prod.material,
+              size: prod.size,
+              featured: prod.featured || false,
+              isVisible: prod.isVisible ?? true,
+              isNewArrival: prod.isNewArrival || false,
+              additionalCategoryIds: mappedAdditionalCatIds,
+            }),
+          });
+        } catch (err) {
+          console.error(`Failed to import product: ${prod.name}`, err);
+        }
       }
 
       setSuccess(

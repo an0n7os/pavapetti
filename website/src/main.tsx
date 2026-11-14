@@ -5,9 +5,16 @@ import "./index.css";
 
 // Configure API Base URL in production (e.g. Netlify)
 const apiUrl = import.meta.env.VITE_API_URL;
-const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+const isLocalhost = typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
+const isSelfDomain = typeof window !== "undefined" && Boolean(apiUrl && (
+  apiUrl === window.location.origin ||
+  apiUrl === window.location.origin + "/" ||
+  apiUrl === window.location.host ||
+  apiUrl === "/" ||
+  apiUrl === "/api"
+));
 
-if (apiUrl && (!apiUrl.includes("localhost") || isLocalhost)) {
+if (apiUrl && !isSelfDomain && (!apiUrl.includes("localhost") || isLocalhost)) {
   setBaseUrl(apiUrl);
 }
 

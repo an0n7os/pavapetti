@@ -135,10 +135,18 @@ export default function DashboardProducts() {
 
   const openEdit = (product: Product) => {
     setEditProduct(product);
-    const initialPrice = product.price;
-    const initialMrp = (product.mrp && product.mrp > 0) ? product.mrp : product.price;
+    const initialPrice = product.price ?? 0;
+    const initialMrp = (product.mrp && product.mrp > 0) ? product.mrp : initialPrice;
     const discount = initialMrp > initialPrice ? Math.round(((initialMrp - initialPrice) / initialMrp) * 100) : 0;
     setDiscountPercent(discount);
+    
+    const rawAddIds = (product as any).additionalCategoryIds ?? (product as any).additional_category_ids;
+    const parsedAddIds = Array.isArray(rawAddIds)
+      ? rawAddIds.map(Number)
+      : typeof rawAddIds === "string"
+        ? (() => { try { return JSON.parse(rawAddIds).map(Number); } catch { return []; } })()
+        : [];
+
     setForm({
       name: product.name,
       description: product.description,
@@ -147,8 +155,8 @@ export default function DashboardProducts() {
       imageUrl: product.imageUrl,
       images: product.images || [product.imageUrl],
       categoryId: product.categoryId,
-      additionalCategoryIds: (product as any).additionalCategoryIds || [],
-      stock: product.stock,
+      additionalCategoryIds: parsedAddIds,
+      stock: product.stock ?? 0,
       featured: product.featured,
       isVisible: product.isVisible !== undefined ? product.isVisible : true,
       isNewArrival: product.isNewArrival || false,
@@ -192,18 +200,20 @@ export default function DashboardProducts() {
     e.preventDefault();
     const sanitizedForm = {
       ...form,
-      price: Number(form.price) || 0,
-      mrp: form.mrp ? Number(form.mrp) : undefined,
+      price: typeof form.price === "number" ? form.price : (Number(form.price) || 0),
+      mrp: form.mrp !== undefined && form.mrp !== null && String(form.mrp) !== "" ? Number(form.mrp) : undefined,
       stock: parseInt(String(form.stock), 10) || 0,
       imageUrl: form.imageUrl || "",
       description: form.description || "",
+      categoryId: form.categoryId ? Number(form.categoryId) : undefined,
+      additionalCategoryIds: (form.additionalCategoryIds || []).map(Number),
     };
     if (editProduct) {
       updateProduct.mutate(
         { id: editProduct.id, data: sanitizedForm },
         {
           onSuccess: () => { toast({ title: "✅ Product updated successfully" }); setShowForm(false); invalidate(); },
-          onError: (error: any) => toast({ title: "Failed to update product", description: error.message, variant: "destructive" }),
+          onError: (error: any) => toast({ title: "Failed to update product", description: error?.message || "Database update failed", variant: "destructive" }),
         }
       );
     } else {
@@ -211,7 +221,7 @@ export default function DashboardProducts() {
         { data: sanitizedForm },
         {
           onSuccess: () => { toast({ title: "✅ Product created successfully" }); setShowForm(false); invalidate(); },
-          onError: (error: any) => toast({ title: "Failed to create product", description: error.message, variant: "destructive" }),
+          onError: (error: any) => toast({ title: "Failed to create product", description: error?.message || "Database creation failed", variant: "destructive" }),
         }
       );
     }
@@ -418,19 +428,19 @@ export default function DashboardProducts() {
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                       <div className="space-y-1.5">
                         <Label htmlFor="mrp" className={labelCls}>MRP (₹)</Label>
-                        <Input id="mrp" type="number" min="0" step="0.01" placeholder="0" className={inputCls} value={form.mrp || ""} onChange={(e) => handleMrpChange(parseFloat(e.target.value) || 0)} data-testid="input-mrp" />
+                        <Input id="mrp" type="number" min="0" step="0.01" placeholder="0" className={inputCls} value={form.mrp !== undefined && form.mrp !== null ? form.mrp : ""} onChange={(e) => handleMrpChange(parseFloat(e.target.value) || 0)} data-testid="input-mrp" />
                       </div>
                       <div className="space-y-1.5">
                         <Label htmlFor="discount" className={labelCls}>Discount %</Label>
-                        <Input id="discount" type="number" min="0" max="100" placeholder="0" className={inputCls} value={discountPercent || ""} onChange={(e) => handleDiscountChange(parseFloat(e.target.value) || 0)} data-testid="input-discount" />
+                        <Input id="discount" type="number" min="0" max="100" placeholder="0" className={inputCls} value={discountPercent !== undefined && discountPercent !== null ? discountPercent : ""} onChange={(e) => handleDiscountChange(parseFloat(e.target.value) || 0)} data-testid="input-discount" />
                       </div>
                       <div className="space-y-1.5">
                         <Label htmlFor="price" className={labelCls}>Sale Price (₹) *</Label>
-                        <Input id="price" type="number" min="0" step="0.01" placeholder="0" className={`${inputCls} font-semibold text-primary`} value={form.price || ""} onChange={(e) => handlePriceChange(parseFloat(e.target.value) || 0)} required data-testid="input-price" />
+                        <Input id="price" type="number" min="0" step="0.01" placeholder="0" className={`${inputCls} font-semibold text-primary`} value={form.price !== undefined && form.price !== null ? form.price : ""} onChange={(e) => handlePriceChange(parseFloat(e.target.value) || 0)} required data-testid="input-price" />
                       </div>
                       <div className="space-y-1.5">
                         <Label htmlFor="stock" className={labelCls}>Stock Qty</Label>
-                        <Input id="stock" type="number" min="0" placeholder="0" className={inputCls} value={form.stock || ""} onChange={(e) => setForm({ ...form, stock: parseInt(e.target.value, 10) || 0 })} data-testid="input-stock" />
+                        <Input id="stock" type="number" min="0" placeholder="0" className={inputCls} value={form.stock !== undefined && form.stock !== null ? form.stock : ""} onChange={(e) => setForm({ ...form, stock: parseInt(e.target.value, 10) || 0 })} data-testid="input-stock" />
                       </div>
                     </div>
                     {form.mrp > 0 && form.price > 0 && (

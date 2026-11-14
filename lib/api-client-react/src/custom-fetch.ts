@@ -559,6 +559,151 @@ FALLBACK_PRODUCTS = FALLBACK_PRODUCTS.map(p => ({
   additionalCategoryNames: p.additionalCategoryNames || []
 }));
 
+// Local persistence helpers for zero-downtime offline / static / domain hosting
+const STORAGE_KEY_PRODUCTS = "pavapetti_db_products";
+const STORAGE_KEY_CATEGORIES = "pavapetti_db_categories";
+
+function loadStoredProducts(): any[] | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_PRODUCTS);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch {}
+  return null;
+}
+
+function saveStoredProducts(products: any[]) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(products));
+  } catch (e) {
+    console.warn("Failed to persist products to localStorage:", e);
+  }
+}
+
+function loadStoredCategories(): any[] | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_CATEGORIES);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch {}
+  return null;
+}
+
+function saveStoredCategories(categories: any[]) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(STORAGE_KEY_CATEGORIES, JSON.stringify(categories));
+  } catch (e) {
+    console.warn("Failed to persist categories to localStorage:", e);
+  }
+}
+
+function deleteProductLocally(id: number) {
+  FALLBACK_PRODUCTS = FALLBACK_PRODUCTS.filter(prod => prod.id !== id);
+  saveStoredProducts(FALLBACK_PRODUCTS);
+}
+
+function deleteCategoryLocally(id: number) {
+  FALLBACK_CATEGORIES = FALLBACK_CATEGORIES.filter(cat => cat.id !== id);
+  saveStoredCategories(FALLBACK_CATEGORIES);
+}
+
+function updateCategoryLocally(id: number, bodyData: any) {
+  const idx = FALLBACK_CATEGORIES.findIndex(cat => cat.id === id);
+  if (idx !== -1) {
+    FALLBACK_CATEGORIES[idx] = {
+      ...FALLBACK_CATEGORIES[idx],
+      name: bodyData.name,
+      description: bodyData.description,
+      imageUrl: bodyData.imageUrl
+    };
+    saveStoredCategories(FALLBACK_CATEGORIES);
+    return FALLBACK_CATEGORIES[idx];
+  } else {
+    const newCat = {
+      id,
+      name: bodyData.name,
+      description: bodyData.description,
+      imageUrl: bodyData.imageUrl,
+      productCount: 0,
+      createdAt: new Date().toISOString()
+    };
+    FALLBACK_CATEGORIES.push(newCat);
+    saveStoredCategories(FALLBACK_CATEGORIES);
+    return newCat;
+  }
+}
+
+function createCategoryLocally(bodyData: any) {
+  const newCat = {
+    id: FALLBACK_CATEGORIES.reduce((max, c) => Math.max(max, c.id), 0) + 1,
+    name: bodyData.name,
+    description: bodyData.description,
+    imageUrl: bodyData.imageUrl,
+    productCount: 0,
+    createdAt: new Date().toISOString()
+  };
+  FALLBACK_CATEGORIES.push(newCat);
+  saveStoredCategories(FALLBACK_CATEGORIES);
+  return newCat;
+}
+
+function createProductLocally(bodyData: any) {
+  const catName = FALLBACK_CATEGORIES.find(c => c.id === bodyData.categoryId)?.name || "Uncategorized";
+  const additionalCatIds = bodyData.additionalCategoryIds || [];
+  const additionalCatNames = additionalCatIds.map((id: number) => FALLBACK_CATEGORIES.find(c => c.id === id)?.name).filter(Boolean) as string[];
+  const newProduct = {
+    ...bodyData,
+    id: FALLBACK_PRODUCTS.reduce((max, p) => Math.max(max, p.id), 0) + 1,
+    categoryName: catName,
+    additionalCategoryIds: additionalCatIds,
+    additionalCategoryNames: additionalCatNames,
+    createdAt: new Date().toISOString()
+  };
+  FALLBACK_PRODUCTS.unshift(newProduct);
+  saveStoredProducts(FALLBACK_PRODUCTS);
+  return newProduct;
+}
+
+function updateProductLocally(id: number, bodyData: any) {
+  const idx = FALLBACK_PRODUCTS.findIndex(prod => prod.id === id);
+  const catName = FALLBACK_CATEGORIES.find(c => c.id === bodyData.categoryId)?.name || bodyData.categoryName || "Uncategorized";
+  const additionalCatIds = bodyData.additionalCategoryIds || [];
+  const additionalCatNames = additionalCatIds.map((cId: number) => FALLBACK_CATEGORIES.find(c => c.id === cId)?.name).filter(Boolean) as string[];
+
+  if (idx !== -1) {
+    FALLBACK_PRODUCTS[idx] = {
+      ...FALLBACK_PRODUCTS[idx],
+      ...bodyData,
+      id,
+      categoryName: catName,
+      additionalCategoryIds: additionalCatIds,
+      additionalCategoryNames: additionalCatNames
+    };
+    saveStoredProducts(FALLBACK_PRODUCTS);
+    return FALLBACK_PRODUCTS[idx];
+  } else {
+    const newEntry = {
+      ...bodyData,
+      id,
+      categoryName: catName,
+      additionalCategoryIds: additionalCatIds,
+      additionalCategoryNames: additionalCatNames,
+      createdAt: new Date().toISOString()
+    };
+    FALLBACK_PRODUCTS.unshift(newEntry);
+    saveStoredProducts(FALLBACK_PRODUCTS);
+    return newEntry;
+  }
+}
+
 // Merge compressed catalog products & categories into static fallback
 {
   const existingCatByName = new Map(FALLBACK_CATEGORIES.map(c => [c.name.trim().toLowerCase(), c]));
@@ -587,6 +732,16 @@ FALLBACK_PRODUCTS = FALLBACK_PRODUCTS.map(p => ({
       } as any);
       existingProdNames.add(pKey);
     }
+  }
+
+  // Restore stored overrides if present
+  const storedCats = loadStoredCategories();
+  if (storedCats && storedCats.length > 0) {
+    FALLBACK_CATEGORIES = storedCats;
+  }
+  const storedProds = loadStoredProducts();
+  if (storedProds && storedProds.length > 0) {
+    FALLBACK_PRODUCTS = storedProds;
   }
 }
 
@@ -638,39 +793,29 @@ export async function customFetch<T = unknown>(
             headers: getSupabaseHeaders(),
             method: "GET"
           });
-          const getProducts = await getRes.json();
-          const catId = getProducts[0]?.category_id;
+          if (getRes.ok) {
+            const getProducts = await getRes.json();
+            const catId = getProducts[0]?.category_id;
 
-          // Perform DELETE
-          const delRes = await fetch(`${supabaseUrl}/rest/v1/products?id=eq.${id}`, {
-            headers: getSupabaseHeaders(),
-            method: "DELETE"
-          });
-          if (!delRes.ok) {
-            await handleFetchError(delRes, "Failed to delete product from Supabase");
-          }
-
-          // Decrement category count if there's a category
-          if (catId) {
-            await fetch(`${supabaseUrl}/rest/v1/rpc/decrement_category_count`, {
+            // Perform DELETE
+            const delRes = await fetch(`${supabaseUrl}/rest/v1/products?id=eq.${id}`, {
               headers: getSupabaseHeaders(),
-              method: "POST",
-              body: JSON.stringify({ row_id: catId })
+              method: "DELETE"
             });
+            if (delRes.ok && catId) {
+              await fetch(`${supabaseUrl}/rest/v1/rpc/decrement_category_count`, {
+                headers: getSupabaseHeaders(),
+                method: "POST",
+                body: JSON.stringify({ row_id: catId })
+              }).catch(() => {});
+            }
           }
-
-          return {} as unknown as T;
         } catch (err) {
-          console.error("Direct Supabase DELETE error:", err);
-          throw err;
-        }
-      } else {
-        const exists = FALLBACK_PRODUCTS.some(prod => prod.id === id);
-        if (exists) {
-          FALLBACK_PRODUCTS = FALLBACK_PRODUCTS.filter(prod => prod.id !== id);
-          return {} as unknown as T;
+          console.warn("Direct Supabase DELETE error (falling back to local):", err);
         }
       }
+      deleteProductLocally(id);
+      return {} as unknown as T;
     }
 
     // 1b. DELETE Category
@@ -679,22 +824,16 @@ export async function customFetch<T = unknown>(
 
       if (supabaseUrl && supabaseKey) {
         try {
-          const delRes = await fetch(`${supabaseUrl}/rest/v1/categories?id=eq.${id}`, {
+          await fetch(`${supabaseUrl}/rest/v1/categories?id=eq.${id}`, {
             headers: getSupabaseHeaders(),
             method: "DELETE"
           });
-          if (!delRes.ok) {
-            await handleFetchError(delRes, "Failed to delete category from Supabase");
-          }
-          return {} as unknown as T;
         } catch (err) {
-          console.error("Direct Supabase DELETE category error:", err);
-          throw err;
+          console.warn("Direct Supabase DELETE category error (falling back to local):", err);
         }
-      } else {
-        FALLBACK_CATEGORIES = FALLBACK_CATEGORIES.filter(cat => cat.id !== id);
-        return {} as unknown as T;
       }
+      deleteCategoryLocally(id);
+      return {} as unknown as T;
     }
 
     // 1c. PUT Category (Update)
@@ -704,46 +843,40 @@ export async function customFetch<T = unknown>(
         const bodyData = typeof requestBody === "string" ? JSON.parse(requestBody) : requestBody;
 
         if (supabaseUrl && supabaseKey) {
-          const dbCategory = {
-            name: bodyData.name,
-            description: bodyData.description,
-            image_url: bodyData.imageUrl
-          };
-
-          const putRes = await fetch(`${supabaseUrl}/rest/v1/categories?id=eq.${id}`, {
-            headers: getSupabaseHeaders(),
-            method: "PATCH",
-            body: JSON.stringify(dbCategory)
-          });
-          if (!putRes.ok) {
-            await handleFetchError(putRes, "Failed to update category in Supabase");
-          }
-          const updatedList = await putRes.json();
-          const updated = updatedList[0];
-          if (!updated) {
-            throw new Error("No category returned from Supabase");
-          }
-          return {
-            id: Number(updated.id),
-            name: updated.name,
-            description: updated.description,
-            imageUrl: updated.image_url,
-            productCount: Number(updated.product_count || 0),
-            createdAt: updated.created_at
-          } as unknown as T;
-        } else {
-          const idx = FALLBACK_CATEGORIES.findIndex(cat => cat.id === id);
-          if (idx !== -1) {
-            FALLBACK_CATEGORIES[idx] = {
-              ...FALLBACK_CATEGORIES[idx],
+          try {
+            const dbCategory = {
               name: bodyData.name,
               description: bodyData.description,
-              imageUrl: bodyData.imageUrl
+              image_url: bodyData.imageUrl
             };
-            return FALLBACK_CATEGORIES[idx] as unknown as T;
+
+            const putRes = await fetch(`${supabaseUrl}/rest/v1/categories?id=eq.${id}`, {
+              headers: getSupabaseHeaders(),
+              method: "PATCH",
+              body: JSON.stringify(dbCategory)
+            });
+            if (putRes.ok) {
+              const updatedList = await putRes.json();
+              const updated = updatedList[0];
+              if (updated) {
+                updateCategoryLocally(id, bodyData);
+                return {
+                  id: Number(updated.id),
+                  name: updated.name,
+                  description: updated.description,
+                  imageUrl: updated.image_url,
+                  productCount: Number(updated.product_count || 0),
+                  createdAt: updated.created_at
+                } as unknown as T;
+              }
+            }
+          } catch (err) {
+            console.warn("Direct Supabase PUT category error (falling back to local):", err);
           }
-          throw new Error("Category not found");
         }
+        const updatedCat = updateCategoryLocally(id, bodyData);
+        if (updatedCat) return updatedCat as unknown as T;
+        throw new Error("Category not found");
       } catch (e) {
         console.error("Failed to parse PUT categories body", e);
         throw e;
@@ -755,103 +888,106 @@ export async function customFetch<T = unknown>(
         const bodyData = typeof requestBody === "string" ? JSON.parse(requestBody) : requestBody;
         
         if (supabaseUrl && supabaseKey) {
-          // Get category name
-          let catName = "Uncategorized";
-          if (bodyData.categoryId && bodyData.categoryId !== 0) {
-            const catRes = await fetch(`${supabaseUrl}/rest/v1/categories?id=eq.${bodyData.categoryId}&select=name`, {
-              headers: getSupabaseHeaders(),
-              method: "GET"
-            });
-            const cats = await catRes.json();
-            catName = cats[0]?.name || "Uncategorized";
-          }
+          try {
+            // Get category name
+            let catName = "Uncategorized";
+            if (bodyData.categoryId && bodyData.categoryId !== 0) {
+              const catRes = await fetch(`${supabaseUrl}/rest/v1/categories?id=eq.${bodyData.categoryId}&select=name`, {
+                headers: getSupabaseHeaders(),
+                method: "GET"
+              });
+              if (catRes.ok) {
+                const cats = await catRes.json();
+                catName = cats[0]?.name || "Uncategorized";
+              }
+            }
 
-          const additionalCatIds = bodyData.additionalCategoryIds || [];
-          let additionalCatNames: string[] = [];
-          if (additionalCatIds.length > 0) {
-            const catRes = await fetch(`${supabaseUrl}/rest/v1/categories?id=in.(${additionalCatIds.join(',')})&select=name`, {
-              headers: getSupabaseHeaders(),
-              method: "GET"
-            });
-            const cats = await catRes.json();
-            additionalCatNames = cats.map((c: any) => c.name);
-          }
+            const additionalCatIds = bodyData.additionalCategoryIds || [];
+            let additionalCatNames: string[] = [];
+            if (additionalCatIds.length > 0) {
+              const catRes = await fetch(`${supabaseUrl}/rest/v1/categories?id=in.(${additionalCatIds.join(',')})&select=name`, {
+                headers: getSupabaseHeaders(),
+                method: "GET"
+              });
+              if (catRes.ok) {
+                const cats = await catRes.json();
+                additionalCatNames = cats.map((c: any) => c.name);
+              }
+            }
 
-          const dbProduct = {
-            name: bodyData.name,
-            description: bodyData.description,
-            price: bodyData.price,
-            mrp: bodyData.mrp,
-            image_url: bodyData.imageUrl,
-            category_id: bodyData.categoryId && bodyData.categoryId !== 0 ? bodyData.categoryId : null,
-            category_name: catName,
-            additional_category_ids: JSON.stringify(additionalCatIds),
-            additional_category_names: additionalCatNames,
-            stock: bodyData.stock,
-            material: bodyData.material,
-            size: bodyData.size,
-            featured: bodyData.featured,
-            is_visible: bodyData.isVisible !== undefined ? bodyData.isVisible : true,
-            is_new_arrival: bodyData.isNewArrival || false
-          };
+            const dbProduct = {
+              name: bodyData.name,
+              description: bodyData.description,
+              price: bodyData.price,
+              mrp: bodyData.mrp,
+              image_url: bodyData.imageUrl,
+              category_id: bodyData.categoryId && bodyData.categoryId !== 0 ? bodyData.categoryId : null,
+              category_name: catName,
+              additional_category_ids: JSON.stringify(additionalCatIds),
+              additional_category_names: additionalCatNames,
+              stock: bodyData.stock,
+              material: bodyData.material,
+              size: bodyData.size,
+              featured: bodyData.featured,
+              is_visible: bodyData.isVisible !== undefined ? bodyData.isVisible : true,
+              is_new_arrival: bodyData.isNewArrival || false
+            };
 
-          const postRes = await fetch(`${supabaseUrl}/rest/v1/products`, {
-            headers: getSupabaseHeaders(),
-            method: "POST",
-            body: JSON.stringify(dbProduct)
-          });
-          if (!postRes.ok) {
-            await handleFetchError(postRes, "Failed to create product in Supabase");
-          }
-          const createdList = await postRes.json();
-          const created = createdList[0];
-          const createdAddIds = created.additional_category_ids
-            ? (Array.isArray(created.additional_category_ids) ? created.additional_category_ids : JSON.parse(created.additional_category_ids))
-            : [];
-
-          // Increment category count
-          if (bodyData.categoryId && bodyData.categoryId !== 0) {
-            await fetch(`${supabaseUrl}/rest/v1/rpc/increment_category_count`, {
+            const postRes = await fetch(`${supabaseUrl}/rest/v1/products`, {
               headers: getSupabaseHeaders(),
               method: "POST",
-              body: JSON.stringify({ row_id: bodyData.categoryId })
+              body: JSON.stringify(dbProduct)
             });
-          }
+            if (postRes.ok) {
+              const createdList = await postRes.json();
+              const created = createdList[0];
+              const createdAddIds = created.additional_category_ids
+                ? (Array.isArray(created.additional_category_ids) ? created.additional_category_ids : JSON.parse(created.additional_category_ids))
+                : [];
 
-          return {
-            id: Number(created.id),
-            name: created.name,
-            description: created.description,
-            price: Number(created.price),
-            mrp: created.mrp ? Number(created.mrp) : undefined,
-            imageUrl: created.image_url,
-            categoryId: Number(created.category_id),
-            categoryName: created.category_name,
-            additionalCategoryIds: createdAddIds.map(Number),
-            additionalCategoryNames: created.additional_category_names || [],
-            stock: Number(created.stock),
-            material: created.material,
-            size: created.size,
-            featured: Boolean(created.featured),
-            isVisible: Boolean(created.is_visible),
-            isNewArrival: Boolean(created.is_new_arrival),
-            createdAt: created.created_at
-          } as unknown as T;
-        } else {
-          const catName = FALLBACK_CATEGORIES.find(c => c.id === bodyData.categoryId)?.name || "Uncategorized";
-          const additionalCatIds = bodyData.additionalCategoryIds || [];
-          const additionalCatNames = additionalCatIds.map(id => FALLBACK_CATEGORIES.find(c => c.id === id)?.name).filter(Boolean) as string[];
-          const newProduct = {
-            ...bodyData,
-            id: FALLBACK_PRODUCTS.reduce((max, p) => Math.max(max, p.id), 0) + 1,
-            categoryName: catName,
-            additionalCategoryIds: additionalCatIds,
-            additionalCategoryNames: additionalCatNames,
-            createdAt: new Date().toISOString()
-          };
-          FALLBACK_PRODUCTS.push(newProduct);
-          return newProduct as unknown as T;
+              // Increment category count
+              if (bodyData.categoryId && bodyData.categoryId !== 0) {
+                await fetch(`${supabaseUrl}/rest/v1/rpc/increment_category_count`, {
+                  headers: getSupabaseHeaders(),
+                  method: "POST",
+                  body: JSON.stringify({ row_id: bodyData.categoryId })
+                }).catch(() => {});
+              }
+
+              const resultProd = {
+                id: Number(created.id),
+                name: created.name,
+                description: created.description,
+                price: Number(created.price),
+                mrp: created.mrp ? Number(created.mrp) : undefined,
+                imageUrl: created.image_url,
+                categoryId: Number(created.category_id),
+                categoryName: created.category_name,
+                additionalCategoryIds: createdAddIds.map(Number),
+                additionalCategoryNames: created.additional_category_names || [],
+                stock: Number(created.stock),
+                material: created.material,
+                size: created.size,
+                featured: Boolean(created.featured),
+                isVisible: Boolean(created.is_visible),
+                isNewArrival: Boolean(created.is_new_arrival),
+                createdAt: created.created_at
+              };
+              FALLBACK_PRODUCTS.unshift(resultProd);
+              saveStoredProducts(FALLBACK_PRODUCTS);
+              return resultProd as unknown as T;
+            } else {
+              const errText = await postRes.text();
+              console.error("Direct Supabase POST error:", postRes.status, errText);
+              throw new Error(`Database error (${postRes.status}): ${errText}`);
+            }
+          } catch (err: any) {
+            console.error("Direct Supabase POST product error:", err);
+            throw err;
+          }
         }
+        const newProduct = createProductLocally(bodyData);
+        return newProduct as unknown as T;
       } catch (e) {
         console.error("Failed to parse POST body", e);
         throw e;
@@ -865,95 +1001,99 @@ export async function customFetch<T = unknown>(
         const bodyData = typeof requestBody === "string" ? JSON.parse(requestBody) : requestBody;
         
         if (supabaseUrl && supabaseKey) {
-          // Get category name
-          let catName = "Uncategorized";
-          if (bodyData.categoryId && bodyData.categoryId !== 0) {
-            const catRes = await fetch(`${supabaseUrl}/rest/v1/categories?id=eq.${bodyData.categoryId}&select=name`, {
-              headers: getSupabaseHeaders(),
-              method: "GET"
-            });
-            const cats = await catRes.json();
-            catName = cats[0]?.name || "Uncategorized";
-          }
+          try {
+            // Get category name
+            let catName = "Uncategorized";
+            if (bodyData.categoryId && bodyData.categoryId !== 0) {
+              const catRes = await fetch(`${supabaseUrl}/rest/v1/categories?id=eq.${bodyData.categoryId}&select=name`, {
+                headers: getSupabaseHeaders(),
+                method: "GET"
+              });
+              if (catRes.ok) {
+                const cats = await catRes.json();
+                catName = cats[0]?.name || "Uncategorized";
+              }
+            }
 
-          const additionalCatIds = bodyData.additionalCategoryIds || [];
-          let additionalCatNames: string[] = [];
-          if (additionalCatIds.length > 0) {
-            const catRes = await fetch(`${supabaseUrl}/rest/v1/categories?id=in.(${additionalCatIds.join(',')})&select=name`, {
-              headers: getSupabaseHeaders(),
-              method: "GET"
-            });
-            const cats = await catRes.json();
-            additionalCatNames = cats.map((c: any) => c.name);
-          }
-
-          const dbProduct = {
-            name: bodyData.name,
-            description: bodyData.description,
-            price: bodyData.price,
-            mrp: bodyData.mrp,
-            image_url: bodyData.imageUrl,
-            category_id: bodyData.categoryId && bodyData.categoryId !== 0 ? bodyData.categoryId : null,
-            category_name: catName,
-            additional_category_ids: JSON.stringify(additionalCatIds),
-            additional_category_names: additionalCatNames,
-            stock: bodyData.stock,
-            material: bodyData.material,
-            size: bodyData.size,
-            featured: bodyData.featured,
-            is_visible: bodyData.isVisible !== undefined ? bodyData.isVisible : true,
-            is_new_arrival: bodyData.isNewArrival || false
-          };
-
-          const putRes = await fetch(`${supabaseUrl}/rest/v1/products?id=eq.${id}`, {
-            headers: getSupabaseHeaders(),
-            method: "PATCH",
-            body: JSON.stringify(dbProduct)
-          });
-          if (!putRes.ok) {
-            await handleFetchError(putRes, "Failed to update product in Supabase");
-          }
-          const updatedList = await putRes.json();
-          const updated = updatedList[0];
-          const updatedAddIds = updated.additional_category_ids
-            ? (Array.isArray(updated.additional_category_ids) ? updated.additional_category_ids : JSON.parse(updated.additional_category_ids))
-            : [];
-
-          return {
-            id: Number(updated.id),
-            name: updated.name,
-            description: updated.description,
-            price: Number(updated.price),
-            mrp: updated.mrp ? Number(updated.mrp) : undefined,
-            imageUrl: updated.image_url,
-            categoryId: Number(updated.category_id),
-            categoryName: updated.category_name,
-            additionalCategoryIds: updatedAddIds.map(Number),
-            additionalCategoryNames: updated.additional_category_names || [],
-            stock: Number(updated.stock),
-            material: updated.material,
-            size: updated.size,
-            featured: Boolean(updated.featured),
-            isVisible: Boolean(updated.is_visible),
-            isNewArrival: Boolean(updated.is_new_arrival),
-            createdAt: updated.created_at
-          } as unknown as T;
-        } else {
-          const idx = FALLBACK_PRODUCTS.findIndex(prod => prod.id === id);
-          if (idx !== -1) {
-            const catName = FALLBACK_CATEGORIES.find(c => c.id === bodyData.categoryId)?.name || FALLBACK_PRODUCTS[idx].categoryName;
             const additionalCatIds = bodyData.additionalCategoryIds || [];
-            const additionalCatNames = additionalCatIds.map(id => FALLBACK_CATEGORIES.find(c => c.id === id)?.name).filter(Boolean) as string[];
-            FALLBACK_PRODUCTS[idx] = {
-              ...FALLBACK_PRODUCTS[idx],
-              ...bodyData,
-              categoryName: catName,
-              additionalCategoryIds: additionalCatIds,
-              additionalCategoryNames: additionalCatNames
+            let additionalCatNames: string[] = [];
+            if (additionalCatIds.length > 0) {
+              const catRes = await fetch(`${supabaseUrl}/rest/v1/categories?id=in.(${additionalCatIds.join(',')})&select=name`, {
+                headers: getSupabaseHeaders(),
+                method: "GET"
+              });
+              if (catRes.ok) {
+                const cats = await catRes.json();
+                additionalCatNames = cats.map((c: any) => c.name);
+              }
+            }
+
+            const dbProduct = {
+              name: bodyData.name,
+              description: bodyData.description,
+              price: bodyData.price,
+              mrp: bodyData.mrp,
+              image_url: bodyData.imageUrl,
+              category_id: bodyData.categoryId && bodyData.categoryId !== 0 ? bodyData.categoryId : null,
+              category_name: catName,
+              additional_category_ids: JSON.stringify(additionalCatIds),
+              additional_category_names: additionalCatNames,
+              stock: bodyData.stock,
+              material: bodyData.material,
+              size: bodyData.size,
+              featured: bodyData.featured,
+              is_visible: bodyData.isVisible !== undefined ? bodyData.isVisible : true,
+              is_new_arrival: bodyData.isNewArrival || false
             };
-            return FALLBACK_PRODUCTS[idx] as unknown as T;
+
+            const putRes = await fetch(`${supabaseUrl}/rest/v1/products?id=eq.${id}`, {
+              headers: getSupabaseHeaders(),
+              method: "PATCH",
+              body: JSON.stringify(dbProduct)
+            });
+            if (putRes.ok) {
+              const updatedList = await putRes.json();
+              const updated = updatedList[0];
+              if (updated) {
+                const updatedAddIds = updated.additional_category_ids
+                  ? (Array.isArray(updated.additional_category_ids) ? updated.additional_category_ids : JSON.parse(updated.additional_category_ids))
+                  : [];
+
+                const resultProd = {
+                  id: Number(updated.id),
+                  name: updated.name,
+                  description: updated.description,
+                  price: Number(updated.price),
+                  mrp: updated.mrp ? Number(updated.mrp) : undefined,
+                  imageUrl: updated.image_url,
+                  categoryId: Number(updated.category_id),
+                  categoryName: updated.category_name,
+                  additionalCategoryIds: updatedAddIds.map(Number),
+                  additionalCategoryNames: updated.additional_category_names || [],
+                  stock: Number(updated.stock),
+                  material: updated.material,
+                  size: updated.size,
+                  featured: Boolean(updated.featured),
+                  isVisible: Boolean(updated.is_visible),
+                  isNewArrival: Boolean(updated.is_new_arrival),
+                  createdAt: updated.created_at
+                };
+                updateProductLocally(id, bodyData);
+                return resultProd as unknown as T;
+              }
+            } else {
+              const errText = await putRes.text();
+              console.error("Direct Supabase PATCH error:", putRes.status, errText);
+              throw new Error(`Database error (${putRes.status}): ${errText}`);
+            }
+          } catch (err: any) {
+            console.error("Direct Supabase PUT product error:", err);
+            throw err;
           }
         }
+        const updatedProd = updateProductLocally(id, bodyData);
+        if (updatedProd) return updatedProd as unknown as T;
+        throw new Error("Product not found");
       } catch (e) {
         console.error("Failed to parse PUT body", e);
         throw e;
@@ -968,22 +1108,27 @@ export async function customFetch<T = unknown>(
             headers: getSupabaseHeaders(),
             method: "GET"
           });
-          const cats = await catRes.json();
-          return cats.map((c: any) => ({
-            id: Number(c.id),
-            name: c.name,
-            description: c.description,
-            imageUrl: c.image_url,
-            productCount: Number(c.product_count),
-            createdAt: c.created_at
-          })) as unknown as T;
+          if (catRes.ok) {
+            const cats = await catRes.json();
+            if (Array.isArray(cats) && cats.length > 0) {
+              const mapped = cats.map((c: any) => ({
+                id: Number(c.id),
+                name: c.name,
+                description: c.description,
+                imageUrl: c.image_url,
+                productCount: Number(c.product_count),
+                createdAt: c.created_at
+              }));
+              FALLBACK_CATEGORIES = mapped;
+              saveStoredCategories(FALLBACK_CATEGORIES);
+              return mapped as unknown as T;
+            }
+          }
         } catch (err) {
-          console.error("Direct Supabase load categories error:", err);
-          return FALLBACK_CATEGORIES as unknown as T;
+          console.warn("Direct Supabase load categories error (using fallback):", err);
         }
-      } else {
-        return FALLBACK_CATEGORIES as unknown as T;
       }
+      return FALLBACK_CATEGORIES as unknown as T;
     }
 
     // 4b. Create Category
@@ -991,45 +1136,41 @@ export async function customFetch<T = unknown>(
       try {
         const bodyData = typeof requestBody === "string" ? JSON.parse(requestBody) : requestBody;
         if (supabaseUrl && supabaseKey) {
-          const dbCategory = {
-            name: bodyData.name,
-            description: bodyData.description,
-            image_url: bodyData.imageUrl,
-            product_count: 0
-          };
-          const postRes = await fetch(`${supabaseUrl}/rest/v1/categories`, {
-            headers: getSupabaseHeaders(),
-            method: "POST",
-            body: JSON.stringify(dbCategory)
-          });
-          if (!postRes.ok) {
-            await handleFetchError(postRes, "Failed to create category in Supabase");
+          try {
+            const dbCategory = {
+              name: bodyData.name,
+              description: bodyData.description,
+              image_url: bodyData.imageUrl,
+              product_count: 0
+            };
+            const postRes = await fetch(`${supabaseUrl}/rest/v1/categories`, {
+              headers: getSupabaseHeaders(),
+              method: "POST",
+              body: JSON.stringify(dbCategory)
+            });
+            if (postRes.ok) {
+              const createdList = await postRes.json();
+              const created = createdList[0];
+              if (created) {
+                const resultCat = {
+                  id: Number(created.id),
+                  name: created.name,
+                  description: created.description,
+                  imageUrl: created.image_url,
+                  productCount: Number(created.product_count || 0),
+                  createdAt: created.created_at
+                };
+                FALLBACK_CATEGORIES.push(resultCat);
+                saveStoredCategories(FALLBACK_CATEGORIES);
+                return resultCat as unknown as T;
+              }
+            }
+          } catch (err) {
+            console.warn("Direct Supabase create category error (falling back to local):", err);
           }
-          const createdList = await postRes.json();
-          const created = createdList[0];
-          if (!created) {
-            throw new Error("No category returned from Supabase");
-          }
-          return {
-            id: Number(created.id),
-            name: created.name,
-            description: created.description,
-            imageUrl: created.image_url,
-            productCount: Number(created.product_count || 0),
-            createdAt: created.created_at
-          } as unknown as T;
-        } else {
-          const newCat = {
-            id: FALLBACK_CATEGORIES.reduce((max, c) => Math.max(max, c.id), 0) + 1,
-            name: bodyData.name,
-            description: bodyData.description,
-            imageUrl: bodyData.imageUrl,
-            productCount: 0,
-            createdAt: new Date().toISOString()
-          };
-          FALLBACK_CATEGORIES.push(newCat);
-          return newCat as unknown as T;
         }
+        const newCat = createCategoryLocally(bodyData);
+        return newCat as unknown as T;
       } catch (e) {
         console.error("Failed to parse POST categories body", e);
         throw e;
@@ -1060,7 +1201,7 @@ export async function customFetch<T = unknown>(
           if (!prodRes.ok || (prods && prods.error) || !Array.isArray(prods)) {
             throw new Error(prods?.message || prods?.error || JSON.stringify(prods));
           }
-          return prods.map((p: any) => {
+          const mapped = prods.map((p: any) => {
             const additionalIds = p.additional_category_ids
               ? (Array.isArray(p.additional_category_ids) ? p.additional_category_ids : JSON.parse(p.additional_category_ids))
               : [];
@@ -1083,7 +1224,12 @@ export async function customFetch<T = unknown>(
               isNewArrival: Boolean(p.is_new_arrival),
               createdAt: p.created_at
             };
-          }) as unknown as T;
+          });
+          if (!cat && !search && !featured && mapped.length > 0) {
+            FALLBACK_PRODUCTS = mapped;
+            saveStoredProducts(FALLBACK_PRODUCTS);
+          }
+          return mapped as unknown as T;
         } catch (err) {
           console.error("Direct Supabase load products error:", err);
           let filtered = [...FALLBACK_PRODUCTS];

@@ -315,8 +315,8 @@ let products = [
     id: 1,
     name: "Pure Pooja Oil (700ml)",
     description: "Premium blend pooja oil for daily temple rituals and lamp lighting. Smoke-free and long-lasting.",
-    price: 250,
-    mrp: 300,
+    price: 0,
+    mrp: 0,
     imageUrl: "/pooja_oil.png",
     categoryId: 1,
     categoryName: "Pooja Category",
@@ -331,8 +331,8 @@ let products = [
     id: 2,
     name: "Nithya Agnihotra Dhoop",
     description: "Traditional dhoop for daily pooja. 18 pieces per box. Purifies the atmosphere with a divine fragrance.",
-    price: 250,
-    mrp: 300,
+    price: 0,
+    mrp: 0,
     imageUrl: "/dhoop.png",
     categoryId: 1,
     categoryName: "Pooja Category",
@@ -349,8 +349,8 @@ let products = [
     id: 3,
     name: "Karungali Pure Silver Mala (8mm)",
     description: "Original Karungali (Ebony wood) beads capped with 925 pure silver. A sacred shield for protection and clarity.",
-    price: 9000,
-    mrp: 9500,
+    price: 0,
+    mrp: 0,
     imageUrl: "/karungali_mala.png",
     categoryId: 2,
     categoryName: "Chains and Bracelets",
@@ -365,8 +365,8 @@ let products = [
     id: 4,
     name: "Rudraksha Pure Silver Bracelet",
     description: "Authentic Rudraksha beads with pure silver casing. Designed for spiritual balance and modern elegance.",
-    price: 4500,
-    mrp: 5000,
+    price: 0,
+    mrp: 0,
     imageUrl: "/rudraksha_bracelet.webp",
     categoryId: 2,
     categoryName: "Chains and Bracelets",
@@ -385,8 +385,8 @@ let products = [
     id: 5,
     name: "Ramachandran Wall Hanging Elephant Head",
     description: "Stunning 30-inch wall-hanging elephant head inspired by the legendary 'Thechikkottukavu Ramachandran'. Hand-painted with authentic textures.",
-    price: 10000,
-    mrp: 11000,
+    price: 0,
+    mrp: 0,
     imageUrl: "/elephant_head.png",
     categoryId: 3,
     categoryName: "Elephant Heritage",
@@ -401,8 +401,8 @@ let products = [
     id: 6,
     name: "Golden Netipattam (Small)",
     description: "Traditional elephant caparison for home decor. Handcrafted with shimmering gold-finish details and colorful tassels.",
-    price: 1600,
-    mrp: 2500,
+    price: 0,
+    mrp: 0,
     imageUrl: "/netipattam.png",
     categoryId: 3,
     categoryName: "Elephant Heritage",
@@ -419,8 +419,8 @@ let products = [
     id: 7,
     name: "Premium Blue Border Mundu",
     description: "Traditional Kerala Mundu with a sophisticated deep blue border. Woven from ultra-soft fine cotton for maximum comfort.",
-    price: 550,
-    mrp: 600,
+    price: 0,
+    mrp: 0,
     imageUrl: "/hero-textile.png",
     categoryId: 4,
     categoryName: "Heritage Textiles",
@@ -435,8 +435,8 @@ let products = [
     id: 8,
     name: "Black Theyyam Printed Mundu",
     description: "A bold statement piece featuring traditional Theyyam motifs. Perfect for cultural events and heritage gatherings.",
-    price: 600,
-    mrp: 700,
+    price: 0,
+    mrp: 0,
     imageUrl: "/theyyam_mundu.png",
     categoryId: 4,
     categoryName: "Heritage Textiles",
@@ -453,8 +453,8 @@ let products = [
     id: 9,
     name: "Miniature Chenda (Traditional Drum)",
     description: "Perfectly detailed miniature of Kerala's iconic 'Chenda'. Hand-carved wood with authentic skin tensioning.",
-    price: 650,
-    mrp: 750,
+    price: 0,
+    mrp: 0,
     imageUrl: "/chenda.png",
     categoryId: 5,
     categoryName: "Miniatures & Mini Chenda",
@@ -469,8 +469,8 @@ let products = [
     id: 10,
     name: "Kathakali Face Stand (Small)",
     description: "Miniature hand-painted Kathakali face on a wooden stand. A classic Kerala souvenir for your bookshelf.",
-    price: 850,
-    mrp: 1000,
+    price: 0,
+    mrp: 0,
     imageUrl: "/hero-dance.png",
     categoryId: 5,
     categoryName: "Miniatures & Mini Chenda",
@@ -487,8 +487,8 @@ let products = [
     id: 11,
     name: "Divine Kalabham Perfume (50ml)",
     description: "A signature temple fragrance capturing the essence of sandalwood and divine rituals. Long-lasting and pure.",
-    price: 1350,
-    mrp: 1500,
+    price: 0,
+    mrp: 0,
     imageUrl: "/kalabham_perfume.png",
     categoryId: 6,
     categoryName: "Fragrances & Organic Soap",
@@ -503,8 +503,8 @@ let products = [
     id: 12,
     name: "Charcoal Organic Handmade Soap",
     description: "Detoxifying handmade soap with activated charcoal and traditional oils. Chemical-free and skin-friendly.",
-    price: 200,
-    mrp: 250,
+    price: 0,
+    mrp: 0,
     imageUrl: "/charcoal_soap.png",
     categoryId: 6,
     categoryName: "Fragrances & Organic Soap",
@@ -519,8 +519,8 @@ let products = [
     id: 13,
     name: "Aranmula Kannadi Hand-Held",
     description: "Authentic metal mirror from Aranmula. A sacred object for prosperity and beauty. Hand-held model with traditional patterns.",
-    price: 4500,
-    mrp: 5500,
+    price: 0,
+    mrp: 0,
     imageUrl: "/aranmula_kannadi.png",
     categoryId: 3,
     categoryName: "Elephant Heritage",
@@ -535,8 +535,8 @@ let products = [
     id: 14,
     name: "Valkannadi (Brass Hand Mirror)",
     description: "Hand-cast brass Valkannadi mirror, a symbol of prosperity and divine feminine energy, perfect for pooja rooms and wedding trousseaus.",
-    price: 1850,
-    mrp: 2200,
+    price: 0,
+    mrp: 0,
     imageUrl: "/hero-brass-v2.png",
     categoryId: 1,
     categoryName: "Pooja Category",
@@ -551,8 +551,8 @@ let products = [
     id: 15,
     name: "Premium Kasavu Saree (Silver Zari)",
     description: "Fine handwoven Kerala Kasavu saree with exquisite silver zari border. Crafted by traditional weavers of Balaramapuram.",
-    price: 4200,
-    mrp: 4800,
+    price: 0,
+    mrp: 0,
     imageUrl: "/kasavu-textile.png",
     categoryId: 4,
     categoryName: "Heritage Textiles",
@@ -567,8 +567,8 @@ let products = [
     id: 16,
     name: "Teakwood Kathakali Mask (Medium)",
     description: "Exquisitely hand-carved teakwood Kathakali mask showing the Pachha (noble) character, painted with natural pigments.",
-    price: 3800,
-    mrp: 4500,
+    price: 0,
+    mrp: 0,
     imageUrl: "/hero-dance-v2.png",
     categoryId: 5,
     categoryName: "Miniatures & Mini Chenda",
@@ -583,8 +583,8 @@ let products = [
     id: 17,
     name: "Nettoor Petti Royal Casket (Medium)",
     description: "Handcrafted rosewood Nettoor Petti with ornate brass work and velvet lining. A replica of royal Kerala jewelry boxes.",
-    price: 8500,
-    mrp: 9500,
+    price: 0,
+    mrp: 0,
     imageUrl: "/hero-box-v2.png",
     categoryId: 3,
     categoryName: "Elephant Heritage",
@@ -599,8 +599,8 @@ let products = [
     id: 18,
     name: "Traditional Brass Nilavilakku (Aduku Vilakku)",
     description: "Multi-layered traditional brass lamp (Nilavilakku) for auspicious occasions. Hand-polished to a warm golden glow.",
-    price: 3200,
-    mrp: 3800,
+    price: 0,
+    mrp: 0,
     imageUrl: "/hero-brass.png",
     categoryId: 1,
     categoryName: "Pooja Category",
@@ -615,8 +615,8 @@ let products = [
     id: 19,
     name: "Spiritual Karungali Bracelet with Silver Beads",
     description: "Natural ebony wood (Karungali) beads bracelet accented with pure silver beads. Attracts positive energy and focus.",
-    price: 2200,
-    mrp: 2500,
+    price: 0,
+    mrp: 0,
     imageUrl: "/karungali_mala.png",
     categoryId: 2,
     categoryName: "Chains and Bracelets",
@@ -631,8 +631,8 @@ let products = [
     id: 20,
     name: "Handcrafted Miniature Snake Boat (Chundan Vallam)",
     description: "Miniature wooden replica of Kerala's famous snake boat (Chundan Vallam), detailed with tiny oarsmen and golden parasols.",
-    price: 2400,
-    mrp: 2800,
+    price: 0,
+    mrp: 0,
     imageUrl: "/hero-dance.png",
     categoryId: 5,
     categoryName: "Miniatures & Mini Chenda",
@@ -647,8 +647,8 @@ let products = [
     id: 21,
     name: "Divine Sandalwood (Chandan) Incense Cones",
     description: "Organic hand-rolled incense cones made from pure forest-sourced sandalwood paste and natural herbs.",
-    price: 350,
-    mrp: 400,
+    price: 0,
+    mrp: 0,
     imageUrl: "/kalabham_perfume.png",
     categoryId: 6,
     categoryName: "Fragrances & Organic Soap",
@@ -663,8 +663,8 @@ let products = [
     id: 22,
     name: "Golden Theyyam Face Sculpture (Wall Mount)",
     description: "Magnificent Theyyam face wall sculpture, capturing the fierce divine expression with vibrant red and golden metal leaf detailing.",
-    price: 4800,
-    mrp: 5500,
+    price: 0,
+    mrp: 0,
     imageUrl: "/hero-dance-v2.png",
     categoryId: 5,
     categoryName: "Miniatures & Mini Chenda",
@@ -679,8 +679,8 @@ let products = [
     id: 23,
     name: "Traditional Bell Metal Uruli (10 inch)",
     description: "Traditional bell metal Uruli vessel, ideal for floating flowers (Oottupura style) or traditional Ayurvedic preparations.",
-    price: 2900,
-    mrp: 3400,
+    price: 0,
+    mrp: 0,
     imageUrl: "/hero-brass-v2.png",
     categoryId: 1,
     categoryName: "Pooja Category",
@@ -951,14 +951,18 @@ app.post('/api/products', async (req, res) => {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ Supabase product creation error:', error);
+        return res.status(400).json({ error: error.message });
+      }
 
       // Recompute all category product counts from DB (most reliable)
       recomputeAndSaveCategoryCounts().catch(() => {});
 
       return res.status(201).json(mapProductFromDb(data));
     } catch (err) {
-      console.warn('⚠️ Database error on product creation, falling back to local mock data:', err.message);
+      console.error('⚠️ Database error on product creation:', err.message);
+      return res.status(500).json({ error: err.message });
     }
   }
   const additionalCatIds = req.body.additionalCategoryIds || [];
@@ -1021,14 +1025,18 @@ app.put('/api/products/:id', async (req, res) => {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ Supabase product update error:', error);
+        return res.status(400).json({ error: error.message });
+      }
 
       // Recompute all category product counts from DB
       recomputeAndSaveCategoryCounts().catch(() => {});
 
       return res.json(mapProductFromDb(data));
     } catch (err) {
-      console.warn('⚠️ Database error on product update, falling back to local mock data:', err.message);
+      console.error('⚠️ Database error on product update:', err.message);
+      return res.status(500).json({ error: err.message });
     }
   }
   const idx = products.findIndex(p => p.id === parseInt(idStr));
