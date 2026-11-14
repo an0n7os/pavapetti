@@ -63,6 +63,36 @@
   ],
   "products": [
     {
+      "id": 143,
+      "name": "Demo Masterpiece: Royal Kathakali Wooden Mask (Handcrafted)",
+      "description": "An authentic handcrafted Royal Kathakali Wooden Mask sculpted from seasoned Kumbil wood by master Kerala artisans. Features rich natural pigment lacquering, intricate gold leaf detailing, and traditional Paccha vesham sacred iconography. Perfect luxury cultural heirloom for art connoisseurs.",
+      "price": 1899,
+      "mrp": 2499,
+      "imageUrl": "/hero-dance-v2.webp",
+      "images": [
+        "/hero-dance-v2.webp",
+        "/hero-mural-v2.webp"
+      ],
+      "categoryId": 3,
+      "categoryName": "Ideols & Statue",
+      "stock": 12,
+      "material": "Seasoned Kumbil Wood & Organic Lacquer",
+      "size": "16 x 11 x 4 inches",
+      "weight": "1.4 kg",
+      "featured": true,
+      "isVisible": true,
+      "isNewArrival": true,
+      "additionalCategoryIds": [
+        1,
+        2
+      ],
+      "additionalCategoryNames": [
+        "Chains and Bracelets",
+        "Leather Category"
+      ],
+      "createdAt": "2026-11-14T18:49:39.682Z"
+    },
+    {
       "name": "Adiyogi Shiva Face Copper Wall Hanging",
       "description": "Adiyogi Shiva Face Copper Wall Hanging made with Copper, suitable for wall decor, home decor, festive gifting, and spiritual collections.",
       "price": 0,
