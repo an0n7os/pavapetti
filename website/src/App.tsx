@@ -251,7 +251,7 @@ function AdminLogin() {
               className="text-sm"
               style={{ color: "rgba(255,255,255,0.3)", fontWeight: 300 }}
             >
-              Enter your Creator ID and Access Key to access the dashboard.
+              Enter your username and password to access the dashboard.
             </motion.p>
           </div>
 
@@ -263,15 +263,15 @@ function AdminLogin() {
             onSubmit={handleLogin}
             className="space-y-5"
           >
-            {/* Creator ID */}
+            {/* Username */}
             <div className="space-y-2">
               <label className="block text-[9px] font-black tracking-[0.3em] uppercase" style={{ color: "rgba(255,255,255,0.4)" }}>
-                Creator ID
+                Username
               </label>
               <div style={{ position: "relative" }}>
                 <input
                   type="text"
-                  placeholder="Enter Creator ID"
+                  placeholder="Enter username"
                   value={username}
                   autoComplete="username"
                   onChange={(e) => setUsername(e.target.value)}
@@ -290,15 +290,15 @@ function AdminLogin() {
               </div>
             </div>
 
-            {/* Access Key */}
+            {/* Password */}
             <div className="space-y-2">
               <label className="block text-[9px] font-black tracking-[0.3em] uppercase" style={{ color: "rgba(255,255,255,0.4)" }}>
-                Access Key
+                Password
               </label>
               <div style={{ position: "relative" }}>
                 <input
                   type={showPass ? "text" : "password"}
-                  placeholder="Enter Access Key"
+                  placeholder="Enter password"
                   value={password}
                   autoComplete="current-password"
                   onChange={(e) => setPassword(e.target.value)}
