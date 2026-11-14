@@ -103,15 +103,10 @@ export default function Checkout() {
       `_Please confirm my order with the final parcel weight-based shipping amount and payment details._`
     );
 
-    const whatsappWindow = window.open(`https://wa.me/${PHONE}?text=${message}`, "_blank");
+    const waUrl = `https://wa.me/${PHONE}?text=${message}`;
+    const whatsappWindow = window.open(waUrl, "_blank");
     if (!whatsappWindow) {
-      setLoading(false);
-      toast({
-        title: "WhatsApp didn't open",
-        description: "Allow pop-ups for this site, then try again. Your cart is still saved.",
-        variant: "destructive",
-      });
-      return;
+      window.location.href = waUrl;
     }
     setLoading(false);
     setIsOrdered(true);

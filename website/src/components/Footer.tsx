@@ -92,7 +92,7 @@ export default function Footer() {
                 { href: "/products", label: "All Artifacts" },
                 { href: "/art-forms", label: "Art Forms" },
                 { href: "/products?featured=true", label: "Featured" },
-                { href: "/products?category=Pooja Category", label: "Ritual" },
+                { href: "/products?category=" + encodeURIComponent("Lamps & Pooja Decor"), label: "Ritual & Pooja" },
                 { href: "/contact", label: "Contact Us" },
               ].map(({ href, label }) => (
                 <li key={href}>

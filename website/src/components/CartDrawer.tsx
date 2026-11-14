@@ -36,7 +36,11 @@ export default function CartDrawer() {
   }
 
   function handleWhatsApp() {
-    window.open(`https://wa.me/${PHONE}?text=${buildWhatsAppMessage()}`, "_blank");
+    const waUrl = `https://wa.me/${PHONE}?text=${buildWhatsAppMessage()}`;
+    const win = window.open(waUrl, "_blank");
+    if (!win) {
+      window.location.href = waUrl;
+    }
   }
 
   function handleCall() {
@@ -88,7 +92,7 @@ export default function CartDrawer() {
                 
                 {/* Avatar */}
                 <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center relative select-none">
-                  <span className="font-serif font-black text-lg text-white">H</span>
+                  <span className="font-serif font-black text-lg text-white">P</span>
                   <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-[#008069] animate-pulse" />
                 </div>
 

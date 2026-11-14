@@ -269,6 +269,7 @@ _Hi Pavapetti, please let me know the final amount including parcel weight-based
     if (qty > 1) {
       updateQty(product.id, qty);
     }
+    closeCart();
     const waUrl = buildWhatsAppOrderUrl();
     const win = window.open(waUrl, "_blank");
     if (!win) {
@@ -377,7 +378,12 @@ _Hi Pavapetti, please let me know the final amount including parcel weight-based
           {product.categoryName && (
             <>
               <ChevronRight size={12} className="shrink-0 opacity-50" />
-              <span className="text-stone-700 font-medium">{product.categoryName}</span>
+              <Link
+                href={`/products?category=${encodeURIComponent(product.categoryName)}`}
+                className="text-stone-700 font-medium hover:text-primary transition-colors"
+              >
+                {product.categoryName}
+              </Link>
             </>
           )}
           <ChevronRight size={12} className="shrink-0 opacity-50" />
@@ -403,6 +409,11 @@ _Hi Pavapetti, please let me know the final amount including parcel weight-based
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.3 }}
                     onClick={() => setIsLightboxOpen(true)}
+                    onError={(e) => {
+                      const target = e.currentTarget;
+                      target.onerror = null;
+                      target.src = "/catalog/adiyogi-shiva-statue-black-gold.webp";
+                    }}
                     className="w-full h-full object-cover cursor-zoom-in transition-transform duration-700 hover:scale-105"
                   />
                 </AnimatePresence>
@@ -445,7 +456,16 @@ _Hi Pavapetti, please let me know the final amount including parcel weight-based
                           : "border-stone-200 opacity-70 hover:opacity-100 hover:border-stone-400"
                       }`}
                     >
-                      <img src={img} alt={`Thumb ${idx}`} className="w-full h-full object-cover" />
+                      <img
+                        src={img}
+                        alt={`Thumb ${idx}`}
+                        onError={(e) => {
+                          const target = e.currentTarget;
+                          target.onerror = null;
+                          target.src = "/catalog/adiyogi-shiva-statue-black-gold.webp";
+                        }}
+                        className="w-full h-full object-cover"
+                      />
                     </button>
                   ))}
                 </div>
@@ -611,7 +631,7 @@ _Hi Pavapetti, please let me know the final amount including parcel weight-based
                       : "border-stone-900 text-stone-900 bg-white hover:bg-stone-50"
                   }`}
                   disabled={product.stock === 0}
-                  onClick={handleAddToCart}
+                  onClick={inCart ? openCart : handleAddToCart}
                   data-testid="button-add-to-cart"
                 >
                   {inCart ? (
@@ -896,7 +916,7 @@ _Hi Pavapetti, please let me know the final amount including parcel weight-based
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 80, opacity: 0 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
-            className="fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-stone-200 px-4 py-2.5 sm:hidden flex items-center justify-between gap-3 shadow-2xl"
+            className="fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-stone-200 px-4 pt-2.5 pb-[calc(env(safe-area-inset-bottom)+0.6rem)] sm:hidden flex items-center justify-between gap-3 shadow-2xl"
           >
             <div className="min-w-0">
               <div className="flex items-baseline gap-1.5">
@@ -913,15 +933,25 @@ _Hi Pavapetti, please let me know the final amount including parcel weight-based
             </div>
 
             <div className="flex items-center gap-2 shrink-0">
-              <a
-                href={buildWhatsAppOrderUrl(pincodeResult?.valid ? pincodeResult : null)}
-                target="_blank"
-                rel="noreferrer"
-                className="h-10 px-4 rounded-xl bg-[#25D366] hover:bg-[#1ebe5d] text-white font-black text-xs flex items-center gap-1.5 shadow-md shadow-green-600/25 transition-transform active:scale-95 border-none"
-              >
-                <MessageCircle size={15} className="fill-white/20" />
-                <span>ORDER ON WHATSAPP</span>
-              </a>
+              {product.stock > 0 ? (
+                <a
+                  href={buildWhatsAppOrderUrl(pincodeResult?.valid ? pincodeResult : null)}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="h-10 px-4 rounded-xl bg-[#25D366] hover:bg-[#1ebe5d] text-white font-black text-xs flex items-center gap-1.5 shadow-md shadow-green-600/25 transition-transform active:scale-95 border-none"
+                >
+                  <MessageCircle size={15} className="fill-white/20" />
+                  <span>ORDER ON WHATSAPP</span>
+                </a>
+              ) : (
+                <button
+                  type="button"
+                  disabled
+                  className="h-10 px-4 rounded-xl bg-stone-200 text-stone-500 font-bold text-xs flex items-center gap-1.5 cursor-not-allowed border-none"
+                >
+                  <span>SOLD OUT</span>
+                </button>
+              )}
             </div>
           </motion.div>
         )}
@@ -970,6 +1000,11 @@ _Hi Pavapetti, please let me know the final amount including parcel weight-based
           <img
             src={selectedImage || product.imageUrl}
             alt={product.name}
+            onError={(e) => {
+              const target = e.currentTarget;
+              target.onerror = null;
+              target.src = "/catalog/adiyogi-shiva-statue-black-gold.webp";
+            }}
             onClick={(e) => { e.stopPropagation(); setLightboxZoom(!lightboxZoom); }}
             className={`max-w-full max-h-[85vh] object-contain rounded-xl shadow-2xl transition-transform duration-300 ${
               lightboxZoom ? "scale-150 cursor-zoom-out" : "cursor-zoom-in"

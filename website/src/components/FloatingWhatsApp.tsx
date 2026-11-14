@@ -16,9 +16,11 @@ export default function FloatingWhatsApp() {
     "Hi! I'm interested in your Kerala traditional products. Can you help me?"
   );
 
+  const isProductPage = location.startsWith("/product/");
+
   return (
     <div 
-      className="fixed right-6 z-[100] flex flex-col items-end gap-3"
+      className={`fixed right-6 z-[100] ${isProductPage ? "hidden sm:flex" : "flex"} flex-col items-end gap-3`}
       style={{ bottom: `calc(env(safe-area-inset-bottom) + 1.5rem)` }}
     >
       {/* Popup card */}
@@ -35,7 +37,7 @@ export default function FloatingWhatsApp() {
             <div className="bg-[#008069] px-6 py-5 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-md">
-                  <span className="text-white font-serif font-black text-lg">H</span>
+                  <span className="text-white font-serif font-black text-lg">P</span>
                 </div>
                 <div>
                   <p className="text-white font-bold text-sm tracking-tight leading-tight">Pavapetti Heritage Artifacts</p>
