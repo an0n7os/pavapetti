@@ -754,22 +754,16 @@ async function handleFetchError(res: Response, prefix: string): Promise<never> {
   throw new Error(`${prefix}: ${errMsg}`);
 }
 
-export async function customFetch<T = unknown>(
-  input: RequestInfo | URL,
-  options: CustomFetchOptions = {},
-): Promise<T> {
-  const urlStr = resolveUrl(input);
-  // Always use the fallback path when there's no dedicated API server base URL.
-  // The "fallback" logic will then use Supabase directly if credentials are present,
-  // or fall back to in-memory mock data if they are not.
-  // NOTE: Previously this checked `window.location.hostname.includes("netlify.app")`,
-  // which broke custom domains hosted on Netlify (products disappeared on refresh).
-  const isFallbackNeeded = !_baseUrl || _baseUrl === "";
+const DEFAULT_SUPABASE_URL = "https://rtjgsjkptshythmfmqoq.supabase.co";
+const DEFAULT_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ0amdzamtwdHNoeXRobWZtcW9xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyNjMzMTksImV4cCI6MjA5NjgzOTMxOX0.9HoMwKhAtqPhmS5kmuyDArz8pNad19TOIs9RhTmxAvc";
 
-  // Read client-side Supabase credentials from Vite environment
-  const supabaseUrl = (typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_SUPABASE_URL) || "";
-  const supabaseKey = (typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_SUPABASE_ANON_KEY) || "";
-  
+async function executeDirectSupabaseFallback<T>(
+  urlStr: string,
+  options: CustomFetchOptions = {}
+): Promise<T> {
+  const supabaseUrl = (typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_SUPABASE_URL) || DEFAULT_SUPABASE_URL;
+  const supabaseKey = (typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_SUPABASE_ANON_KEY) || DEFAULT_SUPABASE_ANON_KEY;
+
   const getSupabaseHeaders = () => ({
     "apikey": supabaseKey,
     "Authorization": `Bearer ${supabaseKey}`,
@@ -777,10 +771,8 @@ export async function customFetch<T = unknown>(
     "Prefer": "return=representation"
   });
 
-  // Intercept relative API routes in production to serve local mock arrays or direct Supabase REST
-  if (isFallbackNeeded && urlStr.startsWith("/api")) {
-    const cleanUrl = urlStr.split("?")[0];
-    const { method = "GET", body: requestBody } = options;
+  const cleanUrl = urlStr.split("?")[0];
+  const { method = "GET", body: requestBody } = options;
     
     // 1. DELETE Product
     if (method === "DELETE" && cleanUrl.match(/^\/api\/products\/\d+$/)) {
@@ -1395,6 +1387,19 @@ export async function customFetch<T = unknown>(
         } as unknown as T;
       }
     }
+
+  throw new Error(`Unhandled fallback request: ${method} ${urlStr}`);
+}
+
+export async function customFetch<T = unknown>(
+  input: RequestInfo | URL,
+  options: CustomFetchOptions = {},
+): Promise<T> {
+  const urlStr = resolveUrl(input);
+  const isFallbackNeeded = !_baseUrl || _baseUrl === "";
+
+  if (isFallbackNeeded && (urlStr.startsWith("/api") || (typeof input === "string" && input.includes("/api")))) {
+    return executeDirectSupabaseFallback<T>(urlStr, options);
   }
 
   input = applyBaseUrl(input);
@@ -1431,12 +1436,22 @@ export async function customFetch<T = unknown>(
 
   const requestInfo = { method, url: resolveUrl(input) };
 
-  const response = await fetch(input, { ...init, method, headers });
+  try {
+    const response = await fetch(input, { ...init, method, headers });
 
-  if (!response.ok) {
-    const errorData = await parseErrorBody(response, method);
-    throw new ApiError(response, errorData, requestInfo);
+    if (!response.ok) {
+      const errorData = await parseErrorBody(response, method);
+      throw new ApiError(response, errorData, requestInfo);
+    }
+
+    return (await parseSuccessBody(response, responseType, requestInfo)) as T;
+  } catch (err: any) {
+    // If API server fetch fails (e.g. port 8081 stopped, network down, connection refused),
+    // automatically fall back to direct Supabase REST
+    if (urlStr.startsWith("/api") || (typeof input === "string" && input.includes("/api"))) {
+      console.warn("API server fetch failed, automatically falling back to direct Supabase REST:", err.message);
+      return executeDirectSupabaseFallback<T>(urlStr, options);
+    }
+    throw err;
   }
-
-  return (await parseSuccessBody(response, responseType, requestInfo)) as T;
 }

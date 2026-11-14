@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "concurrently --names \"API,WEB\" --prefix-colors \"cyan,magenta\" \"node mock-api-server/index.mjs\" \"npm run dev --prefix website\"",
     "build": "npm install --prefix website && npm run build --prefix website",
-    "deploy": "npm run build && wrangler deploy"
+    "deploy": "npm run build && npx wrangler deploy",
+    "deploy:all": "git add . && git commit -m \"update website\" && git push && npm run deploy"
   },
   "devDependencies": {
     "concurrently": "^9.1.2",

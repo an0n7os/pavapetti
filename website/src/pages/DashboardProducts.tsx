@@ -127,7 +127,11 @@ export default function DashboardProducts() {
 
   const openAdd = () => {
     setEditProduct(null);
-    setForm(emptyForm);
+    const defaultCatId = (categories && categories.length > 0) ? Number(categories[0].id) : 1;
+    setForm({
+      ...emptyForm,
+      categoryId: defaultCatId,
+    });
     setDiscountPercent(0);
     setShowForm(true);
     setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 50);
@@ -198,14 +202,23 @@ export default function DashboardProducts() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!form.name || !form.name.trim()) {
+      toast({ title: "Product name is required", variant: "destructive" });
+      return;
+    }
+    const finalCatId = form.categoryId && form.categoryId !== 0
+      ? Number(form.categoryId)
+      : (categories && categories.length > 0 ? Number(categories[0].id) : 1);
+
     const sanitizedForm = {
       ...form,
+      name: form.name.trim(),
       price: typeof form.price === "number" ? form.price : (Number(form.price) || 0),
       mrp: form.mrp !== undefined && form.mrp !== null && String(form.mrp) !== "" ? Number(form.mrp) : undefined,
       stock: parseInt(String(form.stock), 10) || 0,
       imageUrl: form.imageUrl || "",
       description: form.description || "",
-      categoryId: form.categoryId ? Number(form.categoryId) : undefined,
+      categoryId: finalCatId,
       additionalCategoryIds: (form.additionalCategoryIds || []).map(Number),
     };
     if (editProduct) {
