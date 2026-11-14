@@ -83,11 +83,14 @@ export default function DashboardProducts() {
   useEffect(() => {
     if (isModalOpen) {
       document.body.style.overflow = "hidden";
+      document.documentElement.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
     }
     return () => {
       document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
     };
   }, [isModalOpen]);
 
@@ -334,379 +337,384 @@ export default function DashboardProducts() {
       {/* ── Add / Edit Modal: Minimal, Compact & Fast ── */}
       <AnimatePresence>
         {showForm && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/60 backdrop-blur-sm overflow-y-auto">
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/60 backdrop-blur-sm"
+            onClick={() => setShowForm(false)}
+          >
             <motion.div
               initial={{ opacity: 0, scale: 0.96, y: 8 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.96, y: 8 }}
               transition={{ duration: 0.18, ease: "easeOut" }}
-              className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-stone-200 overflow-hidden my-auto max-h-[92vh] flex flex-col"
+              className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-stone-200 overflow-hidden my-auto max-h-[90vh] flex flex-col"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Modal Header */}
-              <div className="px-5 py-3 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-7 h-7 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold text-xs">
-                    {editProduct ? <Pencil size={13} /> : <Plus size={14} />}
+              <form id="product-modal-form" onSubmit={handleSubmit} className="flex flex-col h-full min-h-0 overflow-hidden">
+                {/* 1. Sticky Modal Header */}
+                <div className="px-5 py-3 border-b border-stone-100 flex items-center justify-between bg-stone-50/90 shrink-0">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold text-xs">
+                      {editProduct ? <Pencil size={13} /> : <Plus size={14} />}
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-sm text-stone-900 leading-tight">
+                        {editProduct ? "Modify Product Details" : "Add New Product"}
+                      </h3>
+                      <p className="text-[11px] text-muted-foreground">
+                        {editProduct ? `Editing ID: #${editProduct.id} — ${editProduct.name}` : "Fill in the details to add an artifact to your catalog"}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-sm text-stone-900 leading-tight">
-                      {editProduct ? "Modify Product Details" : "Add New Product"}
-                    </h3>
-                    <p className="text-[11px] text-muted-foreground">
-                      {editProduct ? `Editing ID: #${editProduct.id} — ${editProduct.name}` : "Fill in the details to add an artifact to your catalog"}
-                    </p>
-                  </div>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    className="rounded-lg h-8 w-8 p-0 text-muted-foreground hover:text-stone-900 hover:bg-stone-200/50"
+                    onClick={() => setShowForm(false)}
+                    data-testid="button-close-form"
+                  >
+                    <X size={16} />
+                  </Button>
                 </div>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="rounded-lg h-8 w-8 p-0 text-muted-foreground hover:text-stone-900 hover:bg-stone-200/50"
-                  onClick={() => setShowForm(false)}
-                  data-testid="button-close-form"
-                >
-                  <X size={16} />
-                </Button>
-              </div>
 
-              {/* Modal Scrollable Body */}
-              <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
-                
-                {/* 1. Basic Info */}
-                <div className="space-y-3">
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <div className="sm:col-span-2 space-y-1">
-                      <Label htmlFor="name" className={labelCls}>
-                        <span>Product Name *</span>
-                      </Label>
-                      <Input
-                        id="name"
-                        className={inputCls}
-                        placeholder="e.g. Kathakali Headgear Wall Hanging"
-                        value={form.name}
-                        onChange={(e) => setForm({ ...form, name: e.target.value })}
-                        required
-                        data-testid="input-product-name"
-                      />
-                    </div>
+                {/* 2. Scrollable Body: min-h-0 and overscroll-contain ensures smooth scrolling */}
+                <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 sm:p-5 space-y-4">
+                  {/* 1. Basic Info */}
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div className="sm:col-span-2 space-y-1">
+                        <Label htmlFor="name" className={labelCls}>
+                          <span>Product Name *</span>
+                        </Label>
+                        <Input
+                          id="name"
+                          className={inputCls}
+                          placeholder="e.g. Kathakali Headgear Wall Hanging"
+                          value={form.name}
+                          onChange={(e) => setForm({ ...form, name: e.target.value })}
+                          required
+                          data-testid="input-product-name"
+                        />
+                      </div>
 
-                    <div className="space-y-1">
-                      <Label htmlFor="category" className={labelCls}>
-                        <span>Primary Category *</span>
-                      </Label>
-                      <Select
-                        value={form.categoryId ? String(form.categoryId) : ""}
-                        onValueChange={(v) => setForm({ ...form, categoryId: parseInt(v, 10) })}
-                      >
-                        <SelectTrigger className={inputCls} data-testid="select-category">
-                          <SelectValue placeholder="Select Category" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {(categories ?? []).map((cat: any) => (
-                            <SelectItem key={cat.id} value={String(cat.id)} className="text-xs">
-                              {cat.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  {/* Also Show In - Compact Pill Tags */}
-                  {(categories ?? []).length > 1 && (
-                    <div className="space-y-1.5 pt-1">
-                      <Label className="text-[10px] font-semibold text-stone-500 uppercase tracking-wider block">
-                        Also Show In Additional Categories (Optional)
-                      </Label>
-                      <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-1 bg-stone-50/60 rounded-lg border border-stone-100">
-                        {(categories ?? [])
-                          .filter((cat: any) => cat.id !== form.categoryId)
-                          .map((cat: any) => {
-                            const isChecked = (form.additionalCategoryIds || []).includes(cat.id);
-                            return (
-                              <button
-                                key={cat.id}
-                                type="button"
-                                onClick={() => {
-                                  const curr = form.additionalCategoryIds || [];
-                                  setForm({
-                                    ...form,
-                                    additionalCategoryIds: isChecked
-                                      ? curr.filter((id) => id !== cat.id)
-                                      : [...curr, cat.id],
-                                  });
-                                }}
-                                className={`text-[11px] px-2.5 py-1 rounded-md border font-medium transition-all flex items-center gap-1 ${
-                                  isChecked
-                                    ? "bg-primary text-white border-primary shadow-xs"
-                                    : "bg-white text-stone-600 border-stone-200 hover:border-stone-400 hover:bg-stone-50"
-                                }`}
-                              >
-                                {isChecked && <Check size={11} strokeWidth={3} />}
+                      <div className="space-y-1">
+                        <Label htmlFor="category" className={labelCls}>
+                          <span>Primary Category *</span>
+                        </Label>
+                        <Select
+                          value={form.categoryId ? String(form.categoryId) : ""}
+                          onValueChange={(v) => setForm({ ...form, categoryId: parseInt(v, 10) })}
+                        >
+                          <SelectTrigger className={inputCls} data-testid="select-category">
+                            <SelectValue placeholder="Select Category" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {(categories ?? []).map((cat: any) => (
+                              <SelectItem key={cat.id} value={String(cat.id)} className="text-xs">
                                 {cat.name}
-                              </button>
-                            );
-                          })}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
                     </div>
-                  )}
 
-                  {/* Description */}
-                  <div className="space-y-1">
-                    <Label htmlFor="description" className={labelCls}>
-                      <span>Description</span>
-                    </Label>
-                    <Textarea
-                      id="description"
-                      placeholder="Brief details regarding heritage, craftsmanship and significance..."
-                      value={form.description}
-                      onChange={(e) => setForm({ ...form, description: e.target.value })}
-                      rows={2}
-                      className="bg-white border border-stone-200 hover:border-stone-300 focus:border-primary/50 focus:ring-1 focus:ring-primary/20 rounded-lg p-2.5 text-xs outline-none resize-none placeholder:text-muted-foreground/40"
-                      data-testid="input-description"
-                    />
-                  </div>
-                </div>
-
-                {/* 2. Pricing & Inventory - Sleek 4 Col Grid */}
-                <div className="p-3 bg-stone-50/70 rounded-xl border border-stone-100 space-y-2">
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                    <div className="space-y-1">
-                      <Label htmlFor="mrp" className={labelCls}>MRP (₹)</Label>
-                      <Input
-                        id="mrp"
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        placeholder="0"
-                        className={inputCls}
-                        value={form.mrp !== undefined && form.mrp !== null ? form.mrp : ""}
-                        onChange={(e) => handleMrpChange(parseFloat(e.target.value) || 0)}
-                        data-testid="input-mrp"
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <Label htmlFor="discount" className={labelCls}>Discount %</Label>
-                      <Input
-                        id="discount"
-                        type="number"
-                        min="0"
-                        max="100"
-                        placeholder="0"
-                        className={inputCls}
-                        value={discountPercent !== undefined && discountPercent !== null ? discountPercent : ""}
-                        onChange={(e) => handleDiscountChange(parseFloat(e.target.value) || 0)}
-                        data-testid="input-discount"
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <Label htmlFor="price" className={labelCls}>Sale Price (₹) *</Label>
-                      <Input
-                        id="price"
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        placeholder="0"
-                        className={`${inputCls} font-bold text-primary`}
-                        value={form.price !== undefined && form.price !== null ? form.price : ""}
-                        onChange={(e) => handlePriceChange(parseFloat(e.target.value) || 0)}
-                        required
-                        data-testid="input-price"
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <Label htmlFor="stock" className={labelCls}>Stock</Label>
-                      <Input
-                        id="stock"
-                        type="number"
-                        min="0"
-                        placeholder="0"
-                        className={inputCls}
-                        value={form.stock !== undefined && form.stock !== null ? form.stock : ""}
-                        onChange={(e) => setForm({ ...form, stock: parseInt(e.target.value, 10) || 0 })}
-                        data-testid="input-stock"
-                      />
-                    </div>
-                  </div>
-
-                  {form.mrp > 0 && form.price > 0 && (
-                    <div className="flex items-center gap-2 pt-1 text-[11px]">
-                      <span className="text-muted-foreground">Live Customer Price:</span>
-                      <span className="font-bold text-primary">₹{Number(form.price).toLocaleString("en-IN")}</span>
-                      <span className="line-through text-muted-foreground/70">₹{Number(form.mrp).toLocaleString("en-IN")}</span>
-                      {discountPercent > 0 && (
-                        <span className="font-bold text-amber-700 bg-amber-100 px-1.5 py-0.2 rounded text-[10px]">
-                          {discountPercent}% OFF
-                        </span>
-                      )}
-                    </div>
-                  )}
-                </div>
-
-                {/* 3. Specifications */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                  <div className="space-y-1">
-                    <Label htmlFor="material" className={labelCls}>Material</Label>
-                    <Input
-                      id="material"
-                      placeholder="e.g. Teak Wood, Brass"
-                      className={inputCls}
-                      value={form.material || ""}
-                      onChange={(e) => setForm({ ...form, material: e.target.value })}
-                      data-testid="input-material"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <Label htmlFor="size" className={labelCls}>Size / Dimensions</Label>
-                    <Input
-                      id="size"
-                      placeholder="e.g. 12 x 8 inches"
-                      className={inputCls}
-                      value={form.size || ""}
-                      onChange={(e) => setForm({ ...form, size: e.target.value })}
-                      data-testid="input-size"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <Label htmlFor="weight" className={labelCls}>Weight</Label>
-                    <Input
-                      id="weight"
-                      placeholder="e.g. 850 grams"
-                      className={inputCls}
-                      value={form.weight || ""}
-                      onChange={(e) => setForm({ ...form, weight: e.target.value })}
-                      data-testid="input-weight"
-                    />
-                  </div>
-                </div>
-
-                {/* 4. Images - Compact Side-by-Side Strip */}
-                <div className="p-3 bg-stone-50/70 rounded-xl border border-stone-100 space-y-2">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-                    <div className="space-y-0.5">
-                      <Label className="text-xs font-semibold text-stone-800">Product Images</Label>
-                      <p className="text-[10px] text-muted-foreground">Upload main showcase picture and gallery shots</p>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <input type="file" id="main-image-input" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, true)} />
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="outline"
-                        disabled={uploadingMain}
-                        onClick={() => document.getElementById("main-image-input")?.click()}
-                        className="h-7 px-2.5 rounded-md text-[11px] gap-1.5 border-stone-300 hover:bg-white"
-                      >
-                        {uploadingMain ? <span className="animate-spin text-xs">⌛</span> : <Upload size={12} />}
-                        {uploadingMain ? "Uploading..." : form.imageUrl ? "Change Main" : "Upload Main"}
-                      </Button>
-
-                      <input type="file" id="gallery-image-input" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, false)} />
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="outline"
-                        disabled={uploadingExtra}
-                        onClick={() => document.getElementById("gallery-image-input")?.click()}
-                        className="h-7 px-2.5 rounded-md text-[11px] gap-1.5 border-stone-300 hover:bg-white"
-                      >
-                        {uploadingExtra ? <span className="animate-spin text-xs">⌛</span> : <Plus size={12} />}
-                        Add Gallery Image
-                      </Button>
-                    </div>
-                  </div>
-
-                  {/* Image Thumbnails Strip */}
-                  <div className="flex items-center gap-2 overflow-x-auto py-1">
-                    {form.imageUrl && (
-                      <div className="relative group w-14 h-14 rounded-lg overflow-hidden border-2 border-primary/40 shrink-0 shadow-xs">
-                        <img src={form.imageUrl} alt="Main" className="w-full h-full object-cover" />
-                        <span className="absolute bottom-0 inset-x-0 bg-primary/90 text-[8px] font-bold text-white text-center py-0.5 uppercase tracking-wider">
-                          Main
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => setForm({ ...form, imageUrl: "" })}
-                          className="absolute top-1 right-1 w-4 h-4 bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                          title="Remove main image"
-                        >
-                          <X size={10} />
-                        </button>
+                    {/* Also Show In - Compact Pill Tags */}
+                    {(categories ?? []).length > 1 && (
+                      <div className="space-y-1.5 pt-1">
+                        <Label className="text-[10px] font-semibold text-stone-500 uppercase tracking-wider block">
+                          Also Show In Additional Categories (Optional)
+                        </Label>
+                        <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-1 bg-stone-50/60 rounded-lg border border-stone-100">
+                          {(categories ?? [])
+                            .filter((cat: any) => cat.id !== form.categoryId)
+                            .map((cat: any) => {
+                              const isChecked = (form.additionalCategoryIds || []).includes(cat.id);
+                              return (
+                                <button
+                                  key={cat.id}
+                                  type="button"
+                                  onClick={() => {
+                                    const curr = form.additionalCategoryIds || [];
+                                    setForm({
+                                      ...form,
+                                      additionalCategoryIds: isChecked
+                                        ? curr.filter((id) => id !== cat.id)
+                                        : [...curr, cat.id],
+                                    });
+                                  }}
+                                  className={`text-[11px] px-2.5 py-1 rounded-md border font-medium transition-all flex items-center gap-1 ${
+                                    isChecked
+                                      ? "bg-primary text-white border-primary shadow-xs"
+                                      : "bg-white text-stone-600 border-stone-200 hover:border-stone-400 hover:bg-stone-50"
+                                  }`}
+                                >
+                                  {isChecked && <Check size={11} strokeWidth={3} />}
+                                  {cat.name}
+                                </button>
+                              );
+                            })}
+                        </div>
                       </div>
                     )}
 
-                    {(form.images || [])
-                      .filter((img) => img && !img.startsWith("data:") && img !== form.imageUrl)
-                      .map((img, idx) => (
-                        <div key={idx} className="relative group w-14 h-14 rounded-lg overflow-hidden border border-stone-200 shrink-0 shadow-xs">
-                          <img src={img} alt={`Gallery ${idx}`} className="w-full h-full object-cover" />
+                    {/* Description */}
+                    <div className="space-y-1">
+                      <Label htmlFor="description" className={labelCls}>
+                        <span>Description</span>
+                      </Label>
+                      <Textarea
+                        id="description"
+                        placeholder="Brief details regarding heritage, craftsmanship and significance..."
+                        value={form.description}
+                        onChange={(e) => setForm({ ...form, description: e.target.value })}
+                        rows={2}
+                        className="bg-white border border-stone-200 hover:border-stone-300 focus:border-primary/50 focus:ring-1 focus:ring-primary/20 rounded-lg p-2.5 text-xs outline-none resize-none placeholder:text-muted-foreground/40"
+                        data-testid="input-description"
+                      />
+                    </div>
+                  </div>
+
+                  {/* 2. Pricing & Inventory - Sleek 4 Col Grid */}
+                  <div className="p-3 bg-stone-50/70 rounded-xl border border-stone-100 space-y-2">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                      <div className="space-y-1">
+                        <Label htmlFor="mrp" className={labelCls}>MRP (₹)</Label>
+                        <Input
+                          id="mrp"
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          placeholder="0"
+                          className={inputCls}
+                          value={form.mrp !== undefined && form.mrp !== null ? form.mrp : ""}
+                          onChange={(e) => handleMrpChange(parseFloat(e.target.value) || 0)}
+                          data-testid="input-mrp"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label htmlFor="discount" className={labelCls}>Discount %</Label>
+                        <Input
+                          id="discount"
+                          type="number"
+                          min="0"
+                          max="100"
+                          placeholder="0"
+                          className={inputCls}
+                          value={discountPercent !== undefined && discountPercent !== null ? discountPercent : ""}
+                          onChange={(e) => handleDiscountChange(parseFloat(e.target.value) || 0)}
+                          data-testid="input-discount"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label htmlFor="price" className={labelCls}>Sale Price (₹) *</Label>
+                        <Input
+                          id="price"
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          placeholder="0"
+                          className={`${inputCls} font-bold text-primary`}
+                          value={form.price !== undefined && form.price !== null ? form.price : ""}
+                          onChange={(e) => handlePriceChange(parseFloat(e.target.value) || 0)}
+                          required
+                          data-testid="input-price"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label htmlFor="stock" className={labelCls}>Stock</Label>
+                        <Input
+                          id="stock"
+                          type="number"
+                          min="0"
+                          placeholder="0"
+                          className={inputCls}
+                          value={form.stock !== undefined && form.stock !== null ? form.stock : ""}
+                          onChange={(e) => setForm({ ...form, stock: parseInt(e.target.value, 10) || 0 })}
+                          data-testid="input-stock"
+                        />
+                      </div>
+                    </div>
+
+                    {form.mrp > 0 && form.price > 0 && (
+                      <div className="flex items-center gap-2 pt-1 text-[11px]">
+                        <span className="text-muted-foreground">Live Customer Price:</span>
+                        <span className="font-bold text-primary">₹{Number(form.price).toLocaleString("en-IN")}</span>
+                        <span className="line-through text-muted-foreground/70">₹{Number(form.mrp).toLocaleString("en-IN")}</span>
+                        {discountPercent > 0 && (
+                          <span className="font-bold text-amber-700 bg-amber-100 px-1.5 py-0.2 rounded text-[10px]">
+                            {discountPercent}% OFF
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 3. Specifications */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                    <div className="space-y-1">
+                      <Label htmlFor="material" className={labelCls}>Material</Label>
+                      <Input
+                        id="material"
+                        placeholder="e.g. Teak Wood, Brass"
+                        className={inputCls}
+                        value={form.material || ""}
+                        onChange={(e) => setForm({ ...form, material: e.target.value })}
+                        data-testid="input-material"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="size" className={labelCls}>Size / Dimensions</Label>
+                      <Input
+                        id="size"
+                        placeholder="e.g. 12 x 8 inches"
+                        className={inputCls}
+                        value={form.size || ""}
+                        onChange={(e) => setForm({ ...form, size: e.target.value })}
+                        data-testid="input-size"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="weight" className={labelCls}>Weight</Label>
+                      <Input
+                        id="weight"
+                        placeholder="e.g. 850 grams"
+                        className={inputCls}
+                        value={form.weight || ""}
+                        onChange={(e) => setForm({ ...form, weight: e.target.value })}
+                        data-testid="input-weight"
+                      />
+                    </div>
+                  </div>
+
+                  {/* 4. Images - Compact Side-by-Side Strip */}
+                  <div className="p-3 bg-stone-50/70 rounded-xl border border-stone-100 space-y-2">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                      <div className="space-y-0.5">
+                        <Label className="text-xs font-semibold text-stone-800">Product Images</Label>
+                        <p className="text-[10px] text-muted-foreground">Upload main showcase picture and gallery shots</p>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <input type="file" id="main-image-input" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, true)} />
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          disabled={uploadingMain}
+                          onClick={() => document.getElementById("main-image-input")?.click()}
+                          className="h-7 px-2.5 rounded-md text-[11px] gap-1.5 border-stone-300 hover:bg-white"
+                        >
+                          {uploadingMain ? <span className="animate-spin text-xs">⌛</span> : <Upload size={12} />}
+                          {uploadingMain ? "Uploading..." : form.imageUrl ? "Change Main" : "Upload Main"}
+                        </Button>
+
+                        <input type="file" id="gallery-image-input" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, false)} />
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          disabled={uploadingExtra}
+                          onClick={() => document.getElementById("gallery-image-input")?.click()}
+                          className="h-7 px-2.5 rounded-md text-[11px] gap-1.5 border-stone-300 hover:bg-white"
+                        >
+                          {uploadingExtra ? <span className="animate-spin text-xs">⌛</span> : <Plus size={12} />}
+                          Add Gallery Image
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Image Thumbnails Strip */}
+                    <div className="flex items-center gap-2 overflow-x-auto py-1">
+                      {form.imageUrl && (
+                        <div className="relative group w-14 h-14 rounded-lg overflow-hidden border-2 border-primary/40 shrink-0 shadow-xs">
+                          <img src={form.imageUrl} alt="Main" className="w-full h-full object-cover" />
+                          <span className="absolute bottom-0 inset-x-0 bg-primary/90 text-[8px] font-bold text-white text-center py-0.5 uppercase tracking-wider">
+                            Main
+                          </span>
                           <button
                             type="button"
-                            onClick={() => setForm({ ...form, images: form.images?.filter((_, i) => i !== idx) })}
+                            onClick={() => setForm({ ...form, imageUrl: "" })}
                             className="absolute top-1 right-1 w-4 h-4 bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                            title="Remove image"
+                            title="Remove main image"
                           >
                             <X size={10} />
                           </button>
                         </div>
-                      ))}
+                      )}
 
-                    {!form.imageUrl && (form.images || []).length === 0 && (
-                      <div className="h-14 w-full flex items-center justify-center border border-dashed border-stone-300 rounded-lg text-[11px] text-muted-foreground/60 italic">
-                        No image uploaded yet
-                      </div>
-                    )}
+                      {(form.images || [])
+                        .filter((img) => img && !img.startsWith("data:") && img !== form.imageUrl)
+                        .map((img, idx) => (
+                          <div key={idx} className="relative group w-14 h-14 rounded-lg overflow-hidden border border-stone-200 shrink-0 shadow-xs">
+                            <img src={img} alt={`Gallery ${idx}`} className="w-full h-full object-cover" />
+                            <button
+                              type="button"
+                              onClick={() => setForm({ ...form, images: form.images?.filter((_, i) => i !== idx) })}
+                              className="absolute top-1 right-1 w-4 h-4 bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                              title="Remove image"
+                            >
+                              <X size={10} />
+                            </button>
+                          </div>
+                        ))}
+
+                      {!form.imageUrl && (form.images || []).length === 0 && (
+                        <div className="h-14 w-full flex items-center justify-center border border-dashed border-stone-300 rounded-lg text-[11px] text-muted-foreground/60 italic">
+                          No image uploaded yet
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* 5. Status & Flags - Minimal 3-Button Toggle Row */}
+                  <div className="grid grid-cols-3 gap-2">
+                    {/* Featured */}
+                    <button
+                      type="button"
+                      onClick={() => setForm({ ...form, featured: !form.featured })}
+                      className={`h-9 px-3 rounded-lg border text-xs font-medium transition-all flex items-center justify-center gap-1.5 ${
+                        form.featured
+                          ? "bg-amber-50 text-amber-800 border-amber-300 shadow-xs font-semibold"
+                          : "bg-white text-stone-600 border-stone-200 hover:bg-stone-50"
+                      }`}
+                    >
+                      <Star size={13} className={form.featured ? "text-amber-500 fill-amber-500" : "text-stone-400"} />
+                      <span>Featured</span>
+                    </button>
+
+                    {/* Visible */}
+                    <button
+                      type="button"
+                      onClick={() => setForm({ ...form, isVisible: !form.isVisible })}
+                      className={`h-9 px-3 rounded-lg border text-xs font-medium transition-all flex items-center justify-center gap-1.5 ${
+                        form.isVisible
+                          ? "bg-green-50 text-green-800 border-green-300 shadow-xs font-semibold"
+                          : "bg-white text-stone-400 border-stone-200 hover:bg-stone-50"
+                      }`}
+                    >
+                      {form.isVisible ? <Eye size={13} className="text-green-600" /> : <EyeOff size={13} className="text-stone-400" />}
+                      <span>{form.isVisible ? "Visible" : "Hidden"}</span>
+                    </button>
+
+                    {/* New Arrival */}
+                    <button
+                      type="button"
+                      onClick={() => setForm({ ...form, isNewArrival: !form.isNewArrival })}
+                      className={`h-9 px-3 rounded-lg border text-xs font-medium transition-all flex items-center justify-center gap-1.5 ${
+                        form.isNewArrival
+                          ? "bg-primary/10 text-primary border-primary/30 shadow-xs font-semibold"
+                          : "bg-white text-stone-600 border-stone-200 hover:bg-stone-50"
+                      }`}
+                    >
+                      <Sparkles size={13} className={form.isNewArrival ? "text-primary fill-primary" : "text-stone-400"} />
+                      <span>New Arrival</span>
+                    </button>
                   </div>
                 </div>
 
-                {/* 5. Status & Flags - Minimal 3-Button Toggle Row */}
-                <div className="grid grid-cols-3 gap-2">
-                  {/* Featured */}
-                  <button
-                    type="button"
-                    onClick={() => setForm({ ...form, featured: !form.featured })}
-                    className={`h-9 px-3 rounded-lg border text-xs font-medium transition-all flex items-center justify-center gap-1.5 ${
-                      form.featured
-                        ? "bg-amber-50 text-amber-800 border-amber-300 shadow-xs font-semibold"
-                        : "bg-white text-stone-600 border-stone-200 hover:bg-stone-50"
-                    }`}
-                  >
-                    <Star size={13} className={form.featured ? "text-amber-500 fill-amber-500" : "text-stone-400"} />
-                    <span>Featured</span>
-                  </button>
-
-                  {/* Visible */}
-                  <button
-                    type="button"
-                    onClick={() => setForm({ ...form, isVisible: !form.isVisible })}
-                    className={`h-9 px-3 rounded-lg border text-xs font-medium transition-all flex items-center justify-center gap-1.5 ${
-                      form.isVisible
-                        ? "bg-green-50 text-green-800 border-green-300 shadow-xs font-semibold"
-                        : "bg-white text-stone-400 border-stone-200 hover:bg-stone-50"
-                    }`}
-                  >
-                    {form.isVisible ? <Eye size={13} className="text-green-600" /> : <EyeOff size={13} className="text-stone-400" />}
-                    <span>{form.isVisible ? "Visible" : "Hidden"}</span>
-                  </button>
-
-                  {/* New Arrival */}
-                  <button
-                    type="button"
-                    onClick={() => setForm({ ...form, isNewArrival: !form.isNewArrival })}
-                    className={`h-9 px-3 rounded-lg border text-xs font-medium transition-all flex items-center justify-center gap-1.5 ${
-                      form.isNewArrival
-                        ? "bg-primary/10 text-primary border-primary/30 shadow-xs font-semibold"
-                        : "bg-white text-stone-600 border-stone-200 hover:bg-stone-50"
-                    }`}
-                  >
-                    <Sparkles size={13} className={form.isNewArrival ? "text-primary fill-primary" : "text-stone-400"} />
-                    <span>New Arrival</span>
-                  </button>
-                </div>
-
-                {/* Modal Footer */}
-                <div className="pt-3 border-t border-stone-100 flex items-center justify-between">
+                {/* 3. Sticky Modal Footer: ALWAYS visible at bottom, never cut off! */}
+                <div className="px-5 py-3 border-t border-stone-100 flex items-center justify-between bg-stone-50/90 shrink-0">
                   <span className="text-[11px] text-muted-foreground hidden sm:inline">
                     Changes sync immediately to Supabase
                   </span>
