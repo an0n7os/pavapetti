@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
-import { Check, ShoppingBag, ArrowLeft, MessageCircle, MapPin, Phone, User, CreditCard } from "lucide-react";
+import { Check, ShoppingBag, ArrowLeft, MessageCircle, MapPin, Phone, User, CreditCard, Loader2 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useToast } from "@/hooks/use-toast";
+import { verifyPincode, type PincodeInfo } from "@/lib/pincode";
 
 const PHONE = "919292016901";
 
@@ -18,6 +19,8 @@ export default function Checkout() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [isOrdered, setIsOrdered] = useState(false);
+  const [pincodeInfo, setPincodeInfo] = useState<PincodeInfo | null>(null);
+  const [isVerifyingPin, setIsVerifyingPin] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -27,8 +30,33 @@ export default function Checkout() {
     zip: "",
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+    
+    if (name === "zip") {
+      const cleanZip = value.replace(/\D/g, "");
+      setFormData(prev => ({ ...prev, zip: cleanZip }));
+      if (cleanZip.length === 6) {
+        setIsVerifyingPin(true);
+        try {
+          const res = await verifyPincode(cleanZip);
+          setPincodeInfo(res);
+          if (res.valid && res.district) {
+            setFormData(prev => ({
+              ...prev,
+              city: prev.city || `${res.postOffice ? `${res.postOffice}, ` : ""}${res.district}, ${res.state}`
+            }));
+          }
+        } catch {}
+        finally {
+          setIsVerifyingPin(false);
+        }
+      } else {
+        setPincodeInfo(null);
+      }
+      return;
+    }
+
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
@@ -57,6 +85,10 @@ export default function Checkout() {
     
     // Construct WhatsApp Message
     const orderSummary = items.map(item => `• ${item.name} (x${item.quantity}) - ₹${item.price.toLocaleString("en-IN")}`).join("\n");
+    const pinLocationText = pincodeInfo && pincodeInfo.valid
+      ? `\n*Location Verified:* ${pincodeInfo.postOffice ? pincodeInfo.postOffice + ', ' : ''}${pincodeInfo.district}, ${pincodeInfo.state} (${pincodeInfo.pincode})\n*Est. Delivery:* ${pincodeInfo.deliveryDays} (${pincodeInfo.shippingCharge})`
+      : "";
+
     const message = encodeURIComponent(
       `*NEW ORDER - PAVAPETTI HERITAGE ARTIFACTS*\n\n` +
       `*Order Details:*\n${orderSummary}\n\n` +
@@ -66,7 +98,7 @@ export default function Checkout() {
       `Phone: ${formData.phone}\n` +
       `Email: ${formData.email || "N/A"}\n\n` +
       `*Shipping Address:*\n` +
-      `${formData.address}${formData.city ? ", " + formData.city : ""}${formData.zip ? " - " + formData.zip : ""}\n\n` +
+      `${formData.address}${formData.city ? ", " + formData.city : ""}${formData.zip ? " - PIN: " + formData.zip : ""}${pinLocationText}\n\n` +
       `_Please confirm my order and let me know the payment details._`
     );
 
@@ -248,17 +280,44 @@ export default function Checkout() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label htmlFor="checkout-zip" className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground ml-1">ZIP / Postal Code</label>
+                    <div className="flex items-center justify-between">
+                      <label htmlFor="checkout-zip" className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground ml-1">
+                        PIN / Postal Code *
+                      </label>
+                      {isVerifyingPin && (
+                        <span className="text-[10px] text-muted-foreground flex items-center gap-1 font-medium">
+                          <Loader2 size={10} className="animate-spin" /> Checking...
+                        </span>
+                      )}
+                    </div>
                     <Input 
                       id="checkout-zip"
                       name="zip"
+                      maxLength={6}
                       inputMode="numeric"
                       autoComplete="postal-code"
                       value={formData.zip}
                       onChange={handleInputChange}
-                      placeholder="000 000" 
-                      className="rounded-xl border-border/60 focus:border-primary/40 py-6" 
+                      placeholder="e.g. 682001" 
+                      className="rounded-xl border-border/60 focus:border-primary/40 py-6 font-mono" 
                     />
+                    {pincodeInfo && (
+                      <p className={`text-[11px] font-medium flex items-center gap-1 pt-1 ${
+                        pincodeInfo.valid ? "text-emerald-700" : "text-amber-700"
+                      }`}>
+                        {pincodeInfo.valid ? (
+                          <>
+                            <Check size={12} className="text-emerald-600 shrink-0" />
+                            <span>
+                              {pincodeInfo.isKerala ? "Kerala Delivery: " : "Delivery: "}
+                              <strong>{pincodeInfo.postOffice ? `${pincodeInfo.postOffice}, ` : ""}{pincodeInfo.district}, {pincodeInfo.state}</strong> ({pincodeInfo.deliveryDays})
+                            </span>
+                          </>
+                        ) : (
+                          <span>{pincodeInfo.message}</span>
+                        )}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>

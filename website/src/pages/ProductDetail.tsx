@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   ArrowLeft, Package, Tag, Star, Phone, Share2, ShoppingBag, 
   Check, MessageCircle, Heart, ChevronRight, ChevronLeft, X,
-  Truck, ShieldCheck, CreditCard, Zap, Sparkles, Minus, Plus, Box, Clock
+  Truck, ShieldCheck, CreditCard, Zap, Sparkles, Minus, Plus, Box, Clock,
+  MapPin, Loader2
 } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,7 @@ import { useAccessibleDialog } from "@/hooks/use-accessible-dialog";
 import { useWishlist } from "@/context/WishlistContext";
 import { useToast } from "@/hooks/use-toast";
 import Magnetic from "@/components/Magnetic";
+import { verifyPincode, type PincodeInfo } from "@/lib/pincode";
 
 function AccordionItem({ title, content }: { title: string; content: string }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -79,7 +81,8 @@ export default function ProductDetail() {
   const { toast } = useToast();
   const [qty, setQty] = useState(1);
   const [pincode, setPincode] = useState("");
-  const [pincodeChecked, setPincodeChecked] = useState(false);
+  const [pincodeResult, setPincodeResult] = useState<PincodeInfo | null>(null);
+  const [isCheckingPin, setIsCheckingPin] = useState(false);
 
   const inCart = product ? isInCart(product.id) : false;
   const wishlisted = product ? isWishlisted(product.id) : false;
@@ -183,7 +186,73 @@ export default function ProductDetail() {
     }
   }
 
-  // Instant Buy Now
+  const PHONE = "919292016901";
+
+  // Dynamic WhatsApp order URL generator with verified location & item breakdown
+  function buildWhatsAppOrderUrl(customPin?: PincodeInfo | null) {
+    if (!product) return `https://wa.me/${PHONE}`;
+    const targetPin = customPin !== undefined ? customPin : pincodeResult;
+    const totalAmount = Number(product.price) * qty;
+
+    let locDetails = "";
+    if (targetPin && targetPin.valid) {
+      const area = targetPin.postOffice ? `${targetPin.postOffice}, ` : "";
+      locDetails = `\n*📍 Delivery Location:* ${area}${targetPin.district}, ${targetPin.state} (PIN: ${targetPin.pincode})\n*🚚 Delivery Speed:* ${targetPin.deliveryDays} • ${targetPin.shippingCharge}`;
+    } else if (pincode && pincode.length === 6) {
+      locDetails = `\n*📍 Delivery PIN:* ${pincode}`;
+    }
+
+    const msg =
+`*NEW ORDER - PAVAPETTI HERITAGE* 🏺
+
+*Artifact:* ${product.name}
+*Item ID:* #${product.id}
+*Quantity:* ${qty} unit(s)
+*Price:* ₹${Number(product.price).toLocaleString("en-IN")} each
+*Total Amount:* ₹${totalAmount.toLocaleString("en-IN")}${locDetails}
+
+*Product Link:* ${window.location.origin}/product/${product.id}
+
+_Hi Pavapetti, I would like to order this authentic handcrafted treasure. Please confirm availability and share payment (UPI / Bank transfer) details._`;
+
+    return `https://wa.me/${PHONE}?text=${encodeURIComponent(msg)}`;
+  }
+
+  // Check & verify pincode with Kerala district & all-India postal API
+  async function handleCheckPincode(pinToCheck = pincode) {
+    const clean = pinToCheck.trim().replace(/\D/g, "");
+    if (clean.length !== 6) {
+      toast({
+        title: "6-Digit Pincode Required",
+        description: "Please enter a valid 6-digit Indian PIN code to check delivery.",
+        variant: "destructive",
+      });
+      return;
+    }
+    setIsCheckingPin(true);
+    try {
+      const res = await verifyPincode(clean);
+      setPincodeResult(res);
+      if (res.valid) {
+        toast({
+          title: res.isKerala ? `Kerala Delivery: ${res.district}` : `All-India Delivery: ${res.state}`,
+          description: res.message,
+        });
+      } else {
+        toast({
+          title: "Pincode Unverified",
+          description: res.message,
+          variant: "destructive",
+        });
+      }
+    } catch {
+      // safe fallback
+    } finally {
+      setIsCheckingPin(false);
+    }
+  }
+
+  // Instant Buy Now via WhatsApp
   function handleBuyNow() {
     if (!product) return;
     addItem({
@@ -197,7 +266,11 @@ export default function ProductDetail() {
     if (qty > 1) {
       updateQty(product.id, qty);
     }
-    setLocation("/checkout");
+    const waUrl = buildWhatsAppOrderUrl();
+    const win = window.open(waUrl, "_blank");
+    if (!win) {
+      window.location.href = waUrl;
+    }
   }
 
   // Add To Cart with selected quantity
@@ -275,7 +348,6 @@ export default function ProductDetail() {
     );
   }
 
-  const PHONE = "919292016901";
   const waMsg = encodeURIComponent(
     `Hi! I'm interested in *${product.name}* (Price: ₹${product.price.toLocaleString("en-IN")}, Product ID: #${product.id}). Could you please share more details and delivery availability?`
   );
@@ -514,17 +586,17 @@ export default function ProductDetail() {
                 </div>
               </div>
 
-              {/* Dual Buy Buttons: Instant Buy Now + Add to Cart */}
+              {/* Dual Buy Buttons: Instant WhatsApp Order + Add to Cart */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                 <Button
                   size="lg"
-                  className="bg-primary hover:bg-primary/95 text-white font-bold text-sm h-12 rounded-xl shadow-lg shadow-primary/20 flex items-center justify-center gap-2 transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50"
+                  className="bg-[#25D366] hover:bg-[#1ebe5d] text-white font-black text-xs sm:text-sm tracking-wide h-12 rounded-xl shadow-lg shadow-green-500/25 flex items-center justify-center gap-2 transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 border-none"
                   disabled={product.stock === 0}
                   onClick={handleBuyNow}
                   data-testid="button-buy-now"
                 >
-                  <Zap size={16} className="fill-white" />
-                  <span>BUY NOW</span>
+                  <MessageCircle size={18} className="fill-white/20" />
+                  <span>ORDER ON WHATSAPP</span>
                 </Button>
 
                 <Button
@@ -578,37 +650,108 @@ export default function ProductDetail() {
               </div>
             </div>
 
-            {/* ── Delivery Pincode Checker ── */}
-            <div className="p-4 rounded-xl border border-stone-200/80 bg-stone-50/60 space-y-2">
+            {/* ── Delivery Pincode Checker with Kerala & All-India Verification ── */}
+            <div className="p-4 rounded-2xl border border-stone-200/90 bg-stone-50/70 space-y-2.5">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-stone-800 flex items-center gap-1.5">
-                  <Truck size={14} className="text-primary" /> Delivery & Logistics
+                  <Truck size={14} className="text-primary" /> Delivery & Location Checker
                 </span>
-                <span className="text-[11px] text-emerald-700 font-semibold">Free Shipping India-wide</span>
+                <span className="text-[11px] text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                  Free Shipping India-wide
+                </span>
               </div>
+              
               <div className="flex gap-2">
-                <input
-                  type="text"
-                  maxLength={6}
-                  placeholder="Enter 6-digit Pincode"
-                  value={pincode}
-                  onChange={(e) => setPincode(e.target.value.replace(/\D/g, ""))}
-                  className="flex-1 bg-white border border-stone-300 rounded-lg h-9 px-3 text-xs outline-none focus:border-primary font-mono placeholder:text-muted-foreground/40"
-                />
+                <div className="relative flex-1">
+                  <MapPin size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" />
+                  <input
+                    type="text"
+                    maxLength={6}
+                    placeholder="Enter 6-digit Pincode (e.g. 682001)"
+                    value={pincode}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\D/g, "");
+                      setPincode(val);
+                      if (val.length === 6) {
+                        handleCheckPincode(val);
+                      } else {
+                        setPincodeResult(null);
+                      }
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && pincode.length === 6) {
+                        handleCheckPincode(pincode);
+                      }
+                    }}
+                    className="w-full bg-white border border-stone-300 rounded-xl h-10 pl-9 pr-3 text-xs outline-none focus:border-primary font-mono placeholder:text-muted-foreground/50 shadow-2xs"
+                  />
+                </div>
                 <Button
                   type="button"
                   size="sm"
                   variant="outline"
-                  onClick={() => setPincodeChecked(pincode.length === 6)}
-                  className="h-9 px-3.5 text-xs font-semibold rounded-lg border-stone-300 hover:bg-stone-100"
+                  disabled={isCheckingPin || pincode.length !== 6}
+                  onClick={() => handleCheckPincode(pincode)}
+                  className="h-10 px-4 text-xs font-bold rounded-xl border-stone-300 hover:bg-stone-100 shrink-0"
                 >
-                  Check
+                  {isCheckingPin ? (
+                    <Loader2 size={13} className="animate-spin" />
+                  ) : (
+                    "Check"
+                  )}
                 </Button>
               </div>
-              {pincodeChecked && (
-                <p className="text-[11px] text-emerald-700 font-medium flex items-center gap-1 pt-0.5">
-                  <Check size={12} /> Standard delivery available by {new Date(Date.now() + 4 * 86400000).toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short" })} to {pincode}.
-                </p>
+
+              {pincodeResult && (
+                <div className={`p-3.5 rounded-xl border text-xs space-y-2 animate-in fade-in duration-200 ${
+                  pincodeResult.valid
+                    ? "bg-emerald-50/90 border-emerald-200/90 text-emerald-950"
+                    : "bg-amber-50/90 border-amber-200/90 text-amber-950"
+                }`}>
+                  <div className="flex items-start gap-2.5">
+                    {pincodeResult.valid ? (
+                      <div className="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-xs">
+                        <Check size={12} strokeWidth={3} />
+                      </div>
+                    ) : (
+                      <div className="w-5 h-5 rounded-full bg-amber-500 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-xs">
+                        <X size={12} strokeWidth={3} />
+                      </div>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <p className="font-bold text-xs leading-tight">
+                        {pincodeResult.valid ? (
+                          <>
+                            Delivery Available to{" "}
+                            <span className="text-emerald-800 underline decoration-emerald-400 font-extrabold">
+                              {pincodeResult.postOffice ? `${pincodeResult.postOffice}, ` : ""}{pincodeResult.district}, {pincodeResult.state}
+                            </span>{" "}
+                            ({pincodeResult.pincode})
+                          </>
+                        ) : (
+                          "Pincode Not Verified"
+                        )}
+                      </p>
+                      <p className="text-[11px] text-stone-600 mt-1 leading-normal">
+                        {pincodeResult.valid
+                          ? `⚡ Estimated Delivery: ${pincodeResult.deliveryDays} • ${pincodeResult.shippingCharge}`
+                          : pincodeResult.message}
+                      </p>
+                    </div>
+                  </div>
+
+                  {pincodeResult.valid && (
+                    <a
+                      href={buildWhatsAppOrderUrl(pincodeResult)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="w-full mt-2 py-2 px-3 rounded-lg bg-[#25D366] hover:bg-[#1ebe5d] text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm transition-transform active:scale-[0.99]"
+                    >
+                      <MessageCircle size={14} className="fill-white/20" />
+                      <span>Order to {pincodeResult.district || pincodeResult.pincode} via WhatsApp</span>
+                    </a>
+                  )}
+                </div>
               )}
             </div>
 
@@ -768,24 +911,14 @@ export default function ProductDetail() {
 
             <div className="flex items-center gap-2 shrink-0">
               <a
-                href={`https://wa.me/${PHONE}?text=${waMsg}`}
+                href={buildWhatsAppOrderUrl(pincodeResult?.valid ? pincodeResult : null)}
                 target="_blank"
                 rel="noreferrer"
-                className="w-10 h-10 rounded-xl bg-[#25D366] text-white flex items-center justify-center shrink-0 shadow-sm"
-                title="WhatsApp Enquiry"
+                className="h-10 px-4 rounded-xl bg-[#25D366] hover:bg-[#1ebe5d] text-white font-black text-xs flex items-center gap-1.5 shadow-md shadow-green-600/25 transition-transform active:scale-95 border-none"
               >
-                <MessageCircle size={18} className="fill-white/20" />
+                <MessageCircle size={15} className="fill-white/20" />
+                <span>ORDER ON WHATSAPP</span>
               </a>
-
-              <Button
-                size="sm"
-                className="bg-primary hover:bg-primary/95 text-white font-bold text-xs h-10 px-4 rounded-xl shadow-md shadow-primary/25"
-                disabled={product.stock === 0}
-                onClick={handleBuyNow}
-              >
-                <Zap size={14} className="mr-1 fill-white" />
-                BUY NOW
-              </Button>
             </div>
           </motion.div>
         )}
