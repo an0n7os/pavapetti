@@ -143,7 +143,7 @@ export async function verifyPincode(rawPin: string): Promise<PincodeInfo> {
           postOffice,
           isKerala: isKeralaState,
           deliveryDays: isKeralaState ? "2 - 3 business days" : "4 - 6 business days",
-          shippingCharge: "FREE Express Delivery",
+          shippingCharge: "Shipping as per parcel weight",
           message: isKeralaState
             ? `Delivery available to ${postOffice ? `${postOffice}, ` : ""}${district}, Kerala.`
             : `All-India delivery available to ${postOffice ? `${postOffice}, ` : ""}${district}, ${state}.`,
@@ -164,7 +164,7 @@ export async function verifyPincode(rawPin: string): Promise<PincodeInfo> {
       state: "Kerala",
       isKerala: true,
       deliveryDays: "2 - 3 business days",
-      shippingCharge: "FREE Express Delivery",
+      shippingCharge: "Shipping as per parcel weight",
       message: `Delivery available to ${districtName}, Kerala.`,
     };
   }
@@ -178,7 +178,7 @@ export async function verifyPincode(rawPin: string): Promise<PincodeInfo> {
       state: "India",
       isKerala: false,
       deliveryDays: "4 - 6 business days",
-      shippingCharge: "FREE Express Delivery",
+      shippingCharge: "Shipping as per parcel weight",
       message: `Pan-India delivery available to PIN code ${pin}.`,
     };
   }

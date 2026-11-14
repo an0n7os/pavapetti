@@ -197,10 +197,12 @@ export default function ProductDetail() {
     let locDetails = "";
     if (targetPin && targetPin.valid) {
       const area = targetPin.postOffice ? `${targetPin.postOffice}, ` : "";
-      locDetails = `\n*📍 Delivery Location:* ${area}${targetPin.district}, ${targetPin.state} (PIN: ${targetPin.pincode})\n*🚚 Delivery Speed:* ${targetPin.deliveryDays} • ${targetPin.shippingCharge}`;
+      locDetails = `\n*📍 Delivery Location:* ${area}${targetPin.district}, ${targetPin.state} (PIN: ${targetPin.pincode})\n*🚚 Delivery Speed:* ${targetPin.deliveryDays}`;
     } else if (pincode && pincode.length === 6) {
       locDetails = `\n*📍 Delivery PIN:* ${pincode}`;
     }
+
+    const weightDetail = product.weight ? `\n*⚖️ Approx Weight:* ${product.weight}` : "";
 
     const msg =
 `*NEW ORDER - PAVAPETTI HERITAGE* 🏺
@@ -208,12 +210,13 @@ export default function ProductDetail() {
 *Artifact:* ${product.name}
 *Item ID:* #${product.id}
 *Quantity:* ${qty} unit(s)
-*Price:* ₹${Number(product.price).toLocaleString("en-IN")} each
-*Total Amount:* ₹${totalAmount.toLocaleString("en-IN")}${locDetails}
+*Item Price:* ₹${Number(product.price).toLocaleString("en-IN")} each
+*Subtotal:* ₹${totalAmount.toLocaleString("en-IN")}${weightDetail}${locDetails}
+*📦 Shipping Charges:* Calculated based on package weight & location (please confirm)
 
 *Product Link:* ${window.location.origin}/product/${product.id}
 
-_Hi Pavapetti, I would like to order this authentic handcrafted treasure. Please confirm availability and share payment (UPI / Bank transfer) details._`;
+_Hi Pavapetti, please let me know the final amount including parcel weight-based shipping charges and share your payment (UPI / Bank transfer) details._`;
 
     return `https://wa.me/${PHONE}?text=${encodeURIComponent(msg)}`;
   }
@@ -656,8 +659,8 @@ _Hi Pavapetti, I would like to order this authentic handcrafted treasure. Please
                 <span className="text-xs font-bold text-stone-800 flex items-center gap-1.5">
                   <Truck size={14} className="text-primary" /> Delivery & Location Checker
                 </span>
-                <span className="text-[11px] text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                  Free Shipping India-wide
+                <span className="text-[11px] text-stone-600 font-semibold bg-stone-200/60 px-2 py-0.5 rounded-full border border-stone-300/60">
+                  Shipping as per weight
                 </span>
               </div>
               
@@ -734,7 +737,7 @@ _Hi Pavapetti, I would like to order this authentic handcrafted treasure. Please
                       </p>
                       <p className="text-[11px] text-stone-600 mt-1 leading-normal">
                         {pincodeResult.valid
-                          ? `⚡ Estimated Delivery: ${pincodeResult.deliveryDays} • ${pincodeResult.shippingCharge}`
+                          ? `⚡ Estimated Delivery: ${pincodeResult.deliveryDays} • Shipping charges extra as per package weight`
                           : pincodeResult.message}
                       </p>
                     </div>
@@ -759,8 +762,8 @@ _Hi Pavapetti, I would like to order this authentic handcrafted treasure. Please
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
               <div className="p-2.5 rounded-xl border border-stone-100 bg-white shadow-xs text-center space-y-1">
                 <Truck size={18} className="mx-auto text-primary" />
-                <p className="text-[11px] font-bold text-stone-900 leading-tight">Free Shipping</p>
-                <p className="text-[10px] text-stone-400">All India orders</p>
+                <p className="text-[11px] font-bold text-stone-900 leading-tight">Insured Shipping</p>
+                <p className="text-[10px] text-stone-400">Safe express transit</p>
               </div>
               <div className="p-2.5 rounded-xl border border-stone-100 bg-white shadow-xs text-center space-y-1">
                 <ShieldCheck size={18} className="mx-auto text-emerald-600" />
@@ -906,7 +909,7 @@ _Hi Pavapetti, I would like to order this authentic handcrafted treasure. Please
                   </span>
                 )}
               </div>
-              <p className="text-[10px] text-emerald-700 font-semibold truncate">Free Delivery Included</p>
+              <p className="text-[10px] text-stone-500 font-medium truncate">Shipping calculated by weight</p>
             </div>
 
             <div className="flex items-center gap-2 shrink-0">

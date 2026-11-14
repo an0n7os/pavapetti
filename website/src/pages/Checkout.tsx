@@ -86,20 +86,21 @@ export default function Checkout() {
     // Construct WhatsApp Message
     const orderSummary = items.map(item => `• ${item.name} (x${item.quantity}) - ₹${item.price.toLocaleString("en-IN")}`).join("\n");
     const pinLocationText = pincodeInfo && pincodeInfo.valid
-      ? `\n*Location Verified:* ${pincodeInfo.postOffice ? pincodeInfo.postOffice + ', ' : ''}${pincodeInfo.district}, ${pincodeInfo.state} (${pincodeInfo.pincode})\n*Est. Delivery:* ${pincodeInfo.deliveryDays} (${pincodeInfo.shippingCharge})`
+      ? `\n*Location Verified:* ${pincodeInfo.postOffice ? pincodeInfo.postOffice + ', ' : ''}${pincodeInfo.district}, ${pincodeInfo.state} (${pincodeInfo.pincode})\n*Est. Delivery:* ${pincodeInfo.deliveryDays}`
       : "";
 
     const message = encodeURIComponent(
       `*NEW ORDER - PAVAPETTI HERITAGE ARTIFACTS*\n\n` +
       `*Order Details:*\n${orderSummary}\n\n` +
-      `*Total Amount:* ₹${total.toLocaleString("en-IN")}\n\n` +
+      `*Subtotal:* ₹${total.toLocaleString("en-IN")}\n` +
+      `*Shipping Charges:* Calculated based on parcel weight & destination (to be confirmed)\n\n` +
       `*Customer Information:*\n` +
       `Name: ${formData.name}\n` +
       `Phone: ${formData.phone}\n` +
       `Email: ${formData.email || "N/A"}\n\n` +
       `*Shipping Address:*\n` +
       `${formData.address}${formData.city ? ", " + formData.city : ""}${formData.zip ? " - PIN: " + formData.zip : ""}${pinLocationText}\n\n` +
-      `_Please confirm my order and let me know the payment details._`
+      `_Please confirm my order with the final parcel weight-based shipping amount and payment details._`
     );
 
     const whatsappWindow = window.open(`https://wa.me/${PHONE}?text=${message}`, "_blank");

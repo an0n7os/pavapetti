@@ -27,9 +27,11 @@ export default function CartDrawer() {
       (item) => `• ${item.name} (×${item.quantity}) — ₹${(item.price * item.quantity).toLocaleString("en-IN")}`
     );
     const msg =
-      `Hi! I'd like to place an order from Pavapetti Heritage Artifacts:\n\n` +
+      `*NEW ORDER - PAVAPETTI HERITAGE ARTIFACTS* 🏺\n\n` +
       lines.join("\n") +
-      `\n\n*Total: ₹${total.toLocaleString("en-IN")}*\n\nPlease confirm availability.`;
+      `\n\n*Subtotal:* ₹${total.toLocaleString("en-IN")}\n` +
+      `*Shipping:* Calculated as per package weight & delivery destination\n\n` +
+      `_Hi Pavapetti, please confirm this order with the final parcel weight-based shipping amount and payment details._`;
     return encodeURIComponent(msg);
   }
 
@@ -218,7 +220,7 @@ export default function CartDrawer() {
                   </div>
                   <div className="flex justify-between text-xs text-slate-500">
                     <span>Shipping</span>
-                    <span className="text-emerald-600 font-bold uppercase tracking-wider text-[9px]">Calculated in Chat</span>
+                    <span className="text-stone-600 font-bold uppercase tracking-wider text-[9px]">Calculated by Weight</span>
                   </div>
                   <div className="flex justify-between items-end pt-2 border-t border-dashed border-slate-200">
                     <span className="font-bold text-slate-800">Total Amount</span>
