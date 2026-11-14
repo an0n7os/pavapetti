@@ -41,6 +41,7 @@ import {
 } from "@workspace/api-client-react";
 import { useToast } from "@/hooks/use-toast";
 import { uploadImageToStorage } from "@/lib/supabase";
+import { useAccessibleDialog } from "@/hooks/use-accessible-dialog";
 
 const emptyForm: CreateProductBody = {
   name: "",
@@ -79,6 +80,7 @@ export default function DashboardProducts() {
 
   // Lock background scroll when modal is open
   const isModalOpen = showForm || deleteId !== null;
+  const productDialogRef = useAccessibleDialog<HTMLDivElement>(showForm, () => setShowForm(false));
 
   useEffect(() => {
     if (isModalOpen) {
@@ -342,6 +344,11 @@ export default function DashboardProducts() {
             onClick={() => setShowForm(false)}
           >
             <motion.div
+              ref={productDialogRef}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="product-form-title"
+              tabIndex={-1}
               initial={{ opacity: 0, scale: 0.96, y: 8 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.96, y: 8 }}
@@ -357,7 +364,7 @@ export default function DashboardProducts() {
                       {editProduct ? <Pencil size={13} /> : <Plus size={14} />}
                     </div>
                     <div>
-                      <h3 className="font-semibold text-sm text-stone-900 leading-tight">
+                      <h3 id="product-form-title" className="font-semibold text-sm text-stone-900 leading-tight">
                         {editProduct ? "Modify Product Details" : "Add New Product"}
                       </h3>
                       <p className="text-[11px] text-muted-foreground">
@@ -366,6 +373,7 @@ export default function DashboardProducts() {
                     </div>
                   </div>
                   <Button
+                    aria-label="Close product editor"
                     type="button"
                     size="sm"
                     variant="ghost"
@@ -425,7 +433,7 @@ export default function DashboardProducts() {
                         <Label className="text-[10px] font-semibold text-stone-500 uppercase tracking-wider block">
                           Also Show In Additional Categories (Optional)
                         </Label>
-                        <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-1 bg-stone-50/60 rounded-lg border border-stone-100">
+                        <div className="flex flex-wrap gap-1.5 p-1 bg-stone-50/60 rounded-lg border border-stone-100">
                           {(categories ?? [])
                             .filter((cat: any) => cat.id !== form.categoryId)
                             .map((cat: any) => {
@@ -901,7 +909,8 @@ export default function DashboardProducts() {
                               size="sm"
                               variant="ghost"
                               onClick={() => openEdit(product)}
-                              className="h-7 w-7 p-0 rounded-md text-stone-500 hover:text-stone-900 hover:bg-stone-100"
+                              aria-label={`Edit ${product.name}`}
+                              className="h-11 w-11 p-0 rounded-md text-stone-500 hover:text-stone-900 hover:bg-stone-100"
                               title="Edit product"
                               data-testid={`button-edit-${product.id}`}
                             >
@@ -911,7 +920,8 @@ export default function DashboardProducts() {
                               size="sm"
                               variant="ghost"
                               onClick={() => setDeleteId(product.id)}
-                              className="h-7 w-7 p-0 rounded-md text-stone-400 hover:text-red-600 hover:bg-red-50"
+                              aria-label={`Delete ${product.name}`}
+                              className="h-11 w-11 p-0 rounded-md text-stone-400 hover:text-red-600 hover:bg-red-50"
                               title="Delete product"
                               data-testid={`button-delete-${product.id}`}
                             >
@@ -953,7 +963,8 @@ export default function DashboardProducts() {
                         size="sm"
                         variant="ghost"
                         onClick={() => openEdit(product)}
-                        className="h-8 w-8 p-0 rounded-lg text-stone-600 hover:bg-stone-100"
+                        aria-label={`Edit ${product.name}`}
+                        className="h-11 w-11 p-0 rounded-lg text-stone-600 hover:bg-stone-100"
                       >
                         <Pencil size={14} />
                       </Button>
@@ -961,7 +972,8 @@ export default function DashboardProducts() {
                         size="sm"
                         variant="ghost"
                         onClick={() => setDeleteId(product.id)}
-                        className="h-8 w-8 p-0 rounded-lg text-red-500 hover:bg-red-50"
+                        aria-label={`Delete ${product.name}`}
+                        className="h-11 w-11 p-0 rounded-lg text-red-500 hover:bg-red-50"
                       >
                         <Trash2 size={14} />
                       </Button>

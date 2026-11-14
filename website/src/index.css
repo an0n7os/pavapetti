@@ -28,11 +28,16 @@
   }
   
   html, body {
-    @apply overflow-x-hidden;
+    overflow-x: clip;
   }
 
   body {
     @apply bg-background text-foreground font-sans antialiased selection:bg-primary selection:text-white;
+  }
+
+  :focus-visible {
+    outline: 3px solid hsl(var(--primary));
+    outline-offset: 3px;
   }
 }
 
@@ -76,25 +81,19 @@
   }
 }
 
-/* Lenis Smooth Scroll Base CSS */
-html.lenis, html.lenis body {
-  height: auto;
-}
+@media (prefers-reduced-motion: reduce) {
+  html:focus-within {
+    scroll-behavior: auto;
+  }
 
-.lenis.lenis-smooth {
-  scroll-behavior: auto !important;
-}
-
-.lenis.lenis-smooth [data-lenis-prevent] {
-  overscroll-behavior: contain;
-}
-
-.lenis.lenis-stopped {
-  overflow: hidden;
-}
-
-.lenis.lenis-smooth iframe {
-  pointer-events: none;
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 @keyframes marquee {

@@ -265,8 +265,10 @@ export default function DashboardBackup() {
 
             <form onSubmit={handleImport} className="space-y-6">
               {/* File Selector */}
-              <div className="relative border-2 border-dashed border-primary/10 rounded-2xl p-6 text-center hover:border-primary/45 transition-colors cursor-pointer bg-[#fdfcfb]">
+              <label htmlFor="backup-file" className="sr-only">Upload a Pavapetti backup JSON file</label>
+              <div className="relative border-2 border-dashed border-primary/10 rounded-2xl p-6 text-center hover:border-primary/45 transition-colors cursor-pointer bg-[#fdfcfb] focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2">
                 <input
+                  id="backup-file"
                   type="file"
                   accept=".json"
                   onChange={handleFileChange}
@@ -282,39 +284,39 @@ export default function DashboardBackup() {
                 ) : (
                   <div>
                     <p className="text-xs font-bold text-foreground">Click to upload backup file</p>
-                    <p className="text-[10px] text-muted-foreground mt-1">Supports Pavapetti JSON backups only</p>
+                    <p id="backup-file-help" className="text-[10px] text-muted-foreground mt-1">Supports Pavapetti JSON backups only</p>
                   </div>
                 )}
               </div>
 
               {/* Import Options */}
-              <div className="space-y-3">
-                <label className="block text-[10px] font-black tracking-wider uppercase text-muted-foreground">Import Mode</label>
+              <fieldset className="space-y-3" disabled={loading}>
+                <legend className="block text-[10px] font-black tracking-wider uppercase text-muted-foreground">Import Mode</legend>
                 <div className="grid grid-cols-2 gap-3">
-                  <div
-                    onClick={() => !loading && setImportMode("merge")}
-                    className={`p-3 rounded-xl border text-center cursor-pointer transition-all duration-200 ${
+                  <label
+                    className={`min-h-16 p-3 rounded-xl border text-center cursor-pointer transition-colors flex flex-col items-center justify-center focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 ${
                       importMode === "merge"
                         ? "bg-primary/5 border-primary text-primary"
                         : "border-border/50 text-muted-foreground hover:bg-neutral-50"
                     }`}
                   >
-                    <p className="text-xs font-bold">Merge</p>
+                    <input type="radio" name="import-mode" value="merge" checked={importMode === "merge"} onChange={() => setImportMode("merge")} className="sr-only" />
+                    <span className="text-xs font-bold">Merge</span>
                     <p className="text-[9px] mt-0.5 leading-tight opacity-75">Add only, don't delete</p>
-                  </div>
-                  <div
-                    onClick={() => !loading && setImportMode("overwrite")}
-                    className={`p-3 rounded-xl border text-center cursor-pointer transition-all duration-200 ${
+                  </label>
+                  <label
+                    className={`min-h-16 p-3 rounded-xl border text-center cursor-pointer transition-colors flex flex-col items-center justify-center focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 ${
                       importMode === "overwrite"
                         ? "bg-red-500/5 border-red-500/40 text-red-600"
                         : "border-border/50 text-muted-foreground hover:bg-neutral-50"
                     }`}
                   >
-                    <p className="text-xs font-bold">Overwrite</p>
+                    <input type="radio" name="import-mode" value="overwrite" checked={importMode === "overwrite"} onChange={() => setImportMode("overwrite")} className="sr-only" />
+                    <span className="text-xs font-bold">Overwrite</span>
                     <p className="text-[9px] mt-0.5 leading-tight opacity-75">Wipe database first</p>
-                  </div>
+                  </label>
                 </div>
-              </div>
+              </fieldset>
 
               {/* Submit */}
               <Button

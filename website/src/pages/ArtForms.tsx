@@ -9,6 +9,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Magnetic from "@/components/Magnetic";
 import { ArtForm, useArtForms, generateArtBookingWhatsAppUrl, WHATSAPP_PHONE } from "@/data/artForms";
+import { useAccessibleDialog } from "@/hooks/use-accessible-dialog";
 
 export default function ArtForms() {
   const { artForms } = useArtForms();
@@ -23,6 +24,8 @@ export default function ArtForms() {
   const [eventDate, setEventDate] = useState("");
   const [eventLocation, setEventLocation] = useState("");
   const [specialNotes, setSpecialNotes] = useState("");
+  const detailDialogRef = useAccessibleDialog<HTMLDivElement>(!!activeDetailArt, () => setActiveDetailArt(null));
+  const bookingDialogRef = useAccessibleDialog<HTMLDivElement>(!!bookingArt, () => setBookingArt(null));
 
   // Lock background window scroll when any modal is open
   const isAnyModalOpen = !!activeDetailArt || !!bookingArt;
@@ -356,6 +359,11 @@ export default function ArtForms() {
         {activeDetailArt && (
           <div data-lenis-prevent className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm overscroll-contain">
             <motion.div
+              ref={detailDialogRef}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="art-form-detail-title"
+              tabIndex={-1}
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -364,6 +372,8 @@ export default function ArtForms() {
             >
               {/* Close Button */}
               <button
+                type="button"
+                aria-label="Close art form details"
                 onClick={() => setActiveDetailArt(null)}
                 className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-black/50 hover:bg-black text-white flex items-center justify-center transition-colors"
               >
@@ -383,7 +393,7 @@ export default function ArtForms() {
                     <span className="px-3 py-1 rounded-full bg-primary text-white text-[10px] font-black uppercase tracking-wider">
                       {activeDetailArt.category}
                     </span>
-                    <h2 className="font-serif text-3xl text-white font-medium mt-1">
+                    <h2 id="art-form-detail-title" className="font-serif text-3xl text-white font-medium mt-1">
                       {activeDetailArt.name} <span className="text-primary font-sans text-xl ml-2">({activeDetailArt.malayalamName})</span>
                     </h2>
                   </div>
@@ -481,6 +491,11 @@ export default function ArtForms() {
         {bookingArt && (
           <div data-lenis-prevent className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm overscroll-contain">
             <motion.div
+              ref={bookingDialogRef}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="art-form-booking-title"
+              tabIndex={-1}
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -490,13 +505,15 @@ export default function ArtForms() {
               {/* Header */}
               <div className="bg-[#0c0c0b] text-white p-6 relative">
                 <button
+                  type="button"
+                  aria-label="Close booking request"
                   onClick={() => setBookingArt(null)}
-                  className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
+                  className="absolute top-4 right-4 w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
                 >
                   <X size={16} />
                 </button>
                 <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Customize Booking Request</p>
-                <h3 className="font-serif text-2xl mt-1 text-[#f8f5ee]">
+                <h3 id="art-form-booking-title" className="font-serif text-2xl mt-1 text-[#f8f5ee]">
                   Book {bookingArt.name} <span className="text-primary">({bookingArt.malayalamName})</span>
                 </h3>
               </div>

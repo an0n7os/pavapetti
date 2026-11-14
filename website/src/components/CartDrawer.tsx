@@ -1,12 +1,24 @@
 import { motion, AnimatePresence } from "framer-motion";
+import { useEffect } from "react";
 import { useLocation } from "wouter";
-import { X, Minus, Plus, Trash2, ShoppingBag, Phone, MessageCircle, ArrowRight, ArrowLeft, MoreVertical, Video, CheckCheck } from "lucide-react";
+import { X, Minus, Plus, Trash2, ShoppingBag, Phone, MessageCircle, ArrowRight, ArrowLeft, CheckCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/context/CartContext";
+import { useAccessibleDialog } from "@/hooks/use-accessible-dialog";
 
 export default function CartDrawer() {
   const { items, count, total, isOpen, closeCart, removeItem, updateQty, clearCart } = useCart();
   const [, setLocation] = useLocation();
+  const cartDialogRef = useAccessibleDialog<HTMLDivElement>(isOpen, closeCart);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isOpen]);
 
   const PHONE = "919292016901";
 
@@ -39,6 +51,7 @@ export default function CartDrawer() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black/40 z-[100] backdrop-blur-[4px]"
+            aria-hidden="true"
             onClick={closeCart}
           />
         )}
@@ -47,19 +60,26 @@ export default function CartDrawer() {
       <AnimatePresence>
         {isOpen && (
           <motion.div
+            ref={cartDialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="cart-title"
+            tabIndex={-1}
             key="drawer"
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="fixed top-0 right-0 h-full w-full max-w-[480px] bg-[#efeae2] shadow-2xl z-[110] flex flex-col"
+            className="fixed top-0 right-0 h-[100dvh] w-full max-w-[480px] bg-[#efeae2] shadow-2xl z-[110] flex flex-col overscroll-contain"
           >
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 bg-[#008069] text-white shadow-md z-10">
               <div className="flex items-center gap-3">
                 <button
+                  type="button"
+                  aria-label="Close cart"
                   onClick={closeCart}
-                  className="p-1 rounded-full hover:bg-white/10 transition-colors text-white"
+                  className="w-11 h-11 rounded-full hover:bg-white/10 transition-colors text-white flex items-center justify-center"
                 >
                   <ArrowLeft size={20} />
                 </button>
@@ -71,20 +91,14 @@ export default function CartDrawer() {
                 </div>
 
                 <div>
-                  <h2 className="font-sans font-bold text-sm leading-tight">Pavapetti Heritage Artifacts</h2>
-                  <p className="text-[10px] text-emerald-100 font-medium">online</p>
+                  <h2 id="cart-title" className="font-sans font-bold text-sm leading-tight">Pavapetti Heritage Artifacts</h2>
+                  <p className="text-[10px] text-emerald-100 font-medium">WhatsApp order support</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-2.5 text-white/90">
-                <button className="p-2 rounded-full hover:bg-white/10 transition-colors hidden sm:block">
-                  <Video size={18} />
-                </button>
-                <button className="p-2 rounded-full hover:bg-white/10 transition-colors hidden sm:block" onClick={handleCall}>
+                <button type="button" aria-label="Call Pavapetti" className="w-11 h-11 rounded-full hover:bg-white/10 transition-colors hidden sm:flex items-center justify-center" onClick={handleCall}>
                   <Phone size={16} />
-                </button>
-                <button className="p-2 rounded-full hover:bg-white/10 transition-colors">
-                  <MoreVertical size={18} />
                 </button>
               </div>
             </div>
@@ -101,7 +115,7 @@ export default function CartDrawer() {
               {/* WhatsApp System Encrypted Notice */}
               <div className="mx-auto my-2 px-3 py-1.5 rounded-lg bg-[#ffe596]/30 border border-[#ffe596]/40 text-[10px] text-amber-800 text-center max-w-[85%] flex items-center gap-1 justify-center leading-normal">
                 <span>🔒</span>
-                <span>Items in your cart are temporarily reserved. Proceed to order via WhatsApp.</span>
+                <span>Review your items, then continue your order in WhatsApp.</span>
               </div>
 
               {items.length === 0 ? (
@@ -141,7 +155,7 @@ export default function CartDrawer() {
                           {/* Name & Remove */}
                           <div className="flex justify-between items-start gap-2 mb-1">
                             <p className="text-[12.5px] font-bold text-slate-800 leading-tight truncate">{item.name}</p>
-                            <button onClick={() => removeItem(item.productId)} className="text-red-500 hover:text-red-600 transition-colors p-0.5">
+                            <button type="button" aria-label={`Remove ${item.name} from cart`} onClick={() => removeItem(item.productId)} className="w-9 h-9 text-red-500 hover:text-red-600 transition-colors flex items-center justify-center">
                               <Trash2 size={13} />
                             </button>
                           </div>
@@ -153,12 +167,12 @@ export default function CartDrawer() {
                           {/* Controls & Price */}
                           <div className="mt-auto flex items-end justify-between gap-2">
                             <div className="flex items-center gap-3 bg-white/70 px-2.5 py-1 rounded-full border border-black/5 shadow-sm">
-                              <button onClick={() => updateQty(item.productId, item.quantity - 1)} className="text-slate-500 hover:text-slate-800 transition-colors">
-                                <Minus size={11} />
+                              <button type="button" aria-label={`Decrease ${item.name} quantity`} onClick={() => updateQty(item.productId, item.quantity - 1)} className="w-11 h-11 text-slate-500 hover:text-slate-800 transition-colors flex items-center justify-center">
+                                <Minus size={14} />
                               </button>
                               <span className="text-[11px] font-bold w-3.5 text-center text-slate-800">{item.quantity}</span>
-                              <button onClick={() => updateQty(item.productId, item.quantity + 1)} className="text-slate-500 hover:text-slate-800 transition-colors">
-                                <Plus size={11} />
+                              <button type="button" aria-label={`Increase ${item.name} quantity`} onClick={() => updateQty(item.productId, item.quantity + 1)} className="w-11 h-11 text-slate-500 hover:text-slate-800 transition-colors flex items-center justify-center">
+                                <Plus size={14} />
                               </button>
                             </div>
                             
@@ -195,8 +209,8 @@ export default function CartDrawer() {
                 {/* Order Summary styled as WhatsApp Invoice Card */}
                 <div className="bg-white rounded-xl p-4 shadow-sm border border-black/5 space-y-2.5">
                   <div className="flex justify-between items-center text-xs border-b border-slate-100 pb-2">
-                    <span className="font-bold text-slate-600 uppercase tracking-widest text-[9px]">Acquisitions Invoice</span>
-                    <span className="text-[10px] text-slate-400 font-medium">🔒 Secure Checkout</span>
+                    <span className="font-bold text-slate-600 uppercase tracking-widest text-[9px]">Order summary</span>
+                    <span className="text-[10px] text-slate-400 font-medium">Total before shipping</span>
                   </div>
                   <div className="flex justify-between text-xs text-slate-500">
                     <span>Treasures ({count})</span>

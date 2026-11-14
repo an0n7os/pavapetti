@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "wouter";
-import { motion, AnimatePresence, useScroll, useTransform, useMotionValue, useSpring } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   ArrowRight, Sparkles, Star, Quote, 
   ShieldCheck, Globe, Heart, MessageCircle 
@@ -120,13 +120,6 @@ export default function Home() {
   const [heroIdx, setHeroIdx] = React.useState(0);
   const intervalRef = React.useRef<NodeJS.Timeout | null>(null);
   
-  // High-performance GPU-accelerated motion values for mouse parallax (no state re-renders!)
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-  
-  const springX = useSpring(mouseX, { damping: 40, stiffness: 40 });
-  const springY = useSpring(mouseY, { damping: 40, stiffness: 40 });
-
   const resetSliderInterval = React.useCallback(() => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
@@ -142,19 +135,11 @@ export default function Home() {
   };
 
   React.useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      const xVal = (e.clientX / window.innerWidth - 0.5) * 20 * -0.3;
-      const yVal = (e.clientY / window.innerHeight - 0.5) * 20 * -0.3;
-      mouseX.set(xVal);
-      mouseY.set(yVal);
-    };
-    window.addEventListener("mousemove", handleMouseMove);
     resetSliderInterval();
     return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [mouseX, mouseY, resetSliderInterval]);
+  }, [resetSliderInterval]);
 
   const slide = HERO_SLIDES[heroIdx];
   const { data: featured = [], isLoading: featuredLoading, isSuccess: isFeaturedSuccess } = useGetFeaturedProducts({
@@ -215,12 +200,6 @@ export default function Home() {
     }
   }, [categories, isCategoriesSuccess]);
 
-  const { scrollY } = useScroll();
-  const y1 = useTransform(scrollY, [0, 500], [0, 200]);
-  const y2 = useTransform(scrollY, [0, 500], [0, -150]);
-  const opacity = useTransform(scrollY, [0, 300], [1, 0]);
-
-
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -246,23 +225,19 @@ export default function Home() {
               opacity: { duration: 1.8 },
               scale: { duration: 7.5, ease: "linear" },
             }}
-            style={{ x: springX, y: springY }}
             className="absolute inset-0 z-0"
           >
             {/* Enhanced Side Gradient for text protection */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/60 md:bg-gradient-to-r md:from-black md:via-black/50 md:to-transparent z-10" />
             
-            <motion.div
-              style={{ y: y1 }}
-              className="absolute inset-0"
-            >
+            <div className="absolute inset-0">
               <img
                 src={slide.src}
                 alt={slide.label}
                 className="w-full h-full object-cover object-[75%_center] scale-110"
                 style={{ filter: 'brightness(0.85)' }}
               />
-            </motion.div>
+            </div>
           </motion.div>
         </AnimatePresence>
 
@@ -284,10 +259,7 @@ export default function Home() {
             </AnimatePresence>
 
             <AnimatePresence mode="wait">
-              <motion.div
-                key={`parallax-h1-${heroIdx}`}
-                style={{ y: y2 }}
-              >
+              <motion.div key={`hero-h1-${heroIdx}`}>
                 <motion.h1
                   initial={{ opacity: 0, y: 40, skewY: 2 }}
                   animate={{ opacity: 1, y: 0, skewY: 0 }}

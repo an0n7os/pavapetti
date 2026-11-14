@@ -5,6 +5,7 @@ import {
   Sparkles, Music, Users, Clock, Eye, AlertTriangle
 } from "lucide-react";
 import DashboardLayout from "@/components/DashboardLayout";
+import { useAccessibleDialog } from "@/hooks/use-accessible-dialog";
 import { 
   ArtForm, useArtForms, addArtForm, updateArtForm, deleteArtForm, resetArtFormsToDefault 
 } from "@/data/artForms";
@@ -22,6 +23,11 @@ export default function DashboardArtForms() {
 
   // Lock background window scroll when any modal is open
   const isAnyModalOpen = isAddOpen || !!editingArt || !!deletingArt || isResetConfirmOpen;
+  const artEditorOpen = isAddOpen || !!editingArt;
+  const editorDialogRef = useAccessibleDialog<HTMLDivElement>(artEditorOpen, () => {
+    setIsAddOpen(false);
+    setEditingArt(null);
+  });
 
   useEffect(() => {
     if (isAnyModalOpen) {
@@ -275,6 +281,11 @@ export default function DashboardArtForms() {
         {(isAddOpen || editingArt) && (
           <div data-lenis-prevent className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm overscroll-contain">
             <motion.div
+              ref={editorDialogRef}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="art-form-editor-title"
+              tabIndex={-1}
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
@@ -287,11 +298,13 @@ export default function DashboardArtForms() {
                   <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">
                     {editingArt ? "Edit Existing Art Form" : "Add New Performing Art Form"}
                   </span>
-                  <h3 className="font-serif text-2xl text-[#f8f5ee]">
+                  <h3 id="art-form-editor-title" className="font-serif text-2xl text-[#f8f5ee]">
                     {editingArt ? `Editing ${editingArt.name}` : "Create New Listing"}
                   </h3>
                 </div>
                 <button
+                  type="button"
+                  aria-label="Close art form editor"
                   onClick={() => { setIsAddOpen(false); setEditingArt(null); }}
                   className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
                 >
@@ -304,10 +317,11 @@ export default function DashboardArtForms() {
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[11px] font-bold uppercase tracking-wider text-foreground/70 mb-1">
+                    <label htmlFor="art-form-name" className="block text-[11px] font-bold uppercase tracking-wider text-foreground/70 mb-1">
                       Art Form Name (English) *
                     </label>
                     <input
+                      id="art-form-name"
                       type="text"
                       required
                       placeholder="e.g. Theyyam"
@@ -318,10 +332,11 @@ export default function DashboardArtForms() {
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-bold uppercase tracking-wider text-foreground/70 mb-1">
+                    <label htmlFor="art-form-malayalam-name" className="block text-[11px] font-bold uppercase tracking-wider text-foreground/70 mb-1">
                       Malayalam Name (മലയാളത്തിൽ) *
                     </label>
                     <input
+                      id="art-form-malayalam-name"
                       type="text"
                       required
                       placeholder="e.g. തെയ്യം"
@@ -334,10 +349,11 @@ export default function DashboardArtForms() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[11px] font-bold uppercase tracking-wider text-foreground/70 mb-1">
+                    <label htmlFor="art-form-category" className="block text-[11px] font-bold uppercase tracking-wider text-foreground/70 mb-1">
                       Category *
                     </label>
                     <select
+                      id="art-form-category"
                       value={formData.category || "Classical Dance"}
                       onChange={(e) => setFormData({ ...formData, category: e.target.value as any })}
                       className="w-full bg-[#f8f6f0] border border-border/60 rounded-xl px-3.5 py-2.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
@@ -350,10 +366,11 @@ export default function DashboardArtForms() {
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-bold uppercase tracking-wider text-foreground/70 mb-1">
+                    <label htmlFor="art-form-image" className="block text-[11px] font-bold uppercase tracking-wider text-foreground/70 mb-1">
                       Image URL / Asset Path *
                     </label>
                     <input
+                      id="art-form-image"
                       type="text"
                       required
                       placeholder="/hero-dance-v2.webp or https://..."
@@ -365,10 +382,11 @@ export default function DashboardArtForms() {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-foreground/70 mb-1">
+                  <label htmlFor="art-form-description" className="block text-[11px] font-bold uppercase tracking-wider text-foreground/70 mb-1">
                     Description *
                   </label>
                   <textarea
+                    id="art-form-description"
                     rows={4}
                     required
                     placeholder="Enter detailed description of the art form..."
@@ -379,10 +397,11 @@ export default function DashboardArtForms() {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-foreground/70 mb-1">
+                  <label htmlFor="art-form-link" className="block text-[11px] font-bold uppercase tracking-wider text-foreground/70 mb-1">
                     Attach Link / Video URL (Optional)
                   </label>
                   <input
+                    id="art-form-link"
                     type="url"
                     placeholder="https://youtube.com/... or https://wa.me/..."
                     value={formData.linkUrl || ""}

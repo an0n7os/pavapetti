@@ -190,7 +190,7 @@ export default function DashboardCategories() {
                   <span className="text-[9px] tracking-[0.4em] text-primary/80 uppercase font-black block mb-1">Collection Taxonomy</span>
                   <CardTitle className="font-serif text-2xl font-light text-foreground">{editCategory ? "Modify Category Details" : "Archive New Category"}</CardTitle>
                 </div>
-                <Button size="sm" variant="ghost" className="rounded-full hover:bg-primary/5 text-muted-foreground hover:text-foreground p-2" onClick={() => setShowForm(false)} data-testid="button-close-category-form">
+                <Button size="sm" variant="ghost" aria-label="Close category form" className="rounded-full hover:bg-primary/5 text-muted-foreground hover:text-foreground p-2" onClick={() => setShowForm(false)} data-testid="button-close-category-form">
                   <X size={18} />
                 </Button>
               </CardHeader>
@@ -323,19 +323,21 @@ export default function DashboardCategories() {
                     </div>
                     <div className="flex gap-1 shrink-0">
                       <Button
+                        aria-label={`Edit ${cat.name}`}
                         size="sm"
                         variant="ghost"
                         onClick={() => openEdit(cat)}
-                        className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground shrink-0"
+                        className="h-11 w-11 p-0 text-muted-foreground hover:text-foreground shrink-0"
                         data-testid={`button-edit-category-${cat.id}`}
                       >
                         <Pencil size={14} />
                       </Button>
                       <Button
+                        aria-label={`Delete ${cat.name}`}
                         size="sm"
                         variant="ghost"
                         onClick={() => setDeleteId(cat.id)}
-                        className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 shrink-0"
+                        className="h-11 w-11 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 shrink-0"
                         data-testid={`button-delete-category-${cat.id}`}
                       >
                         <Trash2 size={14} />

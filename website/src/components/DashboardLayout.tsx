@@ -84,33 +84,36 @@ export default function DashboardLayout({ children, title, subtitle }: Dashboard
       {/* Main content */}
       <div className="flex-1 flex flex-col min-h-screen">
         {/* Top bar — Elegant Sandalwood Header */}
-        <header className="bg-gradient-to-r from-[#f9f7f4] to-white border-b border-primary/5 px-8 py-5 flex items-center justify-between shadow-sm">
-          <div>
-            <h1 className="font-serif text-2xl font-light text-foreground">{title}</h1>
-            {subtitle && <p className="text-xs text-muted-foreground/80 mt-1 uppercase tracking-wider font-semibold">{subtitle}</p>}
+        <header className="bg-gradient-to-r from-[#f9f7f4] to-white border-b border-primary/5 px-4 sm:px-8 py-4 sm:py-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between shadow-sm">
+          <div className="min-w-0">
+            <h1 className="font-serif text-xl sm:text-2xl font-light text-foreground break-words">{title}</h1>
+            {subtitle && <p className="text-[11px] sm:text-xs text-muted-foreground/80 mt-1 uppercase tracking-wider font-semibold">{subtitle}</p>}
           </div>
           {/* Mobile nav + logout */}
-          <div className="flex items-center gap-3">
-            <div className="flex md:hidden gap-2 bg-[#0a0a0a] p-1.5 rounded-full border border-white/5 shadow-md">
+          <div className="w-full sm:w-auto flex items-center justify-between sm:justify-end gap-2 sm:gap-3">
+            <nav aria-label="Dashboard navigation" className="flex md:hidden gap-0.5 bg-[#0a0a0a] p-1 rounded-full border border-white/5 shadow-md shrink-0">
               {navItems.map(({ href, label, icon: Icon }) => {
-                const active = location === href;
+                const active = location === href || (href !== "/dashboard" && location.startsWith(href));
                 return (
-                  <Link key={href} href={href}>
-                    <div 
-                      title={label}
-                      className={`p-2.5 rounded-full transition-all ${active ? "text-primary bg-primary/10" : "text-white/40 hover:text-white/70"}`}
-                    >
-                      <Icon size={16} />
-                    </div>
+                  <Link
+                    key={href}
+                    href={href}
+                    aria-label={label}
+                    aria-current={active ? "page" : undefined}
+                    title={label}
+                    className={`w-11 h-11 flex items-center justify-center rounded-full transition-colors ${active ? "text-primary bg-primary/10" : "text-white/55 hover:text-white/90"}`}
+                  >
+                    <Icon size={16} aria-hidden="true" />
                   </Link>
                 );
               })}
-            </div>
+            </nav>
             {/* Logout button visible on all screens in header */}
             <button
               onClick={handleLogout}
               title="Sign Out"
-              className="flex items-center gap-2 px-4 py-2 rounded-full text-[10px] font-black tracking-widest uppercase text-red-400 hover:text-red-300 bg-red-500/5 hover:bg-red-500/10 border border-red-500/10 transition-all"
+              aria-label="Sign out"
+              className="min-w-11 min-h-11 flex items-center justify-center sm:justify-start gap-2 px-3 sm:px-4 sm:py-2 rounded-full text-[10px] font-black tracking-widest uppercase text-red-400 hover:text-red-300 bg-red-500/5 hover:bg-red-500/10 border border-red-500/10 transition-colors"
             >
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
@@ -122,7 +125,7 @@ export default function DashboardLayout({ children, title, subtitle }: Dashboard
           </div>
         </header>
 
-        <main className="flex-1 p-8 bg-[#fdfcfb]">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 bg-[#fdfcfb]">
           {children}
         </main>
       </div>

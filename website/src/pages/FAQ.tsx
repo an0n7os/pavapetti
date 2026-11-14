@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { HelpCircle, ChevronDown, Sparkles, MessageCircle } from "lucide-react";
 import { WHATSAPP_PHONE } from "@/data/artForms";
 
@@ -121,6 +121,10 @@ export default function FAQ() {
                 className="bg-white rounded-2xl border border-border/60 overflow-hidden transition-all shadow-sm"
               >
                 <button
+                  id={`faq-question-${index}`}
+                  type="button"
+                  aria-expanded={isOpen}
+                  aria-controls={`faq-answer-${index}`}
                   onClick={() => setOpenIndex(isOpen ? null : index)}
                   className="w-full p-6 text-left flex items-center justify-between gap-4 font-serif text-lg font-medium text-foreground hover:text-primary transition-colors"
                 >
@@ -130,21 +134,15 @@ export default function FAQ() {
                   </div>
                 </button>
 
-                <AnimatePresence>
-                  {isOpen && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="overflow-hidden"
-                    >
-                      <div className="px-6 pb-6 pt-0 text-sm text-foreground/80 font-sans leading-relaxed border-t border-border/30 mt-2 pt-4">
-                        {faq.answer}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                <div
+                  id={`faq-answer-${index}`}
+                  role="region"
+                  aria-labelledby={`faq-question-${index}`}
+                  hidden={!isOpen}
+                  className="px-6 pb-6 pt-4 text-sm text-foreground/80 font-sans leading-relaxed border-t border-border/30 mt-2"
+                >
+                  {faq.answer}
+                </div>
               </div>
             );
           })}

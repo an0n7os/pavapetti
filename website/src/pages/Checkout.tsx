@@ -14,7 +14,7 @@ const PHONE = "919292016901";
 
 export default function Checkout() {
   const [, setLocation] = useLocation();
-  const { items, total, clearCart } = useCart();
+  const { items, total } = useCart();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [isOrdered, setIsOrdered] = useState(false);
@@ -70,10 +70,18 @@ export default function Checkout() {
       `_Please confirm my order and let me know the payment details._`
     );
 
-    window.open(`https://wa.me/${PHONE}?text=${message}`, "_blank");
+    const whatsappWindow = window.open(`https://wa.me/${PHONE}?text=${message}`, "_blank");
+    if (!whatsappWindow) {
+      setLoading(false);
+      toast({
+        title: "WhatsApp didn't open",
+        description: "Allow pop-ups for this site, then try again. Your cart is still saved.",
+        variant: "destructive",
+      });
+      return;
+    }
     setLoading(false);
     setIsOrdered(true);
-    clearCart();
   };
 
   if (isOrdered) {
@@ -88,15 +96,15 @@ export default function Checkout() {
           <div className="w-20 h-20 bg-green-500/10 rounded-full flex items-center justify-center mx-auto text-[#25D366]">
             <Check size={40} />
           </div>
-          <h2 className="font-serif text-3xl text-foreground">Order Initiated</h2>
+          <h2 className="font-serif text-3xl text-foreground">WhatsApp Draft Ready</h2>
           <p className="text-muted-foreground text-sm leading-relaxed">
-            Your collection has been sent to our team on WhatsApp! We will confirm your delivery and share secure payment details (UPI/Bank Transfer) in the chat shortly.
+            Review the order details in WhatsApp and press Send to submit your request. Your cart remains saved if you return here.
           </p>
           <div className="bg-white p-6 rounded-2xl border border-primary/5 text-left text-xs space-y-2">
             <p className="text-primary font-bold uppercase tracking-widest text-[9px]">Acquisitions Department</p>
             <p><strong>Seller:</strong> Pavapetti Heritage Artifacts</p>
             <p><strong>Delivery Time:</strong> 3-5 Business Days</p>
-            <p><strong>Payment Mode:</strong> WhatsApp Secured UPI / NetBanking</p>
+            <p><strong>Payment:</strong> Confirmed with our team in WhatsApp</p>
           </div>
           <Button onClick={() => setLocation("/")} className="w-full rounded-full py-6 bg-primary text-primary-foreground font-black text-xs tracking-[0.2em] uppercase shadow-xl hover:scale-[1.02] transition-all">
             Return to Gallery
@@ -140,7 +148,7 @@ export default function Checkout() {
       
       <main className="w-full px-6 lg:px-12 xl:px-20 pt-32 pb-24">
         <div className="flex items-center gap-4 mb-12">
-          <button onClick={() => setLocation("/")} className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors">
+          <button type="button" aria-label="Return to previous page" onClick={() => setLocation("/")} className="w-11 h-11 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors">
             <ArrowLeft size={18} />
           </button>
           <div>
@@ -149,7 +157,7 @@ export default function Checkout() {
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-12 gap-16">
+        <form id="checkout-form" onSubmit={(event) => { event.preventDefault(); handleConfirmOrder(); }} className="grid lg:grid-cols-12 gap-8 lg:gap-16">
           {/* Shipping Form */}
           <div className="lg:col-span-7 space-y-12">
             <section>
@@ -161,9 +169,13 @@ export default function Checkout() {
               </div>
               <div className="grid sm:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground ml-1">Full Name *</label>
+                  <label htmlFor="checkout-name" className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground ml-1">Full Name *</label>
                   <Input 
+                    id="checkout-name"
                     name="name"
+                    type="text"
+                    autoComplete="name"
+                    required
                     value={formData.name}
                     onChange={handleInputChange}
                     placeholder="Enter your full name" 
@@ -171,9 +183,14 @@ export default function Checkout() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground ml-1">Phone Number *</label>
+                  <label htmlFor="checkout-phone" className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground ml-1">Phone Number *</label>
                   <Input 
+                    id="checkout-phone"
                     name="phone"
+                    type="tel"
+                    inputMode="tel"
+                    autoComplete="tel"
+                    required
                     value={formData.phone}
                     onChange={handleInputChange}
                     placeholder="+91 00000 00000" 
@@ -181,9 +198,12 @@ export default function Checkout() {
                   />
                 </div>
                 <div className="sm:col-span-2 space-y-2">
-                  <label className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground ml-1">Email Address (Optional)</label>
+                  <label htmlFor="checkout-email" className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground ml-1">Email Address (Optional)</label>
                   <Input 
+                    id="checkout-email"
                     name="email"
+                    type="email"
+                    autoComplete="email"
                     value={formData.email}
                     onChange={handleInputChange}
                     placeholder="name@example.com" 
@@ -202,9 +222,12 @@ export default function Checkout() {
               </div>
               <div className="space-y-6">
                 <div className="space-y-2">
-                  <label className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground ml-1">Delivery Address *</label>
+                  <label htmlFor="checkout-address" className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground ml-1">Delivery Address *</label>
                   <Textarea 
+                    id="checkout-address"
                     name="address"
+                    autoComplete="street-address"
+                    required
                     value={formData.address}
                     onChange={handleInputChange}
                     placeholder="House name, Street, Landmark..." 
@@ -213,9 +236,11 @@ export default function Checkout() {
                 </div>
                 <div className="grid sm:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground ml-1">City</label>
+                    <label htmlFor="checkout-city" className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground ml-1">City</label>
                     <Input 
+                      id="checkout-city"
                       name="city"
+                      autoComplete="address-level2"
                       value={formData.city}
                       onChange={handleInputChange}
                       placeholder="e.g. Kochi" 
@@ -223,9 +248,12 @@ export default function Checkout() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground ml-1">ZIP / Postal Code</label>
+                    <label htmlFor="checkout-zip" className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground ml-1">ZIP / Postal Code</label>
                     <Input 
+                      id="checkout-zip"
                       name="zip"
+                      inputMode="numeric"
+                      autoComplete="postal-code"
                       value={formData.zip}
                       onChange={handleInputChange}
                       placeholder="000 000" 
@@ -299,27 +327,27 @@ export default function Checkout() {
               </div>
 
               <Button 
-                onClick={handleConfirmOrder}
+                type="submit"
                 disabled={loading}
                 className="w-full rounded-full py-8 bg-[#25D366] hover:bg-[#1ebe5d] text-white font-black text-xs tracking-[0.3em] uppercase shadow-2xl shadow-green-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all gap-3 border-none"
               >
                 {loading ? (
-                  "Processing..."
+                    "Opening WhatsApp…"
                 ) : (
                   <>
                     <MessageCircle size={18} />
-                    Confirm & Order via WhatsApp
+                    Continue to WhatsApp
                   </>
                 )}
               </Button>
               
               <div className="flex items-center justify-center gap-2 mt-6 text-[#25D366]">
                 <Check size={14} />
-                <span className="text-[10px] font-bold uppercase tracking-widest">Safe & Secure WhatsApp Chat</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest">You confirm payment directly with Pavapetti</span>
               </div>
             </div>
           </div>
-        </div>
+        </form>
       </main>
 
       <Footer />

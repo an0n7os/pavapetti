@@ -34,8 +34,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
       className="group relative"
       data-testid={`product-card-${product.id}`}
     >
-      <Link href={`/product/${product.id}`}>
-        <div className="relative flex flex-col cursor-pointer">
+        <div className="relative flex flex-col">
           {/* Image Container — Refined with subtle border instead of heavy shadow */}
           <div 
             className="relative aspect-[4/5] overflow-hidden rounded-[2rem] bg-[#f9f7f4] border border-primary/5 group-hover:border-primary/20 transition-colors duration-700 spotlight-card"
@@ -47,11 +46,12 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
               e.currentTarget.style.setProperty("--mouse-y", `${y}px`);
             }}
           >
-            {/* Spotlight Glow */}
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_var(--mouse-x)_var(--mouse-y),rgba(var(--primary-rgb),0.1),transparent_70%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+            <Link href={`/product/${product.id}`} className="absolute inset-0 z-0 block" aria-label={`View ${product.name}`}>
+              {/* Spotlight Glow */}
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_var(--mouse-x)_var(--mouse-y),rgba(var(--primary-rgb),0.1),transparent_70%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
             
-            {/* Soft Ambient Glow */}
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(var(--primary-rgb),0.03),transparent)] opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+              {/* Soft Ambient Glow */}
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(var(--primary-rgb),0.03),transparent)] opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
             
             <motion.img
               src={product.imageUrl}
@@ -67,13 +67,16 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
               className="h-full w-full object-cover transition-all duration-700 ease-out group-hover:scale-110"
             />
 
-            {/* Hover Overlay — Darkens slightly to make buttons pop */}
-            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-700 pointer-events-none flex items-center justify-center">
-              <span className="text-white text-[10px] font-black tracking-[1em] uppercase opacity-0 group-hover:opacity-100 transition-all duration-1000 translate-y-4 group-hover:translate-y-0">View Piece</span>
-            </div>
+              {/* Hover Overlay — Darkens slightly to make buttons pop */}
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-700 pointer-events-none flex items-center justify-center">
+                <span className="text-white text-[10px] font-black tracking-[1em] uppercase opacity-0 group-hover:opacity-100 transition-all duration-1000 translate-y-4 group-hover:translate-y-0">View Piece</span>
+              </div>
+            </Link>
 
             {/* Favorite Button */}
             <button
+              type="button"
+              aria-label={`${wishlisted ? "Remove" : "Add"} ${product.name} ${wishlisted ? "from" : "to"} wishlist`}
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -111,7 +114,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
             </div>
 
             {/* Quick Add Overlay — More prominent Add to Cart on Desktop */}
-            <div className="hidden md:block absolute inset-x-0 bottom-0 p-8 translate-y-6 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-700 ease-[0.16, 1, 0.3, 1]">
+            <div className="hidden md:block absolute inset-x-0 bottom-0 p-8 translate-y-6 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100 transition-all duration-700 ease-[0.16, 1, 0.3, 1]">
               <Button 
                 onClick={(e) => {
                   e.preventDefault();
@@ -152,9 +155,11 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
             </p>
             
             <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-1 md:gap-4">
-              <h3 className="font-serif text-base md:text-2xl font-light text-foreground transition-all duration-500 leading-tight flex-1">
-                {product.name}
-              </h3>
+              <Link href={`/product/${product.id}`} className="flex-1">
+                <h3 className="font-serif text-base md:text-2xl font-light text-foreground transition-all duration-500 leading-tight">
+                  {product.name}
+                </h3>
+              </Link>
               
               <div className="flex flex-row md:flex-col items-baseline md:items-end gap-1.5 md:gap-1 mt-1 md:mt-0 shrink-0">
                 {product.mrp && product.mrp > product.price && (
@@ -176,7 +181,6 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
             <div className="h-px w-0 group-hover:w-full bg-primary/10 mt-4 md:mt-6 transition-all duration-1000 ease-[0.16, 1, 0.3, 1]" />
           </div>
         </div>
-      </Link>
     </motion.div>
   );
 }

@@ -1,26 +1,15 @@
-import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
+import { motion } from "framer-motion";
 import { Link } from "wouter";
 
 export default function StorySection() {
-  const containerRef = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start end", "end start"]
-  });
-
-  const y1 = useTransform(scrollYProgress, [0, 1], [0, -100]);
-  const y2 = useTransform(scrollYProgress, [0, 1], [0, 100]);
-
   return (
-    <section ref={containerRef} className="py-32 bg-white overflow-hidden">
+    <section className="py-32 bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
           
           {/* Left: Visual Storytelling — Responsively Cushioned & Scaled */}
           <div className="relative pb-12 sm:pb-0">
-            <motion.div 
-              style={{ y: y1 }}
+            <div
               className="aspect-[4/5] rounded-[2rem] overflow-hidden shadow-2xl relative z-10"
             >
               <img 
@@ -29,10 +18,9 @@ export default function StorySection() {
                 className="w-full h-full object-cover group-hover:scale-105 transition-all duration-1000"
               />
               <div className="absolute inset-0 bg-black/5" />
-            </motion.div>
+            </div>
             
-            <motion.div 
-              style={{ y: y2 }}
+            <div
               className="absolute -bottom-8 -right-4 sm:-bottom-16 sm:-right-12 w-1/2 sm:w-2/3 aspect-square rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden shadow-2xl z-20 border-[6px] sm:border-[12px] border-white"
             >
               <img 
@@ -40,7 +28,7 @@ export default function StorySection() {
                 alt="Sacred Heirlooms" 
                 className="w-full h-full object-cover"
               />
-            </motion.div>
+            </div>
 
             {/* Decorative Elements */}
             <div className="absolute top-1/2 -left-20 w-40 h-40 border border-primary/10 rounded-full animate-pulse" />
