@@ -1,7 +1,6 @@
 import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactLenis } from 'lenis/react';
-import { motion, AnimatePresence, useScroll, useSpring as useFramerSpring } from "framer-motion";
+import { motion, AnimatePresence, MotionConfig } from "framer-motion";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { CartProvider } from "@/context/CartContext";
@@ -252,7 +251,7 @@ function AdminLogin() {
               className="text-sm"
               style={{ color: "rgba(255,255,255,0.3)", fontWeight: 300 }}
             >
-              Enter your credentials to access the curator's dashboard.
+              Enter your Creator ID and Access Key to access the dashboard.
             </motion.p>
           </div>
 
@@ -264,15 +263,15 @@ function AdminLogin() {
             onSubmit={handleLogin}
             className="space-y-5"
           >
-            {/* Username */}
+            {/* Creator ID */}
             <div className="space-y-2">
-              <label className="block text-[9px] font-black tracking-[0.3em] uppercase" style={{ color: "rgba(255,255,255,0.3)" }}>
-                Curator ID
+              <label className="block text-[9px] font-black tracking-[0.3em] uppercase" style={{ color: "rgba(255,255,255,0.4)" }}>
+                Creator ID
               </label>
               <div style={{ position: "relative" }}>
                 <input
                   type="text"
-                  placeholder="admin"
+                  placeholder="Enter Creator ID"
                   value={username}
                   autoComplete="username"
                   onChange={(e) => setUsername(e.target.value)}
@@ -291,15 +290,15 @@ function AdminLogin() {
               </div>
             </div>
 
-            {/* Password */}
+            {/* Access Key */}
             <div className="space-y-2">
-              <label className="block text-[9px] font-black tracking-[0.3em] uppercase" style={{ color: "rgba(255,255,255,0.3)" }}>
+              <label className="block text-[9px] font-black tracking-[0.3em] uppercase" style={{ color: "rgba(255,255,255,0.4)" }}>
                 Access Key
               </label>
               <div style={{ position: "relative" }}>
                 <input
                   type={showPass ? "text" : "password"}
-                  placeholder="••••••••••••"
+                  placeholder="Enter Access Key"
                   value={password}
                   autoComplete="current-password"
                   onChange={(e) => setPassword(e.target.value)}
@@ -534,7 +533,7 @@ function Router() {
 
 function App() {
   return (
-    <ReactLenis root options={{ lerp: 0.15, smoothWheel: true, wheelMultiplier: 1.2, touchMultiplier: 1.5 }}>
+    <MotionConfig reducedMotion="user">
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <WishlistProvider>
@@ -556,7 +555,7 @@ function App() {
           </WishlistProvider>
         </TooltipProvider>
       </QueryClientProvider>
-    </ReactLenis>
+    </MotionConfig>
   );
 }
 
