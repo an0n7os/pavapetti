@@ -290,31 +290,41 @@ export default function DashboardArtForms() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white rounded-[2rem] overflow-hidden max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-white/20 overscroll-contain"
+              className="bg-white rounded-2xl sm:rounded-[2rem] overflow-hidden max-w-2xl w-full h-[88dvh] max-h-[88dvh] flex flex-col shadow-2xl border border-white/20 overscroll-contain"
               data-lenis-prevent
             >
               {/* Modal Header */}
-              <div className="bg-[#0a0a09] text-white p-6 flex items-center justify-between relative">
-                <div>
-                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">
-                    {editingArt ? "Edit Existing Art Form" : "Add New Performing Art Form"}
+              <div className="bg-[#0a0a09] text-white p-4 sm:p-6 flex items-center justify-between relative shrink-0">
+                <div className="min-w-0 pr-2">
+                  <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.25em] text-primary block truncate">
+                    {editingArt ? "Edit Existing Art Form" : "Add Performing Art Form"}
                   </span>
-                  <h3 id="art-form-editor-title" className="font-serif text-2xl text-[#f8f5ee]">
+                  <h3 id="art-form-editor-title" className="font-serif text-lg sm:text-2xl text-[#f8f5ee] truncate">
                     {editingArt ? `Editing ${editingArt.name}` : "Create New Listing"}
                   </h3>
                 </div>
-                <button
-                  type="button"
-                  aria-label="Close art form editor"
-                  onClick={() => { setIsAddOpen(false); setEditingArt(null); }}
-                  className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
-                >
-                  <X size={18} />
-                </button>
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    type="submit"
+                    form="art-form-modal-form"
+                    className="px-3 py-1.5 rounded-lg bg-primary text-white font-bold text-xs uppercase tracking-wider hover:bg-primary/90 shadow-sm flex items-center gap-1"
+                  >
+                    <Check size={13} strokeWidth={2.5} />
+                    <span>{editingArt ? "Save" : "Create"}</span>
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Close art form editor"
+                    onClick={() => { setIsAddOpen(false); setEditingArt(null); }}
+                    className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
               </div>
 
               {/* Form Content */}
-              <form onSubmit={editingArt ? handleSaveEdit : handleSaveAdd} className="p-6 overflow-y-auto space-y-4 flex-1">
+              <form id="art-form-modal-form" onSubmit={editingArt ? handleSaveEdit : handleSaveAdd} className="p-4 sm:p-6 overflow-y-auto space-y-4 flex-1 min-h-0">
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
@@ -410,24 +420,26 @@ export default function DashboardArtForms() {
                     className="w-full bg-[#f8f6f0] border border-border/60 rounded-xl px-3.5 py-2.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
                   />
                 </div>
-
-                <div className="pt-4 border-t border-border/40 flex items-center justify-end gap-3">
-                  <button
-                    type="button"
-                    onClick={() => { setIsAddOpen(false); setEditingArt(null); }}
-                    className="px-5 py-2.5 rounded-xl border border-border text-xs font-bold uppercase tracking-wider hover:bg-[#f6f4ee]"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-6 py-2.5 rounded-xl bg-primary text-white font-bold text-xs uppercase tracking-wider hover:bg-primary/90 shadow-md shadow-primary/20"
-                  >
-                    {editingArt ? "Save Changes" : "Create Art Form"}
-                  </button>
-                </div>
-
               </form>
+
+              {/* Sticky Footer */}
+              <div className="p-4 border-t border-border/40 flex items-center justify-between gap-3 bg-[#fdfcfb] shrink-0">
+                <button
+                  type="button"
+                  onClick={() => { setIsAddOpen(false); setEditingArt(null); }}
+                  className="px-5 py-2.5 rounded-xl border border-border text-xs font-bold uppercase tracking-wider hover:bg-[#f6f4ee]"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  form="art-form-modal-form"
+                  className="px-6 py-2.5 rounded-xl bg-primary text-white font-bold text-xs uppercase tracking-wider hover:bg-primary/90 shadow-md shadow-primary/20 flex items-center gap-1.5"
+                >
+                  <Check size={14} />
+                  <span>{editingArt ? "Save Changes" : "Create Art Form"}</span>
+                </button>
+              </div>
             </motion.div>
           </div>
         )}

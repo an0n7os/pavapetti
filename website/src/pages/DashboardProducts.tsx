@@ -344,7 +344,7 @@ export default function DashboardProducts() {
       <AnimatePresence>
         {showForm && (
           <div
-            className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-5 bg-black/65 backdrop-blur-sm"
             onClick={() => setShowForm(false)}
           >
             <motion.div
@@ -357,36 +357,54 @@ export default function DashboardProducts() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.96, y: 8 }}
               transition={{ duration: 0.18, ease: "easeOut" }}
-              className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-stone-200 overflow-hidden my-auto max-h-[90vh] flex flex-col"
+              className="relative w-full max-w-2xl bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-stone-200 overflow-hidden my-auto h-[88dvh] max-h-[88dvh] flex flex-col"
               onClick={(e) => e.stopPropagation()}
             >
               <form id="product-modal-form" onSubmit={handleSubmit} className="flex flex-col h-full min-h-0 overflow-hidden">
                 {/* 1. Sticky Modal Header */}
-                <div className="px-5 py-3 border-b border-stone-100 flex items-center justify-between bg-stone-50/90 shrink-0">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold text-xs">
+                <div className="px-3.5 sm:px-5 py-3 border-b border-stone-100 flex items-center justify-between bg-stone-50/95 shrink-0">
+                  <div className="flex items-center gap-2 min-w-0 pr-2">
+                    <div className="w-7 h-7 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold text-xs shrink-0">
                       {editProduct ? <Pencil size={13} /> : <Plus size={14} />}
                     </div>
-                    <div>
-                      <h3 id="product-form-title" className="font-semibold text-sm text-stone-900 leading-tight">
-                        {editProduct ? "Modify Product Details" : "Add New Product"}
+                    <div className="min-w-0">
+                      <h3 id="product-form-title" className="font-semibold text-sm text-stone-900 leading-tight truncate">
+                        {editProduct ? "Modify Product" : "Add New Product"}
                       </h3>
-                      <p className="text-[11px] text-muted-foreground">
-                        {editProduct ? `Editing ID: #${editProduct.id} — ${editProduct.name}` : "Fill in the details to add an artifact to your catalog"}
+                      <p className="text-[10px] sm:text-[11px] text-muted-foreground truncate">
+                        {editProduct ? `ID: #${editProduct.id}` : "Fill details & click Save"}
                       </p>
                     </div>
                   </div>
-                  <Button
-                    aria-label="Close product editor"
-                    type="button"
-                    size="sm"
-                    variant="ghost"
-                    className="rounded-lg h-8 w-8 p-0 text-muted-foreground hover:text-stone-900 hover:bg-stone-200/50"
-                    onClick={() => setShowForm(false)}
-                    data-testid="button-close-form"
-                  >
-                    <X size={16} />
-                  </Button>
+
+                  {/* Header Actions: Save CTA right in header (impossible to miss on mobile) + Close X */}
+                  <div className="flex items-center gap-2 shrink-0">
+                    <Button
+                      type="submit"
+                      form="product-modal-form"
+                      disabled={isPending}
+                      size="sm"
+                      className="h-8 px-3 text-xs font-bold rounded-lg bg-primary text-white hover:bg-primary/90 shadow-xs flex items-center gap-1"
+                    >
+                      {isPending ? "Saving..." : (
+                        <>
+                          <Check size={13} strokeWidth={2.5} />
+                          <span>{editProduct ? "Save" : "Create"}</span>
+                        </>
+                      )}
+                    </Button>
+                    <Button
+                      aria-label="Close product editor"
+                      type="button"
+                      size="sm"
+                      variant="ghost"
+                      className="rounded-lg h-8 w-8 p-0 text-muted-foreground hover:text-stone-900 hover:bg-stone-200/50"
+                      onClick={() => setShowForm(false)}
+                      data-testid="button-close-form"
+                    >
+                      <X size={16} />
+                    </Button>
+                  </div>
                 </div>
 
                 {/* 2. Scrollable Body: min-h-0 and overscroll-contain ensures smooth scrolling */}
@@ -726,38 +744,33 @@ export default function DashboardProducts() {
                 </div>
 
                 {/* 3. Sticky Modal Footer: ALWAYS visible at bottom, never cut off! */}
-                <div className="px-5 py-3 border-t border-stone-100 flex items-center justify-between bg-stone-50/90 shrink-0">
-                  <span className="text-[11px] text-muted-foreground hidden sm:inline">
-                    Changes sync immediately to Supabase
-                  </span>
-                  <div className="flex items-center gap-2 ml-auto">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className="h-9 px-4 text-xs font-medium rounded-lg border-stone-200 hover:bg-stone-100"
-                      onClick={() => setShowForm(false)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      type="submit"
-                      disabled={isPending}
-                      className="h-9 px-5 text-xs font-semibold rounded-lg bg-primary text-white hover:bg-primary/90 shadow-sm"
-                      data-testid="button-submit-product"
-                    >
-                      {isPending ? (
-                        <span className="flex items-center gap-1.5">
-                          <svg className="animate-spin" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10" strokeOpacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round"/></svg>
-                          Saving...
-                        </span>
-                      ) : (
-                        <span className="flex items-center gap-1.5">
-                          <Check size={14} /> {editProduct ? "Save Changes" : "Create Product"}
-                        </span>
-                      )}
-                    </Button>
-                  </div>
+                <div className="px-4 sm:px-5 py-3 border-t border-stone-200 flex items-center justify-between gap-3 bg-stone-50 shrink-0 z-10">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="h-10 px-4 text-xs font-semibold rounded-xl border-stone-300 hover:bg-stone-100"
+                    onClick={() => setShowForm(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={isPending}
+                    className="h-10 px-5 sm:px-6 text-xs font-bold rounded-xl bg-primary text-white hover:bg-primary/90 shadow-md shadow-primary/20 flex items-center gap-2"
+                    data-testid="button-submit-product"
+                  >
+                    {isPending ? (
+                      <span className="flex items-center gap-1.5">
+                        <svg className="animate-spin" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10" strokeOpacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round"/></svg>
+                        Saving...
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-1.5">
+                        <Check size={15} strokeWidth={2.5} /> {editProduct ? "Save Changes" : "Create Product"}
+                      </span>
+                    )}
+                  </Button>
                 </div>
               </form>
             </motion.div>

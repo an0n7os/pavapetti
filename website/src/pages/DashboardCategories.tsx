@@ -190,7 +190,7 @@ export default function DashboardCategories() {
       <AnimatePresence>
         {showForm && (
           <div
-            className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-5 bg-black/65 backdrop-blur-sm"
             onClick={() => setShowForm(false)}
           >
             <motion.div
@@ -198,20 +198,39 @@ export default function DashboardCategories() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.96, y: 12 }}
               transition={{ duration: 0.2 }}
-              className="relative w-full max-w-xl bg-[#fdfbf7] rounded-3xl shadow-2xl border border-primary/10 overflow-hidden my-auto max-h-[90vh] flex flex-col"
+              className="relative w-full max-w-xl bg-[#fdfbf7] rounded-2xl sm:rounded-3xl shadow-2xl border border-primary/10 overflow-hidden my-auto h-[88dvh] max-h-[88dvh] flex flex-col"
               onClick={(e) => e.stopPropagation()}
             >
-              <CardHeader className="pb-4 pt-6 px-6 sm:px-8 border-b border-primary/10 flex-row items-center justify-between bg-[#faf7f2] shrink-0">
-                <div>
+              {/* Sticky Header */}
+              <CardHeader className="pb-3.5 pt-4 px-4 sm:px-6 border-b border-primary/10 flex-row items-center justify-between bg-[#faf7f2] shrink-0">
+                <div className="min-w-0 pr-2">
                   <span className="text-[9px] tracking-[0.35em] text-primary/80 uppercase font-black block mb-0.5">Collection Taxonomy</span>
-                  <CardTitle className="font-serif text-xl sm:text-2xl font-light text-foreground">{editCategory ? "Modify Category Details" : "Archive New Category"}</CardTitle>
+                  <CardTitle className="font-serif text-lg sm:text-xl font-light text-foreground truncate">{editCategory ? "Modify Category" : "Archive New Category"}</CardTitle>
                 </div>
-                <Button size="sm" variant="ghost" aria-label="Close category form" className="rounded-full hover:bg-primary/10 text-muted-foreground hover:text-foreground p-2 h-9 w-9" onClick={() => setShowForm(false)} data-testid="button-close-category-form">
-                  <X size={18} />
-                </Button>
+                <div className="flex items-center gap-2 shrink-0">
+                  <Button
+                    type="submit"
+                    form="category-modal-form"
+                    disabled={createCategory.isPending || updateCategory.isPending}
+                    size="sm"
+                    className="h-8 px-3 text-xs font-bold rounded-lg bg-primary text-white hover:bg-primary/90 shadow-xs flex items-center gap-1"
+                  >
+                    {createCategory.isPending || updateCategory.isPending ? "Saving..." : (
+                      <>
+                        <Check size={13} strokeWidth={2.5} />
+                        <span>{editCategory ? "Save" : "Create"}</span>
+                      </>
+                    )}
+                  </Button>
+                  <Button size="sm" variant="ghost" aria-label="Close category form" className="rounded-full hover:bg-primary/10 text-muted-foreground hover:text-foreground p-1.5 h-8 w-8" onClick={() => setShowForm(false)} data-testid="button-close-category-form">
+                    <X size={16} />
+                  </Button>
+                </div>
               </CardHeader>
-              <CardContent className="p-6 sm:p-8 overflow-y-auto">
-                <form onSubmit={handleSubmit} className="space-y-5">
+
+              {/* Scrollable Form Body */}
+              <div className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-6">
+                <form id="category-modal-form" onSubmit={handleSubmit} className="space-y-4">
                   <div className="space-y-1.5">
                     <Label htmlFor="cat-name" className="text-[10px] font-black tracking-[0.2em] uppercase text-primary/80 font-semibold">Category Name *</Label>
                     <Input id="cat-name" placeholder="e.g. Pooja Essentials" className="bg-white border border-primary/15 hover:border-primary/25 rounded-xl py-3 px-4 text-sm focus:border-primary/40 focus:ring-1 focus:ring-primary/20 shadow-xs outline-none" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required data-testid="input-category-name" />
@@ -284,15 +303,16 @@ export default function DashboardCategories() {
                       )}
                     </div>
                   </div>
-
-                  <div className="flex gap-2.5 justify-end pt-3 border-t border-primary/10">
-                    <Button type="button" variant="outline" className="rounded-xl px-4 py-2.5 h-auto text-xs font-bold tracking-wider uppercase border-primary/20 hover:bg-primary/5" onClick={() => setShowForm(false)}>Cancel</Button>
-                    <Button type="submit" disabled={createCategory.isPending || updateCategory.isPending} className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl px-5 py-2.5 h-auto text-xs font-bold tracking-wider uppercase shadow-sm" data-testid="button-submit-category">
-                      {createCategory.isPending || updateCategory.isPending ? "Saving..." : (<><Check size={14} /> {editCategory ? "Save Changes" : "Create Category"}</>)}
-                    </Button>
-                  </div>
                 </form>
-              </CardContent>
+              </div>
+
+              {/* Sticky Footer */}
+              <div className="px-4 sm:px-6 py-3 border-t border-primary/10 flex items-center justify-between gap-3 bg-[#faf7f2] shrink-0">
+                <Button type="button" variant="outline" className="rounded-xl px-4 py-2.5 h-10 text-xs font-bold tracking-wider uppercase border-primary/20 hover:bg-primary/5" onClick={() => setShowForm(false)}>Cancel</Button>
+                <Button type="submit" form="category-modal-form" disabled={createCategory.isPending || updateCategory.isPending} className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl px-5 py-2.5 h-10 text-xs font-bold tracking-wider uppercase shadow-sm" data-testid="button-submit-category">
+                  {createCategory.isPending || updateCategory.isPending ? "Saving..." : (<><Check size={14} /> {editCategory ? "Save Changes" : "Create Category"}</>)}
+                </Button>
+              </div>
             </motion.div>
           </div>
         )}
