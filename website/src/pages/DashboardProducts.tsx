@@ -382,22 +382,8 @@ export default function DashboardProducts() {
                     </div>
                   </div>
 
-                  {/* Header Actions: Save CTA right in header (impossible to miss on mobile) + Close X */}
+                  {/* Header Actions: Close X */}
                   <div className="flex items-center gap-2 shrink-0">
-                    <Button
-                      type="submit"
-                      form="product-modal-form"
-                      disabled={isPending}
-                      size="sm"
-                      className="h-8 px-3 text-xs font-bold rounded-lg bg-primary text-white hover:bg-primary/90 shadow-xs flex items-center gap-1"
-                    >
-                      {isPending ? "Saving..." : (
-                        <>
-                          <Check size={13} strokeWidth={2.5} />
-                          <span>{editProduct ? "Save" : "Create"}</span>
-                        </>
-                      )}
-                    </Button>
                     <Button
                       aria-label="Close product editor"
                       type="button"

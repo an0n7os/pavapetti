@@ -208,20 +208,6 @@ export default function DashboardCategories() {
                   <CardTitle className="font-serif text-lg sm:text-xl font-light text-foreground truncate">{editCategory ? "Modify Category" : "Archive New Category"}</CardTitle>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  <Button
-                    type="submit"
-                    form="category-modal-form"
-                    disabled={createCategory.isPending || updateCategory.isPending}
-                    size="sm"
-                    className="h-8 px-3 text-xs font-bold rounded-lg bg-primary text-white hover:bg-primary/90 shadow-xs flex items-center gap-1"
-                  >
-                    {createCategory.isPending || updateCategory.isPending ? "Saving..." : (
-                      <>
-                        <Check size={13} strokeWidth={2.5} />
-                        <span>{editCategory ? "Save" : "Create"}</span>
-                      </>
-                    )}
-                  </Button>
                   <Button size="sm" variant="ghost" aria-label="Close category form" className="rounded-full hover:bg-primary/10 text-muted-foreground hover:text-foreground p-1.5 h-8 w-8" onClick={() => setShowForm(false)} data-testid="button-close-category-form">
                     <X size={16} />
                   </Button>

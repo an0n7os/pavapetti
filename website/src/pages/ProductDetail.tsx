@@ -762,18 +762,6 @@ _Hi Pavapetti, please let me know the final amount including parcel weight-based
                       </p>
                     </div>
                   </div>
-
-                  {pincodeResult.valid && (
-                    <a
-                      href={buildWhatsAppOrderUrl(pincodeResult)}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="w-full mt-2 py-2 px-3 rounded-lg bg-[#25D366] hover:bg-[#1ebe5d] text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm transition-transform active:scale-[0.99]"
-                    >
-                      <MessageCircle size={14} className="fill-white/20" />
-                      <span>Order to {pincodeResult.district || pincodeResult.pincode} via WhatsApp</span>
-                    </a>
-                  )}
                 </div>
               )}
             </div>
