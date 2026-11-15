@@ -84,38 +84,32 @@ export default function DashboardLayout({ children, title, subtitle }: Dashboard
       {/* Main content */}
       <div className="flex-1 flex flex-col min-h-screen">
         {/* Top bar — Elegant Sandalwood Header */}
-        <header className="bg-gradient-to-r from-[#f9f7f4] to-white border-b border-primary/5 px-4 sm:px-8 py-4 sm:py-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between shadow-sm">
-          <div className="min-w-0">
-            <h1 className="font-serif text-xl sm:text-2xl font-light text-foreground break-words">{title}</h1>
-            {subtitle && <p className="text-[11px] sm:text-xs text-muted-foreground/80 mt-1 uppercase tracking-wider font-semibold">{subtitle}</p>}
+        <header className="bg-gradient-to-r from-[#f9f7f4] to-white border-b border-primary/5 px-4 sm:px-8 py-3.5 sm:py-5 flex items-center justify-between shadow-xs">
+          <div className="min-w-0 pr-2">
+            <h1 className="font-serif text-lg sm:text-2xl font-light text-foreground truncate">{title}</h1>
+            {subtitle && <p className="text-[10px] sm:text-xs text-muted-foreground/80 mt-0.5 sm:mt-1 uppercase tracking-wider font-semibold truncate">{subtitle}</p>}
           </div>
-          {/* Mobile nav + logout */}
-          <div className="w-full sm:w-auto flex items-center justify-between sm:justify-end gap-2 sm:gap-3">
-            <nav aria-label="Dashboard navigation" className="flex md:hidden gap-0.5 bg-[#0a0a0a] p-1 rounded-full border border-white/5 shadow-md shrink-0">
-              {navItems.map(({ href, label, icon: Icon }) => {
-                const active = location === href || (href !== "/dashboard" && location.startsWith(href));
-                return (
-                  <Link
-                    key={href}
-                    href={href}
-                    aria-label={label}
-                    aria-current={active ? "page" : undefined}
-                    title={label}
-                    className={`w-11 h-11 flex items-center justify-center rounded-full transition-colors ${active ? "text-primary bg-primary/10" : "text-white/55 hover:text-white/90"}`}
-                  >
-                    <Icon size={16} aria-hidden="true" />
-                  </Link>
-                );
-              })}
-            </nav>
-            {/* Logout button visible on all screens in header */}
+
+          {/* Quick Header Actions: View Store + Logout */}
+          <div className="flex items-center gap-2 shrink-0">
+            <Link href="/">
+              <div
+                title="View Gallery Store"
+                aria-label="View Gallery Store"
+                className="h-9 px-2.5 sm:px-3 rounded-xl flex items-center gap-1.5 text-xs font-semibold text-stone-700 bg-stone-100 hover:bg-stone-200 transition-colors border border-stone-200/60 cursor-pointer"
+              >
+                <Home size={14} className="text-primary shrink-0" />
+                <span className="hidden sm:inline">Store</span>
+              </div>
+            </Link>
+
             <button
               onClick={handleLogout}
               title="Sign Out"
               aria-label="Sign out"
-              className="min-w-11 min-h-11 flex items-center justify-center sm:justify-start gap-2 px-3 sm:px-4 sm:py-2 rounded-full text-[10px] font-black tracking-widest uppercase text-red-400 hover:text-red-300 bg-red-500/5 hover:bg-red-500/10 border border-red-500/10 transition-colors"
+              className="h-9 px-2.5 sm:px-3 rounded-xl flex items-center gap-1.5 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200/60 transition-colors cursor-pointer"
             >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
                 <polyline points="16 17 21 12 16 7" />
                 <line x1="21" y1="12" x2="9" y2="12" />
@@ -125,7 +119,33 @@ export default function DashboardLayout({ children, title, subtitle }: Dashboard
           </div>
         </header>
 
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 bg-[#fdfcfb]">
+        {/* Mobile Horizontal Navigation Tabs (Full Visibility & Easy Swiping) */}
+        <nav
+          aria-label="Mobile dashboard navigation"
+          className="md:hidden flex items-center gap-1.5 px-3 py-2 bg-[#0e0c0a] border-b border-white/10 overflow-x-auto scrollbar-none sticky top-0 z-30 shadow-md"
+        >
+          {navItems.map(({ href, label, icon: Icon }) => {
+            const active = location === href || (href !== "/dashboard" && location.startsWith(href));
+            return (
+              <Link
+                key={href}
+                href={href}
+                aria-label={label}
+                aria-current={active ? "page" : undefined}
+                className={`whitespace-nowrap px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shrink-0 ${
+                  active
+                    ? "bg-primary text-white shadow-xs"
+                    : "text-white/60 hover:text-white bg-white/5"
+                }`}
+              >
+                <Icon size={14} className={active ? "text-white" : "text-primary/80"} />
+                <span>{label.replace(" Archive", "").replace(" & Restore", "")}</span>
+              </Link>
+            );
+          })}
+        </nav>
+
+        <main className="flex-1 p-3 sm:p-6 lg:p-8 bg-[#fdfcfb]">
           {children}
         </main>
       </div>

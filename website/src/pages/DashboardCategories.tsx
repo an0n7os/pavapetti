@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Grid3X3, X, Check, Trash2, Upload, Pencil } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -168,48 +169,63 @@ export default function DashboardCategories() {
 
   return (
     <DashboardLayout title="Categories" subtitle="Manage your product categories">
-      <div className="flex justify-end mb-6">
-        <Button onClick={openAdd} className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90" data-testid="button-add-category">
-          <Plus size={16} /> Add Category
+      {/* ── Toolbar: Category count badge + Prominent Add Category CTA ── */}
+      <div className="flex flex-row items-center justify-between gap-3 mb-6 bg-[#faf7f2]/80 backdrop-blur-xs p-3.5 sm:p-4 rounded-2xl border border-primary/10 shadow-xs">
+        <div className="flex items-center gap-2">
+          <Badge variant="secondary" className="font-mono text-xs px-2.5 py-1 bg-stone-100 text-stone-700 border-stone-200">
+            {(categories ?? []).length} {(categories ?? []).length === 1 ? "Category" : "Categories"}
+          </Badge>
+        </div>
+
+        <Button
+          onClick={openAdd}
+          className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl px-4 h-10 text-xs font-semibold shadow-sm shrink-0"
+          data-testid="button-add-category"
+        >
+          <Plus size={16} /> <span>Add Category</span>
         </Button>
       </div>
 
-      {/* Form */}
+      {/* ── Modal Add / Edit Category: Mobile-First, Scrollable, Clean ── */}
       <AnimatePresence>
         {showForm && (
-          <motion.div
-            initial={{ opacity: 0, y: -12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.25 }}
-            className="mb-6"
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/60 backdrop-blur-sm"
+            onClick={() => setShowForm(false)}
           >
-            <Card className="border border-primary/10 rounded-[2.5rem] bg-[#fdfbf7] shadow-2xl shadow-primary/5 overflow-hidden">
-              <CardHeader className="pb-5 pt-8 px-8 border-b border-primary/5 flex-row items-center justify-between bg-[#faf7f2]">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96, y: 12 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96, y: 12 }}
+              transition={{ duration: 0.2 }}
+              className="relative w-full max-w-xl bg-[#fdfbf7] rounded-3xl shadow-2xl border border-primary/10 overflow-hidden my-auto max-h-[90vh] flex flex-col"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <CardHeader className="pb-4 pt-6 px-6 sm:px-8 border-b border-primary/10 flex-row items-center justify-between bg-[#faf7f2] shrink-0">
                 <div>
-                  <span className="text-[9px] tracking-[0.4em] text-primary/80 uppercase font-black block mb-1">Collection Taxonomy</span>
-                  <CardTitle className="font-serif text-2xl font-light text-foreground">{editCategory ? "Modify Category Details" : "Archive New Category"}</CardTitle>
+                  <span className="text-[9px] tracking-[0.35em] text-primary/80 uppercase font-black block mb-0.5">Collection Taxonomy</span>
+                  <CardTitle className="font-serif text-xl sm:text-2xl font-light text-foreground">{editCategory ? "Modify Category Details" : "Archive New Category"}</CardTitle>
                 </div>
-                <Button size="sm" variant="ghost" aria-label="Close category form" className="rounded-full hover:bg-primary/5 text-muted-foreground hover:text-foreground p-2" onClick={() => setShowForm(false)} data-testid="button-close-category-form">
+                <Button size="sm" variant="ghost" aria-label="Close category form" className="rounded-full hover:bg-primary/10 text-muted-foreground hover:text-foreground p-2 h-9 w-9" onClick={() => setShowForm(false)} data-testid="button-close-category-form">
                   <X size={18} />
                 </Button>
               </CardHeader>
-              <CardContent className="p-8">
-                <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2 md:col-span-2">
-                    <Label htmlFor="cat-name" className="text-[10px] font-black tracking-[0.2em] uppercase text-primary/80 font-semibold">Category Name</Label>
-                    <Input id="cat-name" placeholder="e.g. Pooja Category" className="bg-white border border-primary/10 hover:border-primary/20 rounded-2xl py-6 px-5 text-sm tracking-wide focus:border-primary/30 focus:ring-1 focus:ring-primary/10 transition-all shadow-sm outline-none placeholder:text-muted-foreground/35" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required data-testid="input-category-name" />
+              <CardContent className="p-6 sm:p-8 overflow-y-auto">
+                <form onSubmit={handleSubmit} className="space-y-5">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="cat-name" className="text-[10px] font-black tracking-[0.2em] uppercase text-primary/80 font-semibold">Category Name *</Label>
+                    <Input id="cat-name" placeholder="e.g. Pooja Essentials" className="bg-white border border-primary/15 hover:border-primary/25 rounded-xl py-3 px-4 text-sm focus:border-primary/40 focus:ring-1 focus:ring-primary/20 shadow-xs outline-none" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required data-testid="input-category-name" />
                   </div>
 
-                  <div className="space-y-2 md:col-span-2">
+                  <div className="space-y-1.5">
                     <Label htmlFor="cat-desc" className="text-[10px] font-black tracking-[0.2em] uppercase text-primary/80 font-semibold">Description</Label>
-                    <Input id="cat-desc" placeholder="Short description of this category" className="bg-white border border-primary/10 hover:border-primary/20 rounded-2xl py-6 px-5 text-sm tracking-wide focus:border-primary/30 focus:ring-1 focus:ring-primary/10 transition-all shadow-sm outline-none placeholder:text-muted-foreground/35" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} required data-testid="input-category-description" />
+                    <Input id="cat-desc" placeholder="Short description of this category" className="bg-white border border-primary/15 hover:border-primary/25 rounded-xl py-3 px-4 text-sm focus:border-primary/40 focus:ring-1 focus:ring-primary/20 shadow-xs outline-none" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} required data-testid="input-category-description" />
                   </div>
 
-                  <div className="space-y-2 md:col-span-2">
+                  <div className="space-y-2">
                     <Label className="text-[10px] font-black tracking-[0.2em] uppercase text-primary/80 font-semibold">Category Banner Image</Label>
-                    <div className="flex flex-col md:flex-row gap-6 items-start">
-                      <div className="flex-1 w-full space-y-4">
+                    <div className="flex flex-col sm:flex-row gap-4 items-start">
+                      <div className="flex-1 w-full space-y-3">
                         <div className="relative">
                           <input
                             type="file"
@@ -222,31 +238,29 @@ export default function DashboardCategories() {
                             type="button"
                             variant="secondary"
                             disabled={uploadingImg}
-                            className="w-full border-2 border-dashed border-primary/20 bg-gradient-to-br from-white/90 to-[#faf8f5]/90 hover:from-white hover:to-[#faf6ee] hover:border-primary/45 rounded-3xl py-10 flex flex-col h-auto justify-center items-center cursor-pointer transition-all duration-300 shadow-md shadow-primary/5 hover:shadow-lg hover:shadow-primary/5 group disabled:opacity-70 disabled:cursor-not-allowed"
+                            className="w-full border-2 border-dashed border-primary/25 bg-white hover:bg-[#faf7f2] hover:border-primary/50 rounded-2xl py-6 flex flex-col h-auto justify-center items-center cursor-pointer transition-all duration-200 shadow-xs group disabled:opacity-70 disabled:cursor-not-allowed"
                             onClick={() => document.getElementById("category-image-upload")?.click()}
                           >
-                            <div className="w-10 h-10 rounded-full bg-primary/5 group-hover:bg-primary/10 flex items-center justify-center mb-2 transition-colors duration-300">
+                            <div className="w-9 h-9 rounded-full bg-primary/5 group-hover:bg-primary/10 flex items-center justify-center mb-1.5 transition-colors">
                               {uploadingImg ? (
-                                <svg className="animate-spin text-primary" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" strokeOpacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round"/></svg>
+                                <svg className="animate-spin text-primary" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" strokeOpacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round"/></svg>
                               ) : (
-                                <Upload size={16} className="text-primary opacity-70 group-hover:scale-110 transition-transform duration-300" />
+                                <Upload size={16} className="text-primary opacity-75 group-hover:scale-110 transition-transform" />
                               )}
                             </div>
-                            <div className="flex flex-col items-center">
-                              <span className="text-[10px] font-black tracking-[0.2em] uppercase text-primary/80 group-hover:text-primary transition-colors duration-300">
-                                {uploadingImg ? "Uploading to CDN…" : "Select Banner Photo"}
-                              </span>
-                              <span className="text-[9px] font-serif italic text-muted-foreground/60 tracking-wider mt-0.5">supports png, jpg, webp</span>
-                            </div>
+                            <span className="text-[10px] font-black tracking-[0.18em] uppercase text-primary/80 group-hover:text-primary">
+                              {uploadingImg ? "Uploading to CDN…" : "Select Banner Photo"}
+                            </span>
+                            <span className="text-[9px] font-serif italic text-muted-foreground/60 tracking-wider">supports png, jpg, webp</span>
                           </Button>
                         </div>
                         
                         <div className="space-y-1">
-                          <span className="text-[9px] font-black tracking-[0.15em] uppercase text-muted-foreground/50 block">Or Paste Image URL</span>
+                          <span className="text-[9px] font-black tracking-[0.15em] uppercase text-muted-foreground/60 block">Or Paste Image URL</span>
                           <Input 
                             id="cat-image" 
                             placeholder="https://..." 
-                            className="bg-white border border-primary/10 hover:border-primary/20 rounded-2xl py-5 px-5 text-xs focus:border-primary/30 focus:ring-1 focus:ring-primary/10 transition-all shadow-sm outline-none placeholder:text-muted-foreground/35"
+                            className="bg-white border border-primary/15 hover:border-primary/25 rounded-xl py-2 px-3 text-xs focus:border-primary/40 focus:ring-1 focus:ring-primary/20 shadow-xs"
                             value={form.imageUrl} 
                             onChange={(e) => setForm({ ...form, imageUrl: e.target.value })} 
                             required={!form.imageUrl}
@@ -256,12 +270,13 @@ export default function DashboardCategories() {
                       </div>
                       
                       {form.imageUrl && (
-                        <div className="relative group w-32 h-32 rounded-3xl overflow-hidden border border-primary/10 shadow-lg shadow-primary/5 shrink-0 transition-transform duration-300 hover:scale-[1.02]">
-                          <img src={form.imageUrl} alt="Category Portrait" className="w-full h-full object-cover" />
+                        <div className="relative group w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden border border-primary/20 shadow-md shrink-0">
+                          <img src={form.imageUrl} alt="Category Banner" className="w-full h-full object-cover" />
                           <button 
                             type="button"
                             onClick={() => setForm({ ...form, imageUrl: "" })}
-                            className="absolute top-2 right-2 bg-red-500/90 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
+                            className="absolute top-1.5 right-1.5 bg-red-600 text-white p-1 rounded-full shadow-md hover:bg-red-700"
+                            title="Remove image"
                           >
                             <X size={12} />
                           </button>
@@ -270,24 +285,24 @@ export default function DashboardCategories() {
                     </div>
                   </div>
 
-                  <div className="md:col-span-2 flex gap-3 justify-end mt-2">
-                    <Button type="button" variant="outline" className="rounded-2xl px-6 py-5 h-auto text-xs font-black tracking-[0.2em] uppercase border-primary/15 hover:bg-primary/5 transition-all outline-none" onClick={() => setShowForm(false)}>Cancel</Button>
-                    <Button type="submit" disabled={createCategory.isPending || updateCategory.isPending} className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl px-6 py-5 h-auto text-xs font-black tracking-[0.2em] uppercase transition-all shadow-md shadow-primary/10 outline-none" data-testid="button-submit-category">
+                  <div className="flex gap-2.5 justify-end pt-3 border-t border-primary/10">
+                    <Button type="button" variant="outline" className="rounded-xl px-4 py-2.5 h-auto text-xs font-bold tracking-wider uppercase border-primary/20 hover:bg-primary/5" onClick={() => setShowForm(false)}>Cancel</Button>
+                    <Button type="submit" disabled={createCategory.isPending || updateCategory.isPending} className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl px-5 py-2.5 h-auto text-xs font-bold tracking-wider uppercase shadow-sm" data-testid="button-submit-category">
                       {createCategory.isPending || updateCategory.isPending ? "Saving..." : (<><Check size={14} /> {editCategory ? "Save Changes" : "Create Category"}</>)}
                     </Button>
                   </div>
                 </form>
               </CardContent>
-            </Card>
-          </motion.div>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
 
       {/* Categories grid */}
       {isLoading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="h-40 bg-muted rounded-xl animate-pulse" />
+            <div key={i} className="h-44 bg-muted rounded-2xl animate-pulse" />
           ))}
         </div>
       ) : (categories ?? []).length === 0 ? (
@@ -295,12 +310,12 @@ export default function DashboardCategories() {
           <Grid3X3 size={40} className="mx-auto mb-3 opacity-40" />
           <p className="font-serif text-lg mb-2">No categories yet</p>
           <p className="text-sm mb-4">Create your first category to organize products</p>
-          <Button onClick={openAdd} className="gap-2 bg-primary text-primary-foreground">
+          <Button onClick={openAdd} className="gap-2 bg-primary text-primary-foreground rounded-xl">
             <Plus size={14} /> Add Category
           </Button>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {(categories ?? []).map((cat, i) => (
             <motion.div
               key={cat.id}
@@ -310,40 +325,38 @@ export default function DashboardCategories() {
               data-testid={`card-category-${cat.id}`}
               className="relative group"
             >
-              <Card className="border-border hover:border-primary/40 hover:shadow-md transition-all overflow-hidden">
-                <div className="aspect-video bg-muted overflow-hidden">
-                  <img src={cat.imageUrl} alt={cat.name} className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
-                </div>
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-serif font-semibold text-foreground mb-1 truncate">{cat.name}</h3>
-                      <p className="text-xs text-muted-foreground line-clamp-2 mb-2">{cat.description}</p>
-                      <p className="text-xs font-medium text-primary">{cat.productCount} product{cat.productCount !== 1 ? "s" : ""}</p>
-                    </div>
-                    <div className="flex gap-1 shrink-0">
-                      <Button
-                        aria-label={`Edit ${cat.name}`}
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => openEdit(cat)}
-                        className="h-11 w-11 p-0 text-muted-foreground hover:text-foreground shrink-0"
-                        data-testid={`button-edit-category-${cat.id}`}
-                      >
-                        <Pencil size={14} />
-                      </Button>
-                      <Button
-                        aria-label={`Delete ${cat.name}`}
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => setDeleteId(cat.id)}
-                        className="h-11 w-11 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 shrink-0"
-                        data-testid={`button-delete-category-${cat.id}`}
-                      >
-                        <Trash2 size={14} />
-                      </Button>
-                    </div>
+              <Card className="border-border hover:border-primary/40 hover:shadow-md transition-all overflow-hidden rounded-2xl bg-white flex flex-col h-full">
+                <div className="aspect-video bg-muted overflow-hidden relative">
+                  <img src={cat.imageUrl} alt={cat.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                  <div className="absolute top-2 right-2 flex gap-1.5 bg-black/60 backdrop-blur-md p-1 rounded-xl">
+                    <Button
+                      aria-label={`Edit ${cat.name}`}
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => openEdit(cat)}
+                      className="h-8 w-8 p-0 text-white hover:text-white hover:bg-white/20 shrink-0 rounded-lg"
+                      data-testid={`button-edit-category-${cat.id}`}
+                    >
+                      <Pencil size={13} />
+                    </Button>
+                    <Button
+                      aria-label={`Delete ${cat.name}`}
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => setDeleteId(cat.id)}
+                      className="h-8 w-8 p-0 text-red-400 hover:text-red-300 hover:bg-red-500/20 shrink-0 rounded-lg"
+                      data-testid={`button-delete-category-${cat.id}`}
+                    >
+                      <Trash2 size={13} />
+                    </Button>
                   </div>
+                </div>
+                <CardContent className="p-4 flex-1 flex flex-col justify-between">
+                  <div className="min-w-0">
+                    <h3 className="font-serif font-semibold text-foreground text-base mb-1 truncate">{cat.name}</h3>
+                    <p className="text-xs text-muted-foreground line-clamp-2 mb-2 leading-relaxed">{cat.description}</p>
+                  </div>
+                  <p className="text-xs font-semibold text-primary">{cat.productCount} product{cat.productCount !== 1 ? "s" : ""}</p>
                 </CardContent>
               </Card>
             </motion.div>
