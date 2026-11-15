@@ -124,6 +124,12 @@ export default function Products() {
 
   const hasFilters = search || activeCategory || featuredOnly;
 
+  // Always show newest additions first at the very top of the collection
+  const sortedProducts = React.useMemo(() => {
+    const list = Array.isArray(products) ? products : [];
+    return [...list].sort((a: any, b: any) => (Number(b.id) || 0) - (Number(a.id) || 0));
+  }, [products]);
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -310,7 +316,7 @@ export default function Products() {
             }}
             className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-16"
           >
-            {(Array.isArray(products) ? products : []).map((product: any, i: number) => (
+            {sortedProducts.map((product: any, i: number) => (
               <ProductCard key={product.id} product={product} index={i} />
             ))}
           </motion.div>

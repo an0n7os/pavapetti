@@ -121,6 +121,11 @@ export default function DashboardProducts() {
     return matchesSearch && matchesCategory;
   });
 
+  // Always show newest added products first at the very top (sorted by ID descending)
+  const sortedProducts = [...filteredProducts].sort((a: any, b: any) => {
+    return (Number(b.id) || 0) - (Number(a.id) || 0);
+  });
+
   const invalidate = () => {
     try {
       localStorage.removeItem("cached-products");
@@ -838,7 +843,7 @@ export default function DashboardProducts() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-stone-100">
-                    {[...filteredProducts].reverse().map((product: any) => (
+                    {sortedProducts.map((product: any) => (
                       <tr
                         key={product.id}
                         className="hover:bg-stone-50/60 transition-colors group text-xs"
@@ -954,7 +959,7 @@ export default function DashboardProducts() {
 
               {/* Mobile Card View (< sm screens) */}
               <div className="sm:hidden divide-y divide-stone-100">
-                {[...filteredProducts].reverse().map((product: any) => (
+                {sortedProducts.map((product: any) => (
                   <div
                     key={product.id}
                     className="p-3 sm:p-4 flex items-center justify-between gap-2.5 hover:bg-stone-50/70 transition-colors"

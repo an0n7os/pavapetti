@@ -1130,7 +1130,7 @@ app.get('/api/dashboard/stats', async (req, res) => {
     totalCategories: categories.length,
     featuredProducts: products.filter(p => p.featured).length,
     lowStockProducts: products.filter(p => p.stock < 5).length,
-    recentProducts: products.slice(-5).reverse()
+    recentProducts: [...products].sort((a, b) => b.id - a.id).slice(0, 5)
   });
 });
 

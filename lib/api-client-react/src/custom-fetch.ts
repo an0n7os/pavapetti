@@ -1365,7 +1365,7 @@ async function executeDirectSupabaseFallback<T>(
             totalCategories: cats.length,
             featuredProducts: mappedProds.filter((p: any) => p.featured).length,
             lowStockProducts: mappedProds.filter((p: any) => p.stock < 5).length,
-            recentProducts: mappedProds.slice(-5).reverse()
+            recentProducts: [...mappedProds].sort((a: any, b: any) => (Number(b.id) || 0) - (Number(a.id) || 0)).slice(0, 5)
           } as unknown as T;
         } catch (err) {
           console.error("Direct Supabase load stats error:", err);
@@ -1374,7 +1374,7 @@ async function executeDirectSupabaseFallback<T>(
             totalCategories: FALLBACK_CATEGORIES.length,
             featuredProducts: FALLBACK_PRODUCTS.filter(p => p.featured).length,
             lowStockProducts: FALLBACK_PRODUCTS.filter(p => p.stock < 5).length,
-            recentProducts: FALLBACK_PRODUCTS.slice(-5).reverse()
+            recentProducts: [...FALLBACK_PRODUCTS].sort((a: any, b: any) => (Number(b.id) || 0) - (Number(a.id) || 0)).slice(0, 5)
           } as unknown as T;
         }
       } else {
@@ -1383,7 +1383,7 @@ async function executeDirectSupabaseFallback<T>(
           totalCategories: FALLBACK_CATEGORIES.length,
           featuredProducts: FALLBACK_PRODUCTS.filter(p => p.featured).length,
           lowStockProducts: FALLBACK_PRODUCTS.filter(p => p.stock < 5).length,
-          recentProducts: FALLBACK_PRODUCTS.slice(-5).reverse()
+          recentProducts: [...FALLBACK_PRODUCTS].sort((a: any, b: any) => (Number(b.id) || 0) - (Number(a.id) || 0)).slice(0, 5)
         } as unknown as T;
       }
     }
