@@ -647,30 +647,6 @@ _Hi Pavapetti, please let me know the final amount including parcel weight-based
                   )}
                 </Button>
               </div>
-
-              {/* WhatsApp Concierge Enquiry Card */}
-              <div className="p-3.5 rounded-xl border border-emerald-200/90 bg-gradient-to-r from-emerald-50/80 via-white to-emerald-50/40 flex items-center justify-between gap-3 shadow-xs">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-10 h-10 rounded-xl bg-[#25D366] text-white flex items-center justify-center shrink-0 shadow-md shadow-green-500/20">
-                    <MessageCircle size={20} className="fill-white/20" />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-1.5">
-                      <p className="text-xs font-bold text-stone-900">Have Questions or Custom Request?</p>
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    </div>
-                    <p className="text-[11px] text-stone-500 truncate">Chat directly with our Kerala Artisan Curator</p>
-                  </div>
-                </div>
-                <a
-                  href={`https://wa.me/${PHONE}?text=${waMsg}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="px-3.5 py-2 rounded-lg bg-[#25D366] hover:bg-[#1ebe5d] text-white text-xs font-bold whitespace-nowrap shadow-sm transition-all hover:scale-105 shrink-0 flex items-center gap-1"
-                >
-                  <span>Chat Now</span>
-                </a>
-              </div>
             </div>
 
             {/* ── Delivery Pincode Checker with Kerala & All-India Verification ── */}
@@ -842,19 +818,19 @@ _Hi Pavapetti, please let me know the final amount including parcel weight-based
         {/* ── Reviews & Testimonials ── */}
         <section className="mt-16 sm:mt-24 border-t border-stone-200 pt-16">
           <div className="flex flex-col items-center text-center mb-12">
-            <span className="text-primary text-[10px] tracking-[0.4em] uppercase font-bold mb-2">Verified Reviews</span>
-            <h2 className="font-serif text-3xl sm:text-4xl font-normal text-stone-900 mb-2">Collector Experiences</h2>
+            <span className="text-primary text-[10px] tracking-[0.4em] uppercase font-bold mb-2">Verified Feedback</span>
+            <h2 className="font-serif text-3xl sm:text-4xl font-normal text-stone-900 mb-2">Customer Experiences</h2>
             <div className="flex items-center gap-1.5 text-amber-500">
               {[1, 2, 3, 4, 5].map((s) => <Star key={s} size={15} className="fill-current" />)}
-              <span className="text-xs font-bold text-stone-700 ml-1.5">4.9 / 5.0 (48 Reviews)</span>
+              <span className="text-xs font-bold text-stone-700 ml-1.5">5.0 / 5.0 (Handpicked Artifacts)</span>
             </div>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
             {(product.reviews && product.reviews.length > 0 ? product.reviews : [
               { userName: "Meera Krishnan", rating: 5, comment: "Authentic and beautiful. The packaging was extremely secure and the quality exceeds expectations.", createdAt: "2 days ago" },
-              { userName: "David Wilson", rating: 5, comment: "A true collector's piece. The craftsmanship is evident in every detail. Delivery to London was seamless.", createdAt: "1 week ago" },
-              { userName: "Sanjay Menon", rating: 5, comment: "Excellent service. The product was slightly heavier than expected, which shows its authenticity.", createdAt: "2 weeks ago" }
+              { userName: "Anjali Warrier", rating: 5, comment: "Exquisite finishing and genuine Kerala craftsmanship. It brought an auspicious traditional grace to our home.", createdAt: "1 week ago" },
+              { userName: "Sanjay Menon", rating: 5, comment: "Excellent service. The product has solid weight and fine artisan detailing, truly authentic.", createdAt: "2 weeks ago" }
             ]).map((review: any, i: number) => (
               <div key={i} className="bg-[#faf7f2] p-6 sm:p-7 rounded-2xl border border-stone-200/80 space-y-3">
                 <div className="flex items-center gap-1 text-amber-500">

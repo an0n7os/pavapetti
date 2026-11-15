@@ -22,7 +22,7 @@ const MARQUEE_ITEMS = [
   "Keychains",
   "Lamps & Pooja Decor",
   "Jewellery & Spiritual Accessories",
-  "Leather Category",
+  "Shadow Puppetry Crafts",
   "Car Statues",
   "Money Boxes",
   "Key Holders",
@@ -67,11 +67,11 @@ const HERO_SLIDES = [
     sub: "Exquisite traditional figurines and masks, beautifully illuminated to bring divine energy to your space.",
   },
   {
-    src: "/hero-image-2.jpg",
-    label: "Shadow Puppetry",
-    tag: "Tholpavakoothu",
-    headline: ["Ancient", "Shadow", "Puppetry"],
-    sub: "Experience the magic of traditional Tholpavakoothu shadow puppetry, telling epic tales through light and leather.",
+    src: "/aranmula-mirror.webp",
+    label: "Aranmula Kannadi",
+    tag: "Sacred Metal Mirror",
+    headline: ["Sacred", "Aranmula", "Kannadi"],
+    sub: "GI-tagged authentic front-surface metal alloy mirror handcrafted by traditional master artisans of Aranmula.",
   },
 ];
 
@@ -205,11 +205,11 @@ export default function Home() {
       <Navbar />
 
       <section className="relative min-h-[50vh] md:min-h-[55vh] flex items-center overflow-hidden bg-[#0a0a0a]">
-        {/* Editorial Side Text — Integrated closer for better visual connection */}
-        <div className="absolute left-20 top-1/2 -translate-y-1/2 z-30 hidden lg:flex flex-col items-center gap-24">
-          <span className="text-[9px] font-black tracking-[1.2em] uppercase text-white/30 hover:text-white/80 transition-all duration-700 cursor-default rotate-180" style={{ writingMode: 'vertical-rl' }}>Editorial Edition</span>
-          <div className="w-[1px] h-32 bg-gradient-to-b from-transparent via-primary/30 to-transparent" />
-          <span className="text-[9px] font-black tracking-[1.2em] uppercase text-white/30 hover:text-white/80 transition-all duration-700 cursor-default rotate-180" style={{ writingMode: 'vertical-rl' }}>Vol. MMXXVI</span>
+        {/* Heritage Side Accent */}
+        <div className="absolute left-10 lg:left-14 top-1/2 -translate-y-1/2 z-30 hidden lg:flex flex-col items-center gap-16 pointer-events-none">
+          <span className="text-[9px] font-bold tracking-[0.8em] uppercase text-white/40 rotate-180" style={{ writingMode: 'vertical-rl' }}>Kerala Heritage</span>
+          <div className="w-[1px] h-24 bg-gradient-to-b from-transparent via-primary/40 to-transparent" />
+          <span className="text-[9px] font-bold tracking-[0.8em] uppercase text-white/40 rotate-180" style={{ writingMode: 'vertical-rl' }}>Handcrafted Parampara</span>
         </div>
 
         <AnimatePresence>
@@ -582,19 +582,27 @@ export default function Home() {
 
       <StorySection />
 
-      {/* ── As Seen In — Premium Trust Section ── */}
-      <section className="py-14 md:py-20">
+      {/* ── Craft Guilds & Heritage Traditions Trust Section ── */}
+      <section className="py-12 md:py-16 border-y border-border/10 bg-secondary/20">
         <div className="container mx-auto px-4">
-          <p className="text-center text-[10px] tracking-[0.4em] uppercase font-bold opacity-30 mb-10">As Seen In & Recognized By</p>
-          <div className="grid grid-cols-2 md:flex flex-wrap justify-center items-center gap-x-12 gap-y-8 lg:gap-24 opacity-40 grayscale contrast-150">
-            {["Architectural Digest", "Vogue Living", "Heritage India", "The Hindu", "Deccan Chronicle"].map((brand, idx) => (
+          <p className="text-center text-[10px] tracking-[0.4em] uppercase font-bold text-muted-foreground/70 mb-8">
+            Traditional Craftsmanship &amp; Sacred Art Traditions
+          </p>
+          <div className="grid grid-cols-2 md:flex flex-wrap justify-center items-center gap-x-10 gap-y-6 lg:gap-16 text-muted-foreground/80 font-serif text-sm md:text-base font-medium">
+            {[
+              "Aranmula Bell-Metal Guild",
+              "Valluvanad Puppetry Heritage",
+              "Kerala Mural Artistry",
+              "Traditional Bell-Metal Works",
+              "Classical Performing Lineage"
+            ].map((tradition, idx) => (
               <span 
-                key={brand} 
-                className={`font-serif text-base md:text-xl font-black tracking-tighter whitespace-nowrap text-center ${
-                  idx === 4 ? "col-span-2 text-center mt-2 md:mt-0 md:col-span-1" : ""
+                key={tradition} 
+                className={`whitespace-nowrap text-center ${
+                  idx === 4 ? "col-span-2 text-center md:col-span-1" : ""
                 }`}
               >
-                {brand}
+                ✦ {tradition}
               </span>
             ))}
           </div>
