@@ -274,46 +274,58 @@ export default function DashboardProducts() {
 
   return (
     <DashboardLayout title="Products Archive" subtitle="Manage your complete product catalog">
-      {/* ── Toolbar: Compact, responsive search & filter bar ── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
-        <div className="flex items-center gap-2">
-          <Badge variant="secondary" className="font-mono text-xs px-2.5 py-0.5 bg-stone-100 text-stone-700 border-stone-200">
-            {filteredProducts.length} {filteredProducts.length === 1 ? "Product" : "Products"}
-          </Badge>
-          {filteredProducts.length !== (products ?? []).length && (
-            <span className="text-[11px] text-muted-foreground">
-              (Filtered from {(products ?? []).length})
-            </span>
-          )}
+      {/* ── Toolbar: Header with Count + Prominent Add Product CTA ── */}
+      <div className="bg-[#faf7f2]/80 backdrop-blur-xs p-3.5 sm:p-4 rounded-2xl border border-primary/10 shadow-xs mb-5 space-y-3">
+        {/* Row 1: Products Count Badge + Add Product Button (Always side-by-side on all screens!) */}
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <Badge variant="secondary" className="font-mono text-xs px-2.5 py-1 bg-stone-100 text-stone-700 border-stone-200">
+              {filteredProducts.length} {filteredProducts.length === 1 ? "Product" : "Products"}
+            </Badge>
+            {filteredProducts.length !== (products ?? []).length && (
+              <span className="text-[11px] text-muted-foreground hidden xs:inline">
+                (of {(products ?? []).length})
+              </span>
+            )}
+          </div>
+
+          <Button
+            onClick={openAdd}
+            className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl px-4 h-10 text-xs font-bold shadow-sm shadow-primary/20 shrink-0"
+            data-testid="button-add-product"
+          >
+            <Plus size={16} /> <span>Add Product</span>
+          </Button>
         </div>
 
-        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+        {/* Row 2: Search Bar + Category Filter */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
           {/* Search Bar */}
-          <div className="relative flex-1 sm:w-64 min-w-[180px]">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground/50" size={14} />
+          <div className="relative w-full lg:col-span-2">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/50" size={15} />
             <Input
               type="text"
-              placeholder="Search products..."
+              placeholder="Search products by title, material..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-8 pr-7 bg-white border-stone-200 rounded-lg h-9 text-xs focus:border-primary/50 focus:ring-1 focus:ring-primary/20 placeholder:text-muted-foreground/40"
+              className="pl-9 pr-8 bg-white border-stone-200 rounded-xl h-10 text-xs focus:border-primary/50 focus:ring-1 focus:ring-primary/20 placeholder:text-muted-foreground/45 w-full shadow-xs"
               data-testid="input-search-products"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                title="Clear"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-1"
+                title="Clear search"
               >
-                <X size={12} />
+                <X size={13} />
               </button>
             )}
           </div>
 
           {/* Category Filter */}
           <Select value={selectedCategoryFilter} onValueChange={setSelectedCategoryFilter}>
-            <SelectTrigger className="w-[140px] sm:w-[160px] bg-white border-stone-200 rounded-lg h-9 text-xs shrink-0" data-testid="select-category-filter">
+            <SelectTrigger className="w-full bg-white border-stone-200 rounded-xl h-10 text-xs shadow-xs" data-testid="select-category-filter">
               <SelectValue placeholder="All Categories" />
             </SelectTrigger>
             <SelectContent>
@@ -325,14 +337,6 @@ export default function DashboardProducts() {
               ))}
             </SelectContent>
           </Select>
-
-          <Button
-            onClick={openAdd}
-            className="gap-1.5 bg-primary text-primary-foreground hover:bg-primary/95 rounded-lg px-3.5 h-9 text-xs font-semibold shadow-sm shrink-0"
-            data-testid="button-add-product"
-          >
-            <Plus size={15} /> Add Product
-          </Button>
         </div>
       </div>
 
@@ -940,20 +944,34 @@ export default function DashboardProducts() {
                 {[...filteredProducts].reverse().map((product: any) => (
                   <div
                     key={product.id}
-                    className="p-3 flex items-center justify-between gap-3 hover:bg-stone-50/70 transition-colors"
+                    className="p-3 sm:p-4 flex items-center justify-between gap-2.5 hover:bg-stone-50/70 transition-colors"
                   >
-                    <div className="flex items-center gap-3 min-w-0">
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
                       <img
                         src={product.imageUrl}
                         alt={product.name}
-                        className="w-12 h-12 rounded-lg object-cover border border-stone-200 shrink-0 bg-stone-50"
+                        className="w-14 h-14 rounded-xl object-cover border border-stone-200 shrink-0 bg-stone-50 shadow-xs"
                       />
-                      <div className="min-w-0">
-                        <p className="font-semibold text-xs text-stone-900 truncate">{product.name}</p>
-                        <p className="text-[11px] text-muted-foreground truncate">{product.categoryName}</p>
-                        <div className="flex items-center gap-2 mt-0.5">
+                      <div className="min-w-0 flex-1">
+                        <p className="font-semibold text-xs text-stone-900 truncate leading-snug">{product.name}</p>
+                        <div className="flex items-center gap-1.5 flex-wrap mt-0.5">
+                          <span className="text-[10px] text-muted-foreground truncate">{product.categoryName}</span>
+                          {product.featured && (
+                            <span className="text-[9px] bg-amber-50 text-amber-700 font-bold px-1.5 py-0.2 rounded border border-amber-200/60">
+                              ★ Featured
+                            </span>
+                          )}
+                          {!product.isVisible && (
+                            <span className="text-[9px] bg-stone-100 text-stone-500 font-semibold px-1.5 py-0.2 rounded">
+                              Hidden
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2 mt-1">
                           <span className="font-bold text-xs text-primary">₹{Number(product.price).toLocaleString("en-IN")}</span>
-                          <span className="text-[10px] text-stone-500 font-mono">Stock: {product.stock}</span>
+                          <span className={`text-[10px] font-mono font-medium ${product.stock <= 3 ? "text-red-600" : "text-stone-500"}`}>
+                            Stock: {product.stock}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -964,18 +982,20 @@ export default function DashboardProducts() {
                         variant="ghost"
                         onClick={() => openEdit(product)}
                         aria-label={`Edit ${product.name}`}
-                        className="h-11 w-11 p-0 rounded-lg text-stone-600 hover:bg-stone-100"
+                        className="h-10 w-10 p-0 rounded-xl text-stone-600 hover:bg-stone-100 active:scale-95 transition-all"
+                        data-testid={`button-mobile-edit-${product.id}`}
                       >
-                        <Pencil size={14} />
+                        <Pencil size={15} />
                       </Button>
                       <Button
                         size="sm"
                         variant="ghost"
                         onClick={() => setDeleteId(product.id)}
                         aria-label={`Delete ${product.name}`}
-                        className="h-11 w-11 p-0 rounded-lg text-red-500 hover:bg-red-50"
+                        className="h-10 w-10 p-0 rounded-xl text-red-500 hover:bg-red-50 active:scale-95 transition-all"
+                        data-testid={`button-mobile-delete-${product.id}`}
                       >
-                        <Trash2 size={14} />
+                        <Trash2 size={15} />
                       </Button>
                     </div>
                   </div>
@@ -985,6 +1005,18 @@ export default function DashboardProducts() {
           )}
         </CardContent>
       </Card>
+
+      {/* ── Mobile Floating Action Button (FAB) ── */}
+      <div className="sm:hidden fixed bottom-6 right-5 z-40">
+        <Button
+          onClick={openAdd}
+          aria-label="Add New Product"
+          className="h-13 w-13 rounded-full bg-primary text-primary-foreground shadow-2xl shadow-primary/40 flex items-center justify-center p-0 border-2 border-white hover:scale-105 active:scale-95 transition-all"
+          data-testid="button-fab-add-product"
+        >
+          <Plus size={22} />
+        </Button>
+      </div>
 
       {/* Delete confirmation dialog */}
       <AlertDialog open={deleteId !== null} onOpenChange={(open) => !open && setDeleteId(null)}>

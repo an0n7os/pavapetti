@@ -176,22 +176,23 @@ export default function DashboardArtForms() {
           </div>
 
           {/* Right Action Buttons */}
-          <div className="flex items-center gap-3 w-full md:w-auto justify-end">
+          <div className="flex items-center gap-2.5 w-full md:w-auto justify-between sm:justify-end">
             <button
               onClick={() => setIsResetConfirmOpen(true)}
-              className="px-3.5 py-2.5 rounded-xl border border-border hover:bg-[#f6f4ee] text-xs font-bold text-muted-foreground hover:text-foreground flex items-center gap-1.5 transition-all"
+              className="px-3 py-2 rounded-xl border border-border hover:bg-[#f6f4ee] text-xs font-semibold text-muted-foreground hover:text-foreground flex items-center gap-1.5 transition-all"
               title="Reset Art Forms to Default 9 Items"
             >
-              <RefreshCw size={14} />
-              Reset Defaults
+              <RefreshCw size={13} />
+              <span className="hidden xs:inline">Reset Defaults</span>
+              <span className="xs:hidden">Reset</span>
             </button>
 
             <button
               onClick={handleOpenAdd}
-              className="px-5 py-2.5 rounded-xl bg-primary text-white hover:bg-primary/90 text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-md shadow-primary/20 transition-all hover:scale-[1.02]"
+              className="px-4 py-2.5 rounded-xl bg-primary text-white hover:bg-primary/90 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-md shadow-primary/20 transition-all hover:scale-[1.02] shrink-0"
             >
-              <Plus size={16} />
-              Add New Art Form
+              <Plus size={15} />
+              <span>Add Art Form</span>
             </button>
           </div>
         </div>
@@ -515,6 +516,17 @@ export default function DashboardArtForms() {
           </div>
         )}
       </AnimatePresence>
+
+      {/* ── Mobile Floating Action Button (FAB) ── */}
+      <div className="sm:hidden fixed bottom-6 right-5 z-40">
+        <button
+          onClick={handleOpenAdd}
+          aria-label="Add New Art Form"
+          className="h-13 w-13 rounded-full bg-primary text-white shadow-2xl shadow-primary/40 flex items-center justify-center p-0 border-2 border-white hover:scale-105 active:scale-95 transition-all"
+        >
+          <Plus size={22} />
+        </button>
+      </div>
 
     </DashboardLayout>
   );

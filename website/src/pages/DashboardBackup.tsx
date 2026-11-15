@@ -227,7 +227,7 @@ export default function DashboardBackup() {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="bg-white p-8 rounded-[2rem] border border-primary/5 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between"
+            className="bg-white p-5 sm:p-8 rounded-2xl sm:rounded-[2rem] border border-primary/5 shadow-xs hover:shadow-md transition-all duration-300 flex flex-col justify-between"
           >
             <div>
               <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-6">
@@ -253,7 +253,7 @@ export default function DashboardBackup() {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-            className="bg-white p-8 rounded-[2rem] border border-primary/5 shadow-sm hover:shadow-md transition-all duration-300"
+            className="bg-white p-5 sm:p-8 rounded-2xl sm:rounded-[2rem] border border-primary/5 shadow-xs hover:shadow-md transition-all duration-300"
           >
             <div className="w-12 h-12 rounded-2xl bg-[#c18326]/10 flex items-center justify-center text-[#c18326] mb-6">
               <Upload size={22} />
@@ -336,7 +336,7 @@ export default function DashboardBackup() {
         </div>
 
         {/* Database Stats Information */}
-        <div className="bg-[#fbf9f6] border border-primary/5 rounded-[2rem] p-8 text-muted-foreground">
+        <div className="bg-[#fbf9f6] border border-primary/5 rounded-2xl sm:rounded-[2rem] p-5 sm:p-8 text-muted-foreground">
           <h4 className="font-serif text-lg text-foreground mb-4">🗄️ Backup Safeguard Tips</h4>
           <ul className="text-xs space-y-2.5 leading-relaxed list-disc pl-5">
             <li><strong>Double-check your Database Connection:</strong> Ensure your local configuration is pointing to the correct Supabase project before performing operations.</li>

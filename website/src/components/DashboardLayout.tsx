@@ -82,21 +82,21 @@ export default function DashboardLayout({ children, title, subtitle }: Dashboard
       </aside>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col min-h-screen">
+      <div className="flex-1 flex flex-col min-h-screen min-w-0 max-w-full overflow-x-hidden">
         {/* Top bar — Elegant Sandalwood Header */}
-        <header className="bg-gradient-to-r from-[#f9f7f4] to-white border-b border-primary/5 px-4 sm:px-8 py-3.5 sm:py-5 flex items-center justify-between shadow-xs">
+        <header className="bg-gradient-to-r from-[#f9f7f4] to-white border-b border-primary/5 px-3 sm:px-8 py-3 sm:py-5 flex items-center justify-between shadow-xs min-w-0">
           <div className="min-w-0 pr-2">
             <h1 className="font-serif text-lg sm:text-2xl font-light text-foreground truncate">{title}</h1>
             {subtitle && <p className="text-[10px] sm:text-xs text-muted-foreground/80 mt-0.5 sm:mt-1 uppercase tracking-wider font-semibold truncate">{subtitle}</p>}
           </div>
 
           {/* Quick Header Actions: View Store + Logout */}
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             <Link href="/">
               <div
                 title="View Gallery Store"
                 aria-label="View Gallery Store"
-                className="h-9 px-2.5 sm:px-3 rounded-xl flex items-center gap-1.5 text-xs font-semibold text-stone-700 bg-stone-100 hover:bg-stone-200 transition-colors border border-stone-200/60 cursor-pointer"
+                className="h-8 sm:h-9 px-2 sm:px-3 rounded-xl flex items-center gap-1.5 text-xs font-semibold text-stone-700 bg-stone-100 hover:bg-stone-200 transition-colors border border-stone-200/60 cursor-pointer"
               >
                 <Home size={14} className="text-primary shrink-0" />
                 <span className="hidden sm:inline">Store</span>
@@ -107,7 +107,7 @@ export default function DashboardLayout({ children, title, subtitle }: Dashboard
               onClick={handleLogout}
               title="Sign Out"
               aria-label="Sign out"
-              className="h-9 px-2.5 sm:px-3 rounded-xl flex items-center gap-1.5 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200/60 transition-colors cursor-pointer"
+              className="h-8 sm:h-9 px-2 sm:px-3 rounded-xl flex items-center gap-1.5 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200/60 transition-colors cursor-pointer"
             >
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
@@ -122,7 +122,7 @@ export default function DashboardLayout({ children, title, subtitle }: Dashboard
         {/* Mobile Horizontal Navigation Tabs (Full Visibility & Easy Swiping) */}
         <nav
           aria-label="Mobile dashboard navigation"
-          className="md:hidden flex items-center gap-1.5 px-3 py-2 bg-[#0e0c0a] border-b border-white/10 overflow-x-auto scrollbar-none sticky top-0 z-30 shadow-md"
+          className="md:hidden flex items-center gap-1.5 px-2.5 py-2 bg-[#0e0c0a] border-b border-white/10 overflow-x-auto scrollbar-none sticky top-0 z-30 shadow-md w-full max-w-full"
         >
           {navItems.map(({ href, label, icon: Icon }) => {
             const active = location === href || (href !== "/dashboard" && location.startsWith(href));
@@ -145,7 +145,7 @@ export default function DashboardLayout({ children, title, subtitle }: Dashboard
           })}
         </nav>
 
-        <main className="flex-1 p-3 sm:p-6 lg:p-8 bg-[#fdfcfb]">
+        <main className="flex-1 p-3 sm:p-6 lg:p-8 bg-[#fdfcfb] min-w-0 max-w-full overflow-x-hidden">
           {children}
         </main>
       </div>

@@ -364,6 +364,18 @@ export default function DashboardCategories() {
         </div>
       )}
 
+      {/* ── Mobile Floating Action Button (FAB) ── */}
+      <div className="sm:hidden fixed bottom-6 right-5 z-40">
+        <Button
+          onClick={openAdd}
+          aria-label="Add New Category"
+          className="h-13 w-13 rounded-full bg-primary text-primary-foreground shadow-2xl shadow-primary/40 flex items-center justify-center p-0 border-2 border-white hover:scale-105 active:scale-95 transition-all"
+          data-testid="button-fab-add-category"
+        >
+          <Plus size={22} />
+        </Button>
+      </div>
+
       {/* Delete confirmation */}
       <AlertDialog open={deleteId !== null} onOpenChange={(open) => {
         if (!open) {

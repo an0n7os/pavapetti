@@ -14,17 +14,17 @@ function StatCard({ title, value, icon: Icon }: { title: string; value: number; 
       animate={{ opacity: 1, y: 0 }} 
       transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
     >
-      <div className="bg-gradient-to-br from-[#f9f7f4] to-[#f4f0ea] p-8 rounded-[2rem] border border-primary/5 hover:border-primary/20 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-500 group relative overflow-hidden">
+      <div className="bg-gradient-to-br from-[#f9f7f4] to-[#f4f0ea] p-4 sm:p-8 rounded-2xl sm:rounded-[2rem] border border-primary/5 hover:border-primary/20 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group relative overflow-hidden">
         {/* Subtle bottom accent line in gold */}
-        <div className="absolute bottom-0 left-0 w-full h-1 bg-primary/10 group-hover:bg-primary transition-colors duration-500" />
+        <div className="absolute bottom-0 left-0 w-full h-1 bg-primary/10 group-hover:bg-primary transition-colors duration-300" />
         
-        <div className="flex items-center justify-between mb-5">
-          <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center shadow-sm group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 border border-primary/5">
-            <Icon size={18} className="text-primary" />
+        <div className="flex items-center justify-between mb-3 sm:mb-5">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-white flex items-center justify-center shadow-xs group-hover:scale-110 transition-transform duration-300 border border-primary/5">
+            <Icon size={16} className="text-primary" />
           </div>
         </div>
-        <p className="text-[9px] text-muted-foreground/80 font-black uppercase tracking-[0.25em] mb-2">{title}</p>
-        <p className="text-5xl font-serif font-light text-primary tracking-tight leading-none" data-testid={`stat-${title.toLowerCase().replace(/\s/g, "-")}`}>
+        <p className="text-[9px] text-muted-foreground/80 font-black uppercase tracking-[0.2em] mb-1 sm:mb-2 truncate">{title}</p>
+        <p className="text-3xl sm:text-5xl font-serif font-light text-primary tracking-tight leading-none" data-testid={`stat-${title.toLowerCase().replace(/\s/g, "-")}`}>
           {value}
         </p>
       </div>
@@ -42,10 +42,10 @@ export default function Dashboard() {
         <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Live Heritage Feed</span>
       </div>
       {/* Stats — Premium Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-8 sm:mb-12">
         {isLoading ? (
           Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-44 bg-[#f9f7f4] rounded-[1.5rem] animate-pulse" />
+            <div key={i} className="h-32 sm:h-44 bg-[#f9f7f4] rounded-2xl sm:rounded-[1.5rem] animate-pulse" />
           ))
         ) : (
           <>
@@ -57,12 +57,12 @@ export default function Dashboard() {
         )}
       </div>
 
-      <div className="grid lg:grid-cols-12 gap-8">
+      <div className="grid lg:grid-cols-12 gap-6 sm:gap-8">
         {/* Quick actions — Left Panel */}
         <div className="lg:col-span-4 space-y-6">
-          <div className="bg-white p-8 rounded-[2rem] border border-primary/5 shadow-sm hover:shadow-md transition-all duration-500">
-            <h4 className="font-serif text-xl mb-6">Quick Management</h4>
-            <div className="space-y-4">
+          <div className="bg-white p-5 sm:p-8 rounded-2xl sm:rounded-[2rem] border border-primary/5 shadow-xs hover:shadow-md transition-all duration-300">
+            <h4 className="font-serif text-lg sm:text-xl mb-4 sm:mb-6">Quick Management</h4>
+            <div className="space-y-3 sm:space-y-4">
               <Link href="/dashboard/products" className="group block">
                 <div className="w-full flex items-center justify-between p-4 rounded-2xl border border-primary/5 bg-[#fdfcfb] hover:bg-primary/5 hover:border-primary/20 hover:shadow-md transition-all duration-300 cursor-pointer">
                   <div className="flex items-center gap-4">
@@ -104,11 +104,11 @@ export default function Dashboard() {
 
         {/* Recent Products — Right Panel */}
         <div className="lg:col-span-8">
-          <div className="bg-white p-8 rounded-[2rem] border border-primary/5 shadow-sm hover:shadow-md transition-all duration-500">
-            <div className="flex items-center justify-between mb-8">
-              <h4 className="font-serif text-xl">Recent Additions</h4>
+          <div className="bg-white p-5 sm:p-8 rounded-2xl sm:rounded-[2rem] border border-primary/5 shadow-xs hover:shadow-md transition-all duration-300">
+            <div className="flex items-center justify-between mb-6 sm:mb-8">
+              <h4 className="font-serif text-lg sm:text-xl">Recent Additions</h4>
               <Link href="/dashboard/products">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-primary hover:underline cursor-pointer">View Entire Collection</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-primary hover:underline cursor-pointer">View Collection</span>
               </Link>
             </div>
             
