@@ -369,10 +369,10 @@ export default function DashboardCategories() {
         <Button
           onClick={openAdd}
           aria-label="Add New Category"
-          className="h-13 w-13 rounded-full bg-primary text-primary-foreground shadow-2xl shadow-primary/40 flex items-center justify-center p-0 border-2 border-white hover:scale-105 active:scale-95 transition-all"
+          className="w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-2xl shadow-primary/50 flex items-center justify-center p-0 border-2 border-white hover:scale-105 active:scale-95 transition-all shrink-0"
           data-testid="button-fab-add-category"
         >
-          <Plus size={22} />
+          <Plus size={26} />
         </Button>
       </div>
 
