@@ -3,8 +3,7 @@ import { Link } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   ArrowRight, Sparkles, Star, Quote, 
-  ShieldCheck, Globe, Heart, MessageCircle,
-  ChevronLeft, ChevronRight
+  ShieldCheck, Globe, Heart, MessageCircle 
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -37,42 +36,42 @@ const HERO_SLIDES = [
     label: "Kathakali Vesham",
     tag: "Traditional Performing Art",
     headline: ["Authentic", "Kathakali", "Handicrafts"],
-    sub: "Handcrafted Kathakali wooden masks, murals, and vibrant stage collectibles created by master Kerala artisans.",
+    sub: "Handcrafted Kathakali masks, wall decor, and collectibles crafted by master Kerala artisans.",
   },
   {
     src: "/art-forms/tholpavakoothu.png",
     label: "Tholpavakoothu",
-    tag: "Ancient Shadow Puppetry",
-    headline: ["Ancient", "Tholpavakoothu", "Puppets"],
-    sub: "Sacred temple shadow puppets handcrafted from treated leather by master Kerala puppeteers.",
+    tag: "Traditional Shadow Puppetry",
+    headline: ["Authentic", "Tholpavakoothu", "Puppetry"],
+    sub: "Traditional leather shadow puppetry art forms and handcrafted puppets from master Kerala puppeteers.",
   },
   {
     src: "/hero-mural-v2.webp",
     label: "Kerala Mural Art",
     tag: "Traditional Wall Art",
     headline: ["Handmade", "Kerala Mural", "Paintings"],
-    sub: "Handpainted traditional Kerala murals made with rich natural mineral colors for home and sacred spaces.",
+    sub: "Handpainted traditional Kerala murals made with rich natural colors for home and sacred spaces.",
   },
   {
     src: "/hero-brass-v2.webp",
     label: "Brass Lamps & Pooja Decor",
-    tag: "Bell-Metal & Brassware",
-    headline: ["Hand-Cast", "Nilavilakku &", "Pooja Decor"],
-    sub: "Traditional bell-metal brass lamps, Nilavilakku, and sacred pooja essentials for daily rituals.",
+    tag: "Brassware Collection",
+    headline: ["Hand-Cast", "Nilavilakku &", "Pooja Items"],
+    sub: "Traditional brass lamps, Nilavilakku, and pooja decor items for home ceremonies and gifting.",
   },
   {
     src: "/hero-image-1.jpg",
     label: "Heritage Figurines",
-    tag: "Sacred Temple Crafts",
+    tag: "Sacred Art & Craft",
     headline: ["Divine", "Illuminated", "Heritage"],
-    sub: "Exquisite traditional wooden figurines and icons, crafted to bring divine energy to your living space.",
+    sub: "Exquisite traditional figurines and masks, beautifully illuminated to bring divine energy to your space.",
   },
   {
-    src: "/aranmula-mirror.webp",
-    label: "Aranmula Kannadi",
-    tag: "Sacred Metal Mirror",
-    headline: ["Sacred", "Aranmula", "Kannadi"],
-    sub: "GI-tagged front-surface metal alloy mirror handcrafted by traditional master artisans of Aranmula.",
+    src: "/hero-image-2.jpg",
+    label: "Shadow Puppetry",
+    tag: "Tholpavakoothu",
+    headline: ["Ancient", "Shadow", "Puppetry"],
+    sub: "Experience the magic of traditional Tholpavakoothu shadow puppetry, telling epic tales through light and leather.",
   },
 ];
 
@@ -205,191 +204,153 @@ export default function Home() {
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      <section className="relative min-h-[72vh] sm:min-h-[75vh] md:min-h-[82vh] flex items-center overflow-hidden bg-[#070706]">
-        {/* Heritage Side Accent - Desktop */}
-        <div className="absolute left-8 lg:left-12 top-1/2 -translate-y-1/2 z-30 hidden lg:flex flex-col items-center gap-14 pointer-events-none">
-          <span className="text-[9px] font-bold tracking-[0.8em] uppercase text-amber-200/40 rotate-180" style={{ writingMode: 'vertical-rl' }}>Kerala Heritage</span>
-          <div className="w-[1px] h-20 bg-gradient-to-b from-transparent via-amber-500/40 to-transparent" />
-          <span className="text-[9px] font-bold tracking-[0.8em] uppercase text-amber-200/40 rotate-180" style={{ writingMode: 'vertical-rl' }}>Handcrafted Parampara</span>
+      <section className="relative min-h-[50vh] md:min-h-[55vh] flex items-center overflow-hidden bg-[#0a0a0a]">
+        {/* Editorial Side Text — Integrated closer for better visual connection */}
+        <div className="absolute left-20 top-1/2 -translate-y-1/2 z-30 hidden lg:flex flex-col items-center gap-24">
+          <span className="text-[9px] font-black tracking-[1.2em] uppercase text-white/30 hover:text-white/80 transition-all duration-700 cursor-default rotate-180" style={{ writingMode: 'vertical-rl' }}>Editorial Edition</span>
+          <div className="w-[1px] h-32 bg-gradient-to-b from-transparent via-primary/30 to-transparent" />
+          <span className="text-[9px] font-black tracking-[1.2em] uppercase text-white/30 hover:text-white/80 transition-all duration-700 cursor-default rotate-180" style={{ writingMode: 'vertical-rl' }}>Vol. MMXXVI</span>
         </div>
 
         <AnimatePresence>
           <motion.div
             key={heroIdx}
-            initial={{ opacity: 0, scale: 1.03 }}
+            initial={{ opacity: 0, scale: 1.02 }}
             animate={{ 
               opacity: 1, 
-              scale: 1.08,
+              scale: 1.10,
             }}
-            exit={{ opacity: 0, scale: 1.12 }}
+            exit={{ opacity: 0, scale: 1.15 }}
             transition={{ 
-              opacity: { duration: 1.4 },
+              opacity: { duration: 1.8 },
               scale: { duration: 7.5, ease: "linear" },
             }}
             className="absolute inset-0 z-0"
           >
-            {/* Multi-layered cinematic protective vignette for supreme text legibility across all screens */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/75 to-black/85 md:bg-gradient-to-r md:from-black/95 md:via-black/70 md:to-black/35 z-10" />
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(217,119,6,0.12)_0%,rgba(0,0,0,0.85)_100%)] z-10 pointer-events-none" />
+            {/* Enhanced Side Gradient for text protection */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/60 md:bg-gradient-to-r md:from-black md:via-black/50 md:to-transparent z-10" />
             
             <div className="absolute inset-0">
               <img
                 src={slide.src}
                 alt={slide.label}
-                className="w-full h-full object-cover object-center scale-105"
-                style={{ filter: 'brightness(0.72) contrast(1.05)' }}
+                className="w-full h-full object-cover object-[75%_center] scale-110"
+                style={{ filter: 'brightness(0.85)' }}
               />
             </div>
           </motion.div>
         </AnimatePresence>
+
+        <div className="absolute inset-0 z-10 bg-black/10" />
         
-        <div className="relative z-20 max-w-7xl mx-auto px-5 sm:px-10 lg:px-16 pt-16 pb-16 md:pt-24 md:pb-20 w-full flex flex-col lg:items-start items-center text-center lg:text-left">
-          <div className="max-w-2xl sm:max-w-3xl w-full">
-            {/* Luminous Tag Badge */}
+        <div className="relative z-20 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pt-20 pb-12 md:pt-24 md:pb-20 w-full flex flex-col lg:items-start items-center text-center lg:text-left">
+          <div className="max-w-3xl w-full">
             <AnimatePresence mode="wait">
               <motion.div
                 key={`tag-${heroIdx}`}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.6 }}
-                className="flex items-center lg:justify-start justify-center mb-4 sm:mb-6"
+                transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+                className="flex items-center lg:justify-start justify-center gap-6 mb-6"
               >
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/15 border border-amber-400/35 backdrop-blur-md text-amber-300 text-[10px] sm:text-xs font-bold tracking-[0.2em] uppercase shadow-md shadow-amber-950/40">
-                  <Sparkles size={12} className="text-amber-400 animate-pulse shrink-0" />
-                  <span>{slide.tag}</span>
-                </div>
+                <span className="text-[10px] font-black tracking-[1em] uppercase text-primary/80">{slide.tag}</span>
               </motion.div>
             </AnimatePresence>
 
-            {/* Radiant High-Contrast Headline */}
             <AnimatePresence mode="wait">
               <motion.div key={`hero-h1-${heroIdx}`}>
                 <motion.h1
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                  className="font-serif font-light leading-[1.08] tracking-tight text-[#fefdfa] mb-4 sm:mb-6 text-3xl sm:text-5xl md:text-6xl lg:text-7xl drop-shadow-[0_4px_24px_rgba(0,0,0,0.85)]"
+                  initial={{ opacity: 0, y: 40, skewY: 2 }}
+                  animate={{ opacity: 1, y: 0, skewY: 0 }}
+                  exit={{ opacity: 0, y: -30, skewY: -1 }}
+                  transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+                  className="font-serif font-light leading-[1] mb-6 md:mb-8 tracking-tighter"
+                  style={{ 
+                    fontSize: 'clamp(2rem, 8vw, 5.5rem)', 
+                    color: '#FFF8E7', 
+                    textShadow: '0 20px 80px rgba(0,0,0,0.5)' 
+                  }}
                 >
-                  {slide.headline[0]}{" "}
-                  <span className="font-normal italic text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-300 to-amber-400 drop-shadow-[0_2px_14px_rgba(245,158,11,0.5)] block sm:inline my-1 sm:my-0">
-                    {slide.headline[1]}
-                  </span>{" "}
-                  <br className="hidden sm:inline" />
+                  {slide.headline[0]}<br />
+                  <span className="italic text-primary block my-2 md:my-3">{slide.headline[1]}</span>
                   {slide.headline[2]}
                 </motion.h1>
               </motion.div>
             </AnimatePresence>
 
-            {/* Clear Subtitle */}
             <AnimatePresence mode="wait">
-              <motion.p
-                key={`sub-${heroIdx}`}
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.6, delay: 0.15 }}
-                className="text-xs sm:text-base md:text-lg leading-relaxed mb-6 sm:mb-9 max-w-xl mx-auto lg:mx-0 font-light text-white/90 px-1 sm:px-0"
-              >
-                {slide.sub}
-              </motion.p>
+                <motion.p
+                  key={`sub-${heroIdx}`}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.8, delay: 0.2 }}
+                  className="text-sm md:text-lg leading-relaxed mb-8 md:mb-10 max-w-xl mx-auto lg:mx-0 font-light text-white/70"
+                >
+                  {slide.sub}
+                </motion.p>
             </AnimatePresence>
 
-            {/* High-Converting CTA Strip */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-              className="flex flex-wrap lg:justify-start justify-center gap-3.5 sm:gap-4 items-center"
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="flex flex-wrap lg:justify-start justify-center gap-6 items-center"
             >
               <Link href="/products">
-                <button className="group relative overflow-hidden px-7 sm:px-9 h-12 sm:h-14 rounded-full bg-gradient-to-r from-amber-600 via-amber-700 to-amber-800 hover:from-amber-500 hover:to-amber-700 text-white font-bold text-xs sm:text-sm tracking-[0.2em] uppercase transition-all duration-300 shadow-xl shadow-amber-950/50 hover:shadow-amber-500/30 hover:scale-[1.02] active:scale-[0.98] border border-amber-300/35 flex items-center gap-3">
-                  <span>Explore Collection</span>
-                  <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-white/20 flex items-center justify-center group-hover:translate-x-1 transition-transform">
-                    <ArrowRight size={14} className="text-white" />
-                  </div>
-                </button>
-              </Link>
-              <Link href="/art-forms">
-                <button className="px-5 sm:px-6 h-12 sm:h-14 rounded-full bg-white/10 hover:bg-white/15 text-white/90 hover:text-white border border-white/20 text-xs font-bold tracking-[0.15em] uppercase transition-all backdrop-blur-md active:scale-[0.98]">
-                  Book Performing Arts
+                <button className="group relative overflow-hidden px-10 h-14 bg-primary text-primary-foreground font-black text-[12px] tracking-[0.3em] uppercase transition-all duration-700 hover:shadow-[0_20px_50px_rgba(128,64,18,0.4)]">
+                  <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
+                  <span className="relative flex items-center gap-4">
+                    The Collection
+                    <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform duration-500" />
+                  </span>
                 </button>
               </Link>
             </motion.div>
-
-            {/* Mobile Touch Slider Navigation Controls */}
-            <div className="flex lg:hidden items-center justify-center gap-3 mt-7 pt-2">
-              <button
-                onClick={() => handleSlideSelect((heroIdx - 1 + HERO_SLIDES.length) % HERO_SLIDES.length)}
-                aria-label="Previous slide"
-                className="w-8 h-8 rounded-full bg-black/60 backdrop-blur-md border border-white/25 text-white/90 active:scale-90 flex items-center justify-center"
-              >
-                <ChevronLeft size={16} />
-              </button>
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/20">
-                {HERO_SLIDES.map((_, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => handleSlideSelect(idx)}
-                    className={`transition-all duration-300 rounded-full ${
-                      heroIdx === idx ? "w-5 h-1.5 bg-amber-400" : "w-1.5 h-1.5 bg-white/35"
-                    }`}
-                    aria-label={`Go to slide ${idx + 1}`}
-                  />
-                ))}
-              </div>
-              <button
-                onClick={() => handleSlideSelect((heroIdx + 1) % HERO_SLIDES.length)}
-                aria-label="Next slide"
-                className="w-8 h-8 rounded-full bg-black/60 backdrop-blur-md border border-white/25 text-white/90 active:scale-90 flex items-center justify-center"
-              >
-                <ChevronRight size={16} />
-              </button>
-            </div>
           </div>
+
         </div>
 
-        {/* Custom Hero Slider Indicators with Golden Timelines - Desktop */}
-        <div className="absolute right-6 md:right-16 lg:right-24 bottom-10 z-30 hidden lg:flex items-center gap-6 text-white/60">
-          <button
-            onClick={() => handleSlideSelect((heroIdx - 1 + HERO_SLIDES.length) % HERO_SLIDES.length)}
-            aria-label="Previous slide"
-            className="w-9 h-9 rounded-full bg-white/5 hover:bg-white/15 border border-white/15 text-white/80 hover:text-white flex items-center justify-center transition-all hover:scale-105 active:scale-95"
-          >
-            <ChevronLeft size={17} />
-          </button>
-          <div className="flex items-center gap-6">
-            {HERO_SLIDES.map((s, idx) => (
-              <button
-                key={idx}
-                onClick={() => handleSlideSelect(idx)}
-                className="flex flex-col items-start gap-1 group/control outline-none"
-              >
-                <span className={`text-[10px] font-black tracking-widest transition-colors duration-500 ${heroIdx === idx ? "text-amber-400 font-bold" : "group-hover/control:text-white/80"}`}>
-                  {`0${idx + 1}`}
-                </span>
-                <div className="w-12 h-[2px] bg-white/15 relative overflow-hidden rounded-full">
-                  {heroIdx === idx && (
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: "100%" }}
-                      key={idx}
-                      transition={{ duration: 6.5, ease: "linear" }}
-                      className="absolute inset-y-0 left-0 bg-amber-400"
-                    />
-                  )}
-                </div>
-              </button>
-            ))}
+        {/* Custom Hero Slider Indicators with Golden Timelines */}
+        <div className="absolute right-6 md:right-32 bottom-10 z-30 hidden md:flex items-center gap-8 text-white/50">
+          {HERO_SLIDES.map((s, idx) => (
+            <button
+              key={idx}
+              onClick={() => handleSlideSelect(idx)}
+              className="flex flex-col items-start gap-1 group/control outline-none"
+            >
+              <span className={`text-[10px] font-black tracking-widest transition-colors duration-500 ${heroIdx === idx ? "text-primary font-bold" : "group-hover/control:text-white/80"}`}>
+                {`0${idx + 1}`}
+              </span>
+              <div className="w-16 h-[2px] bg-white/10 relative overflow-hidden rounded-full">
+                {heroIdx === idx && (
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: "100%" }}
+                    key={idx}
+                    transition={{ duration: 6.5, ease: "linear" }}
+                    className="absolute inset-y-0 left-0 bg-primary"
+                  />
+                )}
+              </div>
+            </button>
+          ))}
+        </div>
+
+        {/* Mobile Page Indicator Pill */}
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 md:hidden bg-black/60 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/10 flex items-center gap-2.5">
+          <span className="text-[9px] font-black tracking-widest text-primary">{`0${heroIdx + 1}`}</span>
+          <div className="w-8 h-[1px] bg-white/20 relative overflow-hidden rounded-full">
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: "100%" }}
+              key={heroIdx}
+              transition={{ duration: 6.5, ease: "linear" }}
+              className="absolute inset-y-0 left-0 bg-primary"
+            />
           </div>
-          <button
-            onClick={() => handleSlideSelect((heroIdx + 1) % HERO_SLIDES.length)}
-            aria-label="Next slide"
-            className="w-9 h-9 rounded-full bg-white/5 hover:bg-white/15 border border-white/15 text-white/80 hover:text-white flex items-center justify-center transition-all hover:scale-105 active:scale-95"
-          >
-            <ChevronRight size={17} />
-          </button>
+          <span className="text-[9px] font-black tracking-widest text-white/40">{`0${HERO_SLIDES.length}`}</span>
         </div>
       </section>
 
