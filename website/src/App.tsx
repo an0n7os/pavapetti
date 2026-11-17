@@ -27,8 +27,68 @@ import Privacy from "@/pages/Privacy";
 import ShippingReturns from "@/pages/ShippingReturns";
 import FAQ from "@/pages/FAQ";
 import Contact from "@/pages/Contact";
-import { useState, useEffect } from "react";
+import React, { Component, ErrorInfo, useState, useEffect } from "react";
 import PavapettiLogo from "./components/PavapettiLogo";
+
+interface ErrorBoundaryProps {
+  children: React.ReactNode;
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+  error: Error | null;
+}
+
+class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error("Uncaught application error:", error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen bg-[#faf7f2] flex flex-col items-center justify-center p-6 text-center">
+          <div className="max-w-md w-full bg-white rounded-3xl p-8 border border-stone-200 shadow-xl space-y-5">
+            <div className="w-16 h-16 rounded-2xl bg-amber-500/10 text-primary flex items-center justify-center mx-auto text-2xl font-bold">
+              ✦
+            </div>
+            <h2 className="font-serif text-2xl text-stone-900">Something went wrong</h2>
+            <p className="text-xs text-stone-600 leading-relaxed">
+              We encountered an unexpected issue while loading this page. Please try refreshing or return to the main gallery.
+            </p>
+            <div className="flex gap-3 pt-2 justify-center">
+              <button
+                onClick={() => {
+                  this.setState({ hasError: false, error: null });
+                  window.location.reload();
+                }}
+                className="px-5 py-2.5 rounded-xl bg-primary text-white text-xs font-bold uppercase tracking-wider hover:bg-primary/90 transition-all shadow-md cursor-pointer"
+              >
+                Reload Page
+              </button>
+              <a
+                href="/"
+                className="px-5 py-2.5 rounded-xl border border-stone-200 text-stone-700 hover:bg-stone-50 text-xs font-bold uppercase tracking-wider transition-all"
+              >
+                Go to Home
+              </a>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -543,7 +603,9 @@ function App() {
                 <div className="noise-overlay" />
                 
                 <WouterRouter>
-                  <Router />
+                  <ErrorBoundary>
+                    <Router />
+                  </ErrorBoundary>
                   <CartDrawer />
                   <FloatingWhatsApp />
                   <MobileNav />

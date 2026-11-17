@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Search, SlidersHorizontal, X, Star } from "lucide-react";
 import { useLocation } from "wouter";
@@ -125,7 +125,7 @@ export default function Products() {
   const hasFilters = search || activeCategory || featuredOnly;
 
   // Always show newest additions first at the very top of the collection
-  const sortedProducts = React.useMemo(() => {
+  const sortedProducts = useMemo(() => {
     const list = Array.isArray(products) ? products : [];
     return [...list].sort((a: any, b: any) => (Number(b.id) || 0) - (Number(a.id) || 0));
   }, [products]);

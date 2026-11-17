@@ -162,17 +162,17 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
               </Link>
               
               <div className="flex flex-row md:flex-col items-baseline md:items-end gap-1.5 md:gap-1 mt-1 md:mt-0 shrink-0">
-                {product.mrp && product.mrp > product.price && (
+                {product.mrp && Number(product.mrp) > Number(product.price ?? 0) && (
                   <span className="text-[11px] md:text-[14px] font-light text-foreground/20 line-through tracking-tighter">
-                    ₹{product.mrp.toLocaleString("en-IN")}
+                    ₹{Number(product.mrp).toLocaleString("en-IN")}
                   </span>
                 )}
                 <p className="text-[14px] md:text-[18px] font-bold text-primary tracking-tight">
-                  ₹{product.price.toLocaleString("en-IN")}
+                  ₹{Number(product.price ?? 0).toLocaleString("en-IN")}
                 </p>
-                {product.mrp && product.mrp > product.price && (
+                {product.mrp && Number(product.mrp) > Number(product.price ?? 0) && (
                   <span className="text-[8px] font-black tracking-[0.1em] uppercase px-2 py-0.5 rounded-full bg-emerald-500 text-white">
-                    {Math.round(((product.mrp - product.price) / product.mrp) * 100)}% OFF
+                    {Math.round(((Number(product.mrp) - Number(product.price ?? 0)) / Number(product.mrp)) * 100)}% OFF
                   </span>
                 )}
               </div>

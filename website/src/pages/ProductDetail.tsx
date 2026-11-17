@@ -352,15 +352,18 @@ _Hi Pavapetti, please let me know the final amount including parcel weight-based
     );
   }
 
+  const numPrice = Number(product.price ?? 0);
+  const numMrp = product.mrp ? Number(product.mrp) : undefined;
+
   const waMsg = encodeURIComponent(
-    `Hi! I'm interested in *${product.name}* (Price: ₹${product.price.toLocaleString("en-IN")}, Product ID: #${product.id}). Could you please share more details and delivery availability?`
+    `Hi! I'm interested in *${product.name}* (Price: ₹${numPrice.toLocaleString("en-IN")}, Product ID: #${product.id}). Could you please share more details and delivery availability?`
   );
 
-  const discountPercent = product.mrp && product.mrp > product.price
-    ? Math.round(((product.mrp - product.price) / product.mrp) * 100)
+  const discountPercent = numMrp && numMrp > numPrice
+    ? Math.round(((numMrp - numPrice) / numMrp) * 100)
     : 0;
-  const savingsAmount = product.mrp && product.mrp > product.price
-    ? product.mrp - product.price
+  const savingsAmount = numMrp && numMrp > numPrice
+    ? numMrp - numPrice
     : 0;
 
   return (
